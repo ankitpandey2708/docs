@@ -1,0 +1,4867 @@
+openapi: 3.0.0
+info:
+  title: fnrkuat | Finarkein API endpoints
+  version: 1.0.0
+  description: ''
+servers:
+  - url: '{{FACTORY_API}}'
+  - url: '{{FLUX_API}}'
+  - url: <AA decider webhook url>
+components:
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: X-API-KEY
+security:
+  - ApiKeyAuth: []
+paths:
+  /{workspace}/consent/aa:
+    post:
+      summary: Factory / Consent - AA
+      tags:
+        - Workflows
+        - Consent
+        - Account Aggregator
+      responses:
+        '200':
+          description: Sample complete body
+          headers:
+            Date:
+              schema:
+                type: string
+            Content-Length:
+              schema:
+                type: integer
+            Connection:
+              schema:
+                type: string
+            Vary:
+              schema:
+                type: string
+            Cache-Control:
+              schema:
+                type: string
+            Pragma:
+              schema:
+                type: string
+            Expires:
+              schema:
+                type: integer
+            X-Content-Type-Options:
+              schema:
+                type: string
+            Strict-Transport-Security:
+              schema:
+                type: string
+            X-Frame-Options:
+              schema:
+                type: string
+            X-XSS-Protection:
+              schema:
+                type: integer
+            Content-Security-Policy:
+              schema:
+                type: string
+            Referrer-Policy:
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  consentHandle:
+                    type: string
+                  redirectUrl:
+                    type: string
+                    format: uri
+                  webviewBaseUrl:
+                    type: string
+                    format: uri
+                  parameters:
+                    type: object
+                    properties:
+                      fi:
+                        type: string
+                      ecreq:
+                        type: string
+                      reqdate:
+                        type: string
+                        format: utc-millisec
+      description: >-
+        This API is intended to request the user consent. On approval of the
+        consent FIU will be able to fetch the financial information(FI) from the
+        financial information providers(FIP) like Bank, Insurance Providers,
+        etc.
+
+
+        # Inputs
+
+
+        | Field | **Type** | Description |
+
+        | --- | --- | --- |
+
+        | `customerAAId` | String | In case of new user, `@` is expected, else
+        AA user handle is required |
+
+        | `customerMobileNumber` | String | Customer's mobile to be registered
+        with Account Aggregator or to login with if already signed up |
+
+        | `consentTemplateId` | String | Identifier of predefined consent
+        template to use while generating consent request for the customer. |
+
+        | `consentTemplate.def` | Object | Field allowing to provide the consent
+        template and `consentTemplateId` overrides dynamically in every
+        request.  <br>  <br>See [New consent template
+        definition](#12016555-7c6bf463-d1d2-41c3-be95-49faebeddfe7) request
+        below for allowed input schema reference. |
+
+        | `redirectUrl` | String  <br>(Format: URL) | The URL used by Account
+        Aggregator to redirect the user upon completing the consent journey |
+
+        | `webhook` | Object | Webhook is an HTTP request used to provide push
+        notifications. Finarkein sends  <br>webhooks to programmatically inform
+        you about changes to the status of asynchronous  <br>processes. Consent
+        endpoints currently supports one webhook:  <br>Consent Status (key:
+        **consentStatus**) |
+
+        | `accountFilters` | Array |  |
+
+
+        ## Output:
+
+
+        | Field | Description |
+
+        | --- | --- |
+
+        | `consentHandle` | Unique identifier that refers to the consent request
+        |
+
+        | `redirectUrl` | The URL on which the end user can complete the consent
+        journey |
+
+
+        ## Configuring Webhook: Consent Status
+
+
+        Fired when the consent status changes. This can be due to user-initiated
+        actions like accepting/denying/pausing/revoking the consent or due to
+        consent lifecycle events like consent expiration.
+
+
+        To register a dynamic webhook, you can pass an additional parameter in
+        the input as shown below:
+
+
+        ``` json
+
+        "webhook": {
+          "consentStatus": "[https://webhook.site/9b888dac-ba87-429a-8de3-d6716ce113f9](https://webhook.site/9b888dac-ba87-429a-8de3-d6716ce113f9)",
+          "addOnParams": {
+            "application": "APP091234",
+            "customerSegment": "hni"
+          }
+        }
+
+
+        ```
+
+
+        where, the `webhook.consentStatus` is the URL to the dedicated endpoint
+        on your server as a webhook listener that can recieve POST requests on
+        consent status changes. On the other hand, `webhook.addOnParams` allows
+        you to piggy-back additional information that you need Finarkein webhook
+        services to supply back in the request payload.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+    parameters:
+      - name: workspace
+        in: path
+        required: true
+        description: 'TODO: Replace with {{workspace}}'
+        schema:
+          type: string
+  /{workspace}/consent/aa/status/{consentHandle}:
+    get:
+      summary: Factory / Consent - AA / Status
+      tags:
+        - Workflows
+        - Consent
+        - Account Aggregator
+      responses:
+        '200':
+          description: PENDING - Consent Status
+          headers:
+            Date:
+              schema:
+                type: string
+            Content-Length:
+              schema:
+                type: integer
+            Connection:
+              schema:
+                type: string
+            Vary:
+              schema:
+                type: string
+            Cache-Control:
+              schema:
+                type: string
+            Pragma:
+              schema:
+                type: string
+            Expires:
+              schema:
+                type: integer
+            X-Content-Type-Options:
+              schema:
+                type: string
+            Strict-Transport-Security:
+              schema:
+                type: string
+            X-Frame-Options:
+              schema:
+                type: string
+            X-XSS-Protection:
+              schema:
+                type: integer
+            Content-Security-Policy:
+              schema:
+                type: string
+            Referrer-Policy:
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  customerAAId:
+                    type: string
+                  consentHandle:
+                    type: string
+                  consentStatus:
+                    type: string
+    parameters:
+      - name: workspace
+        in: path
+        required: true
+        description: 'TODO: replace with {{workspace}}'
+        schema:
+          type: string
+      - name: consentHandle
+        in: path
+        required: true
+        schema:
+          type: string
+  /{workspace}/consent/aa/artefact/{consentHandle}:
+    get:
+      summary: Factory / Consent - AA / Artefact
+      tags:
+        - Workflows
+        - Consent
+        - Account Aggregator
+      responses:
+        '200':
+          description: approved
+          headers:
+            Date:
+              schema:
+                type: string
+            Content-Length:
+              schema:
+                type: integer
+            Connection:
+              schema:
+                type: string
+            Vary:
+              schema:
+                type: string
+            Cache-Control:
+              schema:
+                type: string
+            Pragma:
+              schema:
+                type: string
+            Expires:
+              schema:
+                type: integer
+            X-Content-Type-Options:
+              schema:
+                type: string
+            Strict-Transport-Security:
+              schema:
+                type: string
+            X-Frame-Options:
+              schema:
+                type: string
+            X-XSS-Protection:
+              schema:
+                type: integer
+            Content-Security-Policy:
+              schema:
+                type: string
+            Referrer-Policy:
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  consentHandle:
+                    type: string
+                  consentId:
+                    type: string
+                  consentStatus:
+                    type: string
+                  signedConsent:
+                    type: object
+                    properties:
+                      consentStart:
+                        type: string
+                        format: date-time
+                      consentExpiry:
+                        type: string
+                        format: date-time
+                      consentMode:
+                        type: string
+                      fetchType:
+                        type: string
+                      consentTypes:
+                        type: array
+                        items:
+                          type: string
+                      fiTypes:
+                        type: array
+                        items:
+                          type: string
+                      DataConsumer:
+                        type: object
+                        properties:
+                          id:
+                            type: string
+                          type:
+                            type: string
+                      Customer:
+                        type: object
+                        properties:
+                          id:
+                            type: string
+                      Purpose:
+                        type: object
+                        properties:
+                          code:
+                            type: string
+                            format: color
+                          refUri:
+                            type: string
+                            format: uri
+                          text:
+                            type: string
+                          Category:
+                            type: object
+                            properties:
+                              type:
+                                type: string
+                      FIDataRange:
+                        type: object
+                        properties:
+                          from:
+                            type: string
+                            format: date-time
+                          to:
+                            type: string
+                            format: date-time
+                      DataLife:
+                        type: object
+                        properties:
+                          unit:
+                            type: string
+                          value:
+                            type: integer
+                      Frequency:
+                        type: object
+                        properties:
+                          unit:
+                            type: string
+                          value:
+                            type: integer
+                      Accounts:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            fiType:
+                              type: string
+                            fipId:
+                              type: string
+                            accType:
+                              type: string
+                            linkRefNumber:
+                              type: string
+                            maskedAccNumber:
+                              type: string
+                      DataProvider:
+                        type: object
+                        properties:
+                          id:
+                            type: string
+                          type:
+                            type: string
+    parameters:
+      - name: workspace
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: consentHandle
+        in: path
+        required: true
+        schema:
+          type: integer
+  /{workspace}/consent/aa-encr:
+    post:
+      summary: With Encryption / Factory / Consent
+      tags:
+        - Workflows
+        - Consent
+        - Account Aggregator
+      responses:
+        '200':
+          description: With Encryption / Factory / Consent
+          headers:
+            Date:
+              schema:
+                type: string
+            Content-Length:
+              schema:
+                type: integer
+            Connection:
+              schema:
+                type: string
+            Vary:
+              schema:
+                type: string
+            Cache-Control:
+              schema:
+                type: string
+            Pragma:
+              schema:
+                type: string
+            Expires:
+              schema:
+                type: integer
+            X-Content-Type-Options:
+              schema:
+                type: string
+            Strict-Transport-Security:
+              schema:
+                type: string
+            X-Frame-Options:
+              schema:
+                type: string
+            X-XSS-Protection:
+              schema:
+                type: integer
+            Content-Security-Policy:
+              schema:
+                type: string
+            Referrer-Policy:
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  consentHandle:
+                    type: string
+                  redirectUrl:
+                    type: string
+                    format: uri
+                  webviewBaseUrl:
+                    type: string
+                    format: uri
+                  parameters:
+                    type: object
+                    properties:
+                      fi:
+                        type: string
+                      ecreq:
+                        type: string
+                      reqdate:
+                        type: string
+                        format: utc-millisec
+      description: >-
+        This API is intended to request the user consent. On approval of the
+        consent FIU will be able to fetch the financial information(FI) from the
+        financial information providers(FIP) like Bank, Insurance Providers,
+        etc.
+
+
+        # Inputs
+
+
+        | Field | Description |
+
+        | --- | --- |
+
+        | `encryptedPayload` | Encrypted Payload of the API request body |
+
+        | `keyIdentifier` | Key Identifier required for decryption of provided
+        Encrypted Payload |
+
+
+        Refer [Factory / Consent -
+        AA](https://documenter.getpostman.com/view/12016555/2s8Z6sbvtd#58b18bb8-64c8-4a2c-b17d-5fb247318805)
+        API documentation for request body information
+
+
+        Encryption Details,
+
+
+        - Encryption Algorithm: AES
+
+        - KeySize: 256 bit
+            
+
+        Example of keys,
+
+
+        > SALT = UjXn2r5u8x/A?D(G (hex: 67556B58703273357638782F413F4428)  
+
+        > IV = 5u8x/A?D(G+KbPeS (hex: 357538782f413f4428472b4b62506553)  
+
+        > PASSPHRASE = v8y/B?E(H+MbQeThWmZq4t7w9z$C&F)J
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                encryptedPayload:
+                  type: string
+                keyIdentifier:
+                  type: string
+    parameters:
+      - name: workspace
+        in: path
+        required: true
+        description: 'TODO: Replace with {{workspace}}'
+        schema:
+          type: string
+  /{workspace}/consent/itr:
+    post:
+      summary: Factory / Consent - ITR
+      tags:
+        - Workflows
+        - Consent
+        - Digital ITR
+      responses:
+        default:
+          description: Default response
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+    parameters:
+      - name: workspace
+        in: path
+        required: true
+        schema:
+          type: string
+  /{workspace}/run/flow/{flowId}:
+    post:
+      summary: ITR-flow
+      tags:
+        - Workflows
+        - Consent
+        - Digital ITR
+      responses:
+        default:
+          description: Default response
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                input:
+                  type: object
+                  properties:
+                    mode:
+                      type: string
+                    mobileNumber:
+                      type: string
+                      format: utc-millisec
+                    channel:
+                      type: string
+                    policyNo:
+                      type: string
+                    send-sms-to-user:
+                      type: string
+                    panNumber:
+                      type: string
+                    send-email-to-user:
+                      type: string
+    parameters:
+      - name: workspace
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: flowId
+        in: path
+        required: true
+        schema:
+          type: integer
+  /{workspace}/consent/itr/status/{reqId}:
+    get:
+      summary: Factory / Consent - ITR / Status
+      tags:
+        - Workflows
+        - Consent
+        - Digital ITR
+      responses:
+        '200':
+          description: Factory / Consent ITR / Status
+          headers:
+            Date:
+              schema:
+                type: string
+            Content-Length:
+              schema:
+                type: integer
+            Connection:
+              schema:
+                type: string
+            Vary:
+              schema:
+                type: string
+            Cache-Control:
+              schema:
+                type: string
+            Pragma:
+              schema:
+                type: string
+            Expires:
+              schema:
+                type: integer
+            X-Content-Type-Options:
+              schema:
+                type: string
+            Strict-Transport-Security:
+              schema:
+                type: string
+            X-Frame-Options:
+              schema:
+                type: string
+            X-XSS-Protection:
+              schema:
+                type: integer
+            Content-Security-Policy:
+              schema:
+                type: string
+            Referrer-Policy:
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  requestId:
+                    type: string
+                  status:
+                    type: string
+    parameters:
+      - name: workspace
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: reqId
+        in: path
+        required: true
+        schema:
+          type: string
+  /{workspace}/run/flow/{flowId}/{runId}/result:
+    get:
+      summary: Factory / Consent - ITR / Result
+      tags:
+        - Workflows
+        - Consent
+        - Digital ITR
+      responses:
+        default:
+          description: Default response
+    parameters:
+      - name: workspace
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: flowId
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: runId
+        in: path
+        required: true
+        schema:
+          type: string
+  /:
+    post:
+      summary: AA decider webhook
+      tags:
+        - Workflows
+        - Consent
+        - Uddh(उद्ध)
+        - webhook
+      responses:
+        default:
+          description: Default response
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+  /{workspace}/dp/uddh/{flowId}:
+    post:
+      summary: AA decider run
+      tags:
+        - Workflows
+        - Consent
+        - Uddh(उद्ध)
+      responses:
+        default:
+          description: sample response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  requestId:
+                    type: string
+                  redirectUrl:
+                    type: string
+                    format: uri
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+    parameters:
+      - name: workspace
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: flowId
+        in: path
+        required: true
+        schema:
+          type: string
+  /{workspace}/dp/uddh/{flowId}/{requestId}/result:
+    get:
+      summary: AA decider result
+      tags:
+        - Workflows
+        - Consent
+        - Uddh(उद्ध)
+      responses:
+        default:
+          description: sample response
+          content:
+            application/json:
+              schema:
+                type: object
+    parameters:
+      - name: workspace
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: flowId
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: requestId
+        in: path
+        required: true
+        schema:
+          type: string
+  /{workspace}/dp/consent/{flowId}:
+    post:
+      summary: Factory / Consent V2
+      tags:
+        - Workflows
+        - Consent
+        - Consent V2
+      responses:
+        default:
+          description: /consent-plus
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  consentHandle:
+                    type: string
+                  redirectUrl:
+                    type: string
+                    format: uri
+                  webviewBaseUrl:
+                    type: string
+                    format: uri
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+    parameters:
+      - name: workspace
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: flowId
+        in: path
+        required: true
+        schema:
+          type: string
+  /{workspace}/dp/mikt/{requestId}/status:
+    get:
+      summary: 'NA: Factory / Consent V2'
+      tags:
+        - Workflows
+        - Consent
+        - Consent V2
+      responses:
+        default:
+          description: doc upload
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  customerAAId:
+                    nullable: true
+                  consentHandle:
+                    type: string
+                  consentStatus:
+                    type: string
+                  statementUpload:
+                    type: string
+    parameters:
+      - name: workspace
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: requestId
+        in: path
+        required: true
+        schema:
+          type: integer
+  /{workspace}/dp/abha/{flowId}:
+    post:
+      summary: Create Journey URL
+      tags:
+        - Workflows
+        - ABDM | ABHA journey flow
+      responses:
+        default:
+          description: example
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  requestId:
+                    type: string
+                  journeyUrl:
+                    type: string
+                    format: uri
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+    parameters:
+      - name: workspace
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: flowId
+        in: path
+        required: true
+        schema:
+          type: string
+  /{workspace}/dp/abha/{flowId}/{requestId}/status:
+    get:
+      summary: Get Status
+      tags:
+        - Workflows
+        - ABDM | ABHA journey flow
+      responses:
+        default:
+          description: Get Status
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  requestId:
+                    type: string
+                  status:
+                    type: string
+    parameters:
+      - name: workspace
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: flowId
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: requestId
+        in: path
+        required: true
+        schema:
+          type: string
+  /{workspace}/dp/run/flow/ayush:
+    post:
+      summary: New Ayush Flow Run
+      tags:
+        - Workflows
+        - ABDM | Ayush
+      responses:
+        default:
+          description: example 1
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  requestId:
+                    type: string
+                  consentLink:
+                    type: string
+                    format: uri
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+    parameters:
+      - name: workspace
+        in: path
+        required: true
+        schema:
+          type: string
+  /{workspace}/dp/ayush/{requestId}/status:
+    get:
+      summary: Get Ayush Flow Run Status
+      tags:
+        - Workflows
+        - ABDM | Ayush
+      responses:
+        default:
+          description: Get Ayush Flow Run Status
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  timestamp:
+                    type: string
+                    format: date-time
+                  status:
+                    type: string
+      description: >-
+        # Input parameters
+
+
+        | Parameter | Description | Type | M/O |
+
+        | --- | --- | --- | --- |
+
+        | `mobileNumber` | Mobile number of the customer (also used to send SMS
+        with Anubhav link, if enabled) | String | M |
+
+        | `applicationNo` | Your internal system application number (insurance
+        policy identifier, loan application identifier etc.). This will also
+        reflect on the Anubhav Service Console (dedicated UI to track all
+        Anubhav flows). | String | M |
+
+        | `emailId` | Email address of the customer (also used to send email
+        with Anubhav link, if enabled) | String | O |
+
+
+        # Webhooks
+
+
+        Anubhav Financial insights endpoint currently supports one webhook:
+
+
+        - Flow Run Status (key: `flowRunStatus`)
+            
+
+        ## Flow Run Status
+
+
+        Fired when the flow run status changes.  
+
+        To register a dynamic webhook, you can pass an additional parameter in
+        the input as shown below:
+
+
+        ``` json
+
+        "webhook": {
+          "flowRunStatus": "[https://webhook.site/9b888dac-ba87-429a-8de3-d6716ce113f9](https://webhook.site/9b888dac-ba87-429a-8de3-d6716ce113f9)",
+          "addOnParams": {
+            "application": "APP091234",
+            "customerSegment": "hni"
+          }
+        }
+
+
+        ```
+
+
+        where, `flowRunStatus` is the dedicated endpoint on your server as a
+        webhook listener that can recieve POST requests on flow run status
+        changes.
+    parameters:
+      - name: workspace
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: requestId
+        in: path
+        required: true
+        schema:
+          type: string
+  /{workspace}/dp/ayush/{requestId}/consent/status:
+    get:
+      summary: Get Ayush Consent Status
+      tags:
+        - Workflows
+        - ABDM | Ayush
+      responses:
+        default:
+          description: Get Ayush Consent Status
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  timestamp:
+                    type: string
+                    format: date-time
+                  status:
+                    type: string
+      description: >-
+        # Input parameters
+
+
+        | Parameter | Description | Type | M/O |
+
+        | --- | --- | --- | --- |
+
+        | `mobileNumber` | Mobile number of the customer (also used to send SMS
+        with Anubhav link, if enabled) | String | M |
+
+        | `applicationNo` | Your internal system application number (insurance
+        policy identifier, loan application identifier etc.). This will also
+        reflect on the Anubhav Service Console (dedicated UI to track all
+        Anubhav flows). | String | M |
+
+        | `emailId` | Email address of the customer (also used to send email
+        with Anubhav link, if enabled) | String | O |
+
+
+        # Webhooks
+
+
+        Anubhav Financial insights endpoint currently supports one webhook:
+
+
+        - Flow Run Status (key: `flowRunStatus`)
+            
+
+        ## Flow Run Status
+
+
+        Fired when the flow run status changes.  
+
+        To register a dynamic webhook, you can pass an additional parameter in
+        the input as shown below:
+
+
+        ``` json
+
+        "webhook": {
+          "flowRunStatus": "[https://webhook.site/9b888dac-ba87-429a-8de3-d6716ce113f9](https://webhook.site/9b888dac-ba87-429a-8de3-d6716ce113f9)",
+          "addOnParams": {
+            "application": "APP091234",
+            "customerSegment": "hni"
+          }
+        }
+
+
+        ```
+
+
+        where, `flowRunStatus` is the dedicated endpoint on your server as a
+        webhook listener that can recieve POST requests on flow run status
+        changes.
+    parameters:
+      - name: workspace
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: requestId
+        in: path
+        required: true
+        schema:
+          type: string
+  /{workspace}/run/flow/status/{flowId}/{runId}:
+    get:
+      summary: Flow / aa-data-fetch / status
+      tags:
+        - Workflows
+        - Digital Bank Statement
+      responses:
+        default:
+          description: Default response
+    parameters:
+      - name: workspace
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: flowId
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: runId
+        in: path
+        required: true
+        schema:
+          type: string
+  /{workspace}/dp/mikt:
+    post:
+      summary: New Run
+      tags:
+        - Workflows
+        - 'mikt : Raw Data and Lending Insights'
+      responses:
+        default:
+          description: New Run
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  requestId:
+                    type: string
+                  redirectUrl:
+                    type: string
+                    format: uri
+      description: >-
+        | Field | Description |
+
+        | --- | --- |
+
+        | customerMobileNumber | The mobile phone number of the customer. |
+
+        | consentTemplateId | The unique identifier of the consent template used
+        for obtaining the customer's consent. |
+
+
+        **Webhook Fields**
+
+
+        | Field | Description |
+
+        | --- | --- |
+
+        | webhook.consentStatus | The URL for the webhook that will receive
+        updates on the status of the consent. |
+
+        | webhook.rawDataPush | The URL for the webhook that will receive the
+        raw data (transactions). |
+
+        | webhook.analyzedDataPush | The URL for the webhook that will receive
+        the analyzed data. |
+
+        | webhook.flowRunStatus | The URL for the webhook that will receive
+        updates on the status of the flow. |
+
+        | webhook.addOnParams | An object containing any additional data, these
+        parameters will be sent in the webhooks. |
+
+
+        **Account Filter Fields**
+
+
+        | Field | Description |
+
+        | --- | --- |
+
+        | accountFilters | An array of objects specifying the filters to apply
+        when retrieving accounts. Each object in the array contains the
+        following fields: |
+
+        | accountFilters.fipId | The FIP ID of the financial institution
+        associated with the account. |
+
+        | accountFilters.required | A boolean value indicating whether the
+        associated FIP ID is required to be present for an account to be
+        included in the results. |
+
+
+        **Rule Fields**
+
+
+        | Field | Description |
+
+        | --- | --- |
+
+        | rules | An array of strings representing data validation rule
+        identifiers to use for this request. To skip all rules, this parameter
+        can be skipped from the input or set as an empty array \[\]. To apply
+        all available rules, pass \["\*"\]. |
+
+
+        **Consent Template Definition Fields**
+
+
+        | Field Name | Description | Type | Example Value |
+
+        | --- | --- | --- | --- |
+
+        | consentStartOffset | The offset from the time of consent creation when
+        the consent starts | string | "1m" |
+
+        | consentExpiryDuration | The duration for which the consent will be
+        valid | string | "1d" |
+
+        | consentMode | The mode of consent, whether it is to be stored or used
+        for one-time purpose | string | "STORE" |
+
+        | consentTypes | The types of consent granted | array | \["PROFILE",
+        "SUMMARY", "TRANSACTIONS"\] |
+
+        | fiTypes | The types of financial institutions for which the consent is
+        valid | array | \["DEPOSIT"\] |
+
+        | purposeCode | The purpose code for which the consent is being granted
+        | string | "101" |
+
+        | fetchType | The type of data fetch, whether it is one-time or periodic
+        | string | "ONETIME" or "PERIODIC" |
+
+        | frequency | The frequency at which the data is to be fetched | string
+        | "6h" |
+
+        | dataLife | The duration for which the fetched data will be valid |
+        string | "6M" (6 months) |
+
+        | consentTemplateDataRange |  | object |  |
+
+        |  | FINANCIAL_YEAR |  | for current financial year specify,  <br>{ 
+        <br>"type": "FINANCIAL_YEAR",  <br>"year": "0"  <br>}  <br>  <br>for
+        current and last 1 financial year,  <br>{  <br>"type":
+        "FINANCIAL_YEAR",  <br>"year": "1"  <br>} |
+
+        |  | CONSENT_START_RELATIVE_MONTH_INCLUSIVE |  | Last 6 months till
+        consent start date,  <br>{  <br>"type":
+        "CONSENT_START_RELATIVE_MONTH_INCLUSIVE",  <br>"from": "-6M",  <br>"to":
+        "0M"  <br>} |
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                customerMobileNumber:
+                  type: string
+                  format: utc-millisec
+                consentTemplateId:
+                  type: string
+                consentTemplateDefinition:
+                  type: object
+                  properties:
+                    consentExpiryDuration:
+                      type: string
+                    consentMode:
+                      type: string
+                    consentTypes:
+                      type: array
+                      items:
+                        type: string
+                    fiTypes:
+                      type: array
+                      items:
+                        type: string
+                    fetchType:
+                      type: string
+                    frequency:
+                      type: string
+                    dataLife:
+                      type: string
+                    consentTemplateDataRange:
+                      type: object
+                      properties:
+                        type:
+                          type: string
+                        year:
+                          type: string
+                          format: utc-millisec
+                webhook:
+                  type: object
+                  properties:
+                    consentStatus:
+                      type: string
+                      format: uri
+                    rawDataPush:
+                      type: string
+                      format: uri
+                    analyzedDataPush:
+                      type: string
+                      format: uri
+                    flowRunStatus:
+                      type: string
+                      format: uri
+                    addOnParams:
+                      type: object
+                      properties:
+                        param1:
+                          type: string
+                        param2:
+                          type: string
+                rules:
+                  type: array
+                  items:
+                    type: string
+    parameters:
+      - name: workspace
+        in: path
+        required: true
+        schema:
+          type: string
+  /{workspace}/dp/mikt/{requestId}/status/consent/aa:
+    get:
+      summary: Get Consent Status
+      tags:
+        - Workflows
+        - 'mikt : Raw Data and Lending Insights'
+      responses:
+        '200':
+          description: PENDING - Consent Status
+          headers:
+            Date:
+              schema:
+                type: string
+            Content-Length:
+              schema:
+                type: integer
+            Connection:
+              schema:
+                type: string
+            Vary:
+              schema:
+                type: string
+            Cache-Control:
+              schema:
+                type: string
+            Pragma:
+              schema:
+                type: string
+            Expires:
+              schema:
+                type: integer
+            X-Content-Type-Options:
+              schema:
+                type: string
+            Strict-Transport-Security:
+              schema:
+                type: string
+            X-Frame-Options:
+              schema:
+                type: string
+            X-XSS-Protection:
+              schema:
+                type: integer
+            Content-Security-Policy:
+              schema:
+                type: string
+            Referrer-Policy:
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  consentStatus:
+                    type: string
+    parameters:
+      - name: workspace
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: requestId
+        in: path
+        required: true
+        schema:
+          type: string
+  /{workspace}/dp/mikt/{flowId}:
+    post:
+      summary: New Run
+      tags:
+        - Workflows
+        - Mikt
+        - MultiConsent + Data Fetch
+      responses:
+        default:
+          description: New Run
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  requestId:
+                    type: string
+                  redirectUrl:
+                    type: string
+                    format: uri
+                  consentHandles:
+                    type: object
+                    properties:
+                      id1:
+                        type: object
+                        properties:
+                          consentHandle:
+                            type: string
+                      id2:
+                        type: object
+                        properties:
+                          consentHandle:
+                            type: string
+      description: >-
+        # Input parameters
+
+
+        | Parameter | Description | Type | M/O |
+
+        | --- | --- | --- | --- |
+
+        | `mobileNumber` | Mobile number of the customer (also used to send SMS
+        with Anubhav link, if enabled) | String | M |
+
+        | `applicationNo` | Your internal system application number (insurance
+        policy identifier, loan application identifier etc.). This will also
+        reflect on the Anubhav Service Console (dedicated UI to track all
+        Anubhav flows). | String | M |
+
+        | `emailId` | Email address of the customer (also used to send email
+        with Anubhav link, if enabled) | String | O |
+
+
+        # Webhooks
+
+
+        Anubhav Financial insights endpoint currently supports one webhook:
+
+
+        - Flow Run Status (key: `flowRunStatus`)
+            
+
+        ## Flow Run Status
+
+
+        Fired when the flow run status changes.  
+
+        To register a dynamic webhook, you can pass an additional parameter in
+        the input as shown below:
+
+
+        ``` json
+
+        "webhook": {
+          "flowRunStatus": "[https://webhook.site/9b888dac-ba87-429a-8de3-d6716ce113f9](https://webhook.site/9b888dac-ba87-429a-8de3-d6716ce113f9)",
+          "addOnParams": {
+            "application": "APP091234",
+            "customerSegment": "hni"
+          }
+        }
+
+         ```
+
+        where, `flowRunStatus` is the dedicated endpoint on your server as a
+        webhook listener that can recieve POST requests on flow run status
+        changes.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+    parameters:
+      - name: workspace
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: flowId
+        in: path
+        required: true
+        schema:
+          type: string
+  /{workspace}/dp/mikt/{flowId}/{requestId}/status:
+    get:
+      summary: Get Status
+      tags:
+        - Workflows
+        - Mikt
+        - MultiConsent + Data Fetch
+      responses:
+        default:
+          description: Get Status
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  requestId:
+                    type: string
+                  state:
+                    type: object
+                    properties:
+                      id1:
+                        type: object
+                        properties:
+                          consentHandle:
+                            type: string
+                          state:
+                            type: string
+                          consentStatus:
+                            type: string
+                          dataFetchStatus:
+                            type: string
+                      id2:
+                        type: object
+                        properties:
+                          consentHandle:
+                            type: string
+                          state:
+                            type: string
+                          consentStatus:
+                            type: string
+                          dataFetchStatus:
+                            type: string
+    parameters:
+      - name: workspace
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: flowId
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: requestId
+        in: path
+        required: true
+        schema:
+          type: string
+  /{workspace}/dp/mikt/{flowId}/{requestId}/result:
+    get:
+      summary: Get Result
+      tags:
+        - Workflows
+        - Mikt
+        - MultiConsent + Data Fetch
+      responses:
+        default:
+          description: TODO
+    parameters:
+      - name: workspace
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: flowId
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: requestId
+        in: path
+        required: true
+        schema:
+          type: string
+  /{workspace}/dp/mikt/fetch:
+    post:
+      summary: New Run
+      tags:
+        - Workflows
+        - Mikt
+        - 'Data Fetch and Insights: recurring'
+      responses:
+        default:
+          description: New Run
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  runId:
+                    type: string
+      description: >-
+        # Input Parameters
+
+
+        | Parameter | Description |
+
+        | --- | --- |
+
+        | `customerAAId` | Account aggregator id of user |
+
+        | `consentHandle` | Consent handle id |
+
+        | `duration` (optional) | Response calculated against this duration.
+        Valid input formats are 1`y`(year)/`m`(month). Default is consent data
+        date range. |
+
+
+        # Webhooks
+
+
+        Financial insights endpoint(s) currently supports one webhook:
+
+
+        - Flow Run Status (key: `flowRunStatus`)
+            
+
+        ## Flow Run Status
+
+
+        Fired when the flow run status changes.  
+
+        To register a dynamic webhook, you can pass an additional parameter in
+        the input as shown below:
+
+
+        ``` json
+
+        "webhook": {
+          "flowRunStatus": "[https://webhook.site/9b888dac-ba87-429a-8de3-d6716ce113f9](https://webhook.site/9b888dac-ba87-429a-8de3-d6716ce113f9)",
+          "addOnParams": {
+            "application": "APP091234",
+            "customerSegment": "hni"
+          }
+        }
+
+
+        ```
+
+
+        where, `flowRunStatus` is the dedicated endpoint on your server as a
+        webhook listener that can recieve POST requests on flow run status
+        changes.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+    parameters:
+      - name: workspace
+        in: path
+        required: true
+        schema:
+          type: string
+  /{workspace}/dp/mikt/fetch/{runId}/status:
+    get:
+      summary: Get Status
+      tags:
+        - Workflows
+        - Mikt
+        - 'Data Fetch and Insights: recurring'
+      responses:
+        default:
+          description: Get Status
+    parameters:
+      - name: workspace
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: runId
+        in: path
+        required: true
+        schema:
+          type: string
+  /{workspace}/dp/raxe/{flowId}:
+    post:
+      summary: Run / spending-insights
+      tags:
+        - Workflows
+        - Raxe (PFM)
+        - Consent - Data - Analysis
+      responses:
+        default:
+          description: Run / spending-insights
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  requestId:
+                    type: string
+                  redirectUrl:
+                    type: string
+                    format: uri
+      description: >-
+        # Input Parameters
+
+
+        | Parameter | Description |
+
+        | --- | --- |
+
+        | `customerAAId` | Account aggregator id of user |
+
+        | `consentHandle` | Consent handle id |
+
+        | `duration` (optional) | Response calculated against this duration.
+        Valid input formats are 1`y`(year)/`m`(month). Default is consent data
+        date range. |
+
+
+        # Webhooks
+
+
+        Financial insights endpoint(s) currently supports one webhook:
+
+
+        - Flow Run Status (key: `flowRunStatus`)
+            
+
+        ## Flow Run Status
+
+
+        Fired when the flow run status changes.  
+
+        To register a dynamic webhook, you can pass an additional parameter in
+        the input as shown below:
+
+
+        ``` json
+
+        "webhook": {
+          "flowRunStatus": "[https://webhook.site/9b888dac-ba87-429a-8de3-d6716ce113f9](https://webhook.site/9b888dac-ba87-429a-8de3-d6716ce113f9)",
+          "addOnParams": {
+            "application": "APP091234",
+            "customerSegment": "hni"
+          }
+        }
+
+
+        ```
+
+
+        where, `flowRunStatus` is the dedicated endpoint on your server as a
+        webhook listener that can recieve POST requests on flow run status
+        changes.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+    parameters:
+      - name: workspace
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: flowId
+        in: path
+        required: true
+        schema:
+          type: string
+  /{workspace}/dp/raxe/{flowId}/{requestId}/status:
+    get:
+      summary: Status / spending-insights
+      tags:
+        - Workflows
+        - Raxe (PFM)
+        - Consent - Data - Analysis
+      responses:
+        default:
+          description: Get Status
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  state:
+                    type: string
+                  consentStatus:
+                    type: string
+                  dataFetchStatus:
+                    type: string
+    parameters:
+      - name: workspace
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: flowId
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: requestId
+        in: path
+        required: true
+        schema:
+          type: string
+  /{workspace}/dp/raxe/{flowId}/{requestId}/result:
+    get:
+      summary: Get Result
+      tags:
+        - Workflows
+        - Raxe (PFM)
+        - Consent - Data - Analysis
+      responses:
+        '200':
+          description: Get Result
+          headers:
+            Date:
+              schema:
+                type: string
+            Content-Length:
+              schema:
+                type: integer
+            Connection:
+              schema:
+                type: string
+            Vary:
+              schema:
+                type: string
+            Cache-Control:
+              schema:
+                type: string
+            Pragma:
+              schema:
+                type: string
+            Expires:
+              schema:
+                type: integer
+            X-Content-Type-Options:
+              schema:
+                type: string
+            Strict-Transport-Security:
+              schema:
+                type: string
+            X-Frame-Options:
+              schema:
+                type: string
+            X-XSS-Protection:
+              schema:
+                type: integer
+            Content-Security-Policy:
+              schema:
+                type: string
+            Referrer-Policy:
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                type: object
+        default:
+          description: Data Fetch
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  flowId:
+                    type: string
+                  runId:
+                    type: string
+                  state:
+                    type: string
+                  data:
+                    type: object
+                    properties:
+                      meta:
+                        type: object
+                        properties:
+                          version:
+                            type: string
+                      userId:
+                        type: string
+                      depositAccounts:
+                        type: object
+                        properties:
+                          accounts:
+                            type: array
+                            items:
+                              type: object
+                              properties:
+                                statementMeta:
+                                  type: object
+                                  properties:
+                                    noOfTransactions:
+                                      type: integer
+                                    transactionStart:
+                                      type: string
+                                      format: style
+                                    transactionEnd:
+                                      type: string
+                                accountDetails:
+                                  type: object
+                                  properties:
+                                    maskedAccNumber:
+                                      type: string
+                                    account_type:
+                                      type: string
+                                    pendingTransactionType:
+                                      nullable: true
+                                    pendingAmount:
+                                      type: integer
+                                    currentBalance:
+                                      type: string
+                                    currency:
+                                      type: string
+                                    exchgeRate:
+                                      type: string
+                                    type:
+                                      type: string
+                                    branch:
+                                      type: string
+                                    facility:
+                                      type: string
+                                    ifscCode:
+                                      type: string
+                                    micrCode:
+                                      type: string
+                                      format: utc-millisec
+                                    openingDate:
+                                      type: string
+                                      format: date
+                                    currentODLimit:
+                                      type: string
+                                      format: utc-millisec
+                                    drawingLimit:
+                                      type: string
+                                      format: utc-millisec
+                                    status:
+                                      type: string
+                                    fipName:
+                                      type: string
+                                    accountAgeInDays:
+                                      type: integer
+                                    balanceDateTime:
+                                      type: string
+                                      format: style
+                                accountHolder:
+                                  type: object
+                                  properties:
+                                    type:
+                                      type: string
+                                    name:
+                                      type: string
+                                    mobile:
+                                      type: string
+                                      format: utc-millisec
+                                    landLine:
+                                      nullable: true
+                                    nominee:
+                                      type: string
+                                    email:
+                                      type: string
+                                      format: email
+                                    pan:
+                                      type: string
+                                    ckycCompliance:
+                                      type: boolean
+                                    address:
+                                      nullable: true
+                                    dob:
+                                      type: string
+                                      format: date
+                                insights:
+                                  type: object
+                                  properties:
+                                    cashflow:
+                                      type: object
+                                      properties:
+                                        overall:
+                                          type: object
+                                          properties:
+                                            inflow:
+                                              type: integer
+                                            outflow:
+                                              type: integer
+                                            currentBalance:
+                                              type: integer
+                                        monthlySummary:
+                                          type: array
+                                          items:
+                                            type: object
+                                            properties:
+                                              month:
+                                                type: string
+                                              credit:
+                                                type: number
+                                              debit:
+                                                type: number
+                                              avgEodBalance:
+                                                type: number
+                                    debit:
+                                      type: object
+                                      properties:
+                                        monthlySummary:
+                                          type: array
+                                          items:
+                                            type: object
+                                            properties:
+                                              month:
+                                                type: string
+                                              categoryDebits:
+                                                type: array
+                                                items:
+                                                  type: object
+                                                  properties:
+                                                    category:
+                                                      type: string
+                                                    totalAmount:
+                                                      type: integer
+                                                    percentOfTotalDebits:
+                                                      type: number
+                                        categoryDebits:
+                                          type: array
+                                          items:
+                                            type: object
+                                            properties:
+                                              category:
+                                                type: string
+                                              totalAmount:
+                                                type: integer
+                                              percentOfTotalDebits:
+                                                type: number
+                                        regularDebits:
+                                          type: object
+                                          properties:
+                                            summary:
+                                              type: array
+                                              items:
+                                                type: object
+                                                properties:
+                                                  narrationLabel:
+                                                    type: string
+                                                  category:
+                                                    type: string
+                                                  totalAmount:
+                                                    type: integer
+                                                  averageAmount:
+                                                    type: integer
+                                                  noOfTransactions:
+                                                    type: integer
+                                        distribution:
+                                          type: object
+                                          properties:
+                                            mandatory:
+                                              type: number
+                                            discretionary:
+                                              type: number
+                                            savings:
+                                              type: integer
+                                            others:
+                                              type: number
+                                            unit:
+                                              type: string
+                                        budget:
+                                          type: object
+                                          properties:
+                                            recommended:
+                                              type: integer
+                                    credit:
+                                      type: object
+                                      properties:
+                                        categoryCredits:
+                                          type: array
+                                          items:
+                                            type: object
+                                            properties:
+                                              category:
+                                                type: string
+                                              totalAmount:
+                                                type: integer
+                                              percentOfTotalCredits:
+                                                type: number
+                                        regularCredits:
+                                          type: object
+                                          properties:
+                                            summary:
+                                              type: array
+                                              items:
+                                                type: object
+                                                properties:
+                                                  narrationLabel:
+                                                    type: string
+                                                  category:
+                                                    type: string
+                                                  totalAmount:
+                                                    type: integer
+                                                  averageAmount:
+                                                    type: number
+                                                  noOfTransactions:
+                                                    type: integer
+                                    observations:
+                                      type: object
+                                      properties:
+                                        savings:
+                                          type: array
+                                          items:
+                                            type: object
+                                            properties:
+                                              saving:
+                                                type: number
+                                              recommended:
+                                                type: integer
+                                              unit:
+                                                type: string
+                                        insurance:
+                                          type: array
+                                          items:
+                                            type: object
+                                            properties:
+                                              noOfInsurances:
+                                                type: integer
+                                transactions:
+                                  type: array
+                                  items:
+                                    type: object
+                                    properties:
+                                      index:
+                                        type: integer
+                                      narration:
+                                        type: string
+                                      mode:
+                                        type: string
+                                      type:
+                                        type: string
+                                      amount:
+                                        type: number
+                                      currentBalance:
+                                        type: number
+                                      txnId:
+                                        type: string
+                                      reference:
+                                        type: string
+                                      categoryId:
+                                        type: string
+                                      counterParty:
+                                        type: string
+                                      transactionTimestamp:
+                                        type: string
+                                        format: style
+                                      valueDate:
+                                        type: string
+                                        format: date
+    parameters:
+      - name: workspace
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: flowId
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: requestId
+        in: path
+        required: true
+        schema:
+          type: string
+  /{workspace}/dp/raxe/fetch/{flowId}:
+    post:
+      summary: Start Run
+      tags:
+        - Workflows
+        - Raxe (PFM)
+        - Data - Analysis
+      responses:
+        '200':
+          description: Start Run
+          headers:
+            Date:
+              schema:
+                type: string
+            Content-Length:
+              schema:
+                type: integer
+            Connection:
+              schema:
+                type: string
+            Vary:
+              schema:
+                type: string
+            Cache-Control:
+              schema:
+                type: string
+            Pragma:
+              schema:
+                type: string
+            Expires:
+              schema:
+                type: integer
+            X-Content-Type-Options:
+              schema:
+                type: string
+            Strict-Transport-Security:
+              schema:
+                type: string
+            X-Frame-Options:
+              schema:
+                type: string
+            X-XSS-Protection:
+              schema:
+                type: integer
+            Content-Security-Policy:
+              schema:
+                type: string
+            Referrer-Policy:
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  requestId:
+                    type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+    parameters:
+      - name: workspace
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: flowId
+        in: path
+        required: true
+        schema:
+          type: string
+  /{workspace}/dp/nerv/{flowId}:
+    post:
+      summary: New Run
+      tags:
+        - Workflows
+        - Nerv
+        - Consent + Data Fetch
+      responses:
+        '200':
+          description: New Run
+          headers:
+            Date:
+              schema:
+                type: string
+            Content-Length:
+              schema:
+                type: integer
+            Connection:
+              schema:
+                type: string
+            Vary:
+              schema:
+                type: string
+            Cache-Control:
+              schema:
+                type: string
+            Pragma:
+              schema:
+                type: string
+            Expires:
+              schema:
+                type: integer
+            X-Content-Type-Options:
+              schema:
+                type: string
+            Strict-Transport-Security:
+              schema:
+                type: string
+            X-Frame-Options:
+              schema:
+                type: string
+            X-XSS-Protection:
+              schema:
+                type: integer
+            Content-Security-Policy:
+              schema:
+                type: string
+            Referrer-Policy:
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  requestId:
+                    type: string
+                  redirectUrl:
+                    type: string
+                    format: uri
+      description: >-
+        # Input parameters
+
+
+        | Parameter | Description | Type | M/O |
+
+        | --- | --- | --- | --- |
+
+        | `mobileNumber` | Mobile number of the customer (also used to send SMS
+        with Anubhav link, if enabled) | String | M |
+
+        | `applicationNo` | Your internal system application number (insurance
+        policy identifier, loan application identifier etc.). This will also
+        reflect on the Anubhav Service Console (dedicated UI to track all
+        Anubhav flows). | String | M |
+
+        | `emailId` | Email address of the customer (also used to send email
+        with Anubhav link, if enabled) | String | O |
+
+
+        # Webhooks
+
+
+        Anubhav Financial insights endpoint currently supports one webhook:
+
+
+        - Flow Run Status (key: `flowRunStatus`)
+            
+
+        ## Flow Run Status
+
+
+        Fired when the flow run status changes.  
+
+        To register a dynamic webhook, you can pass an additional parameter in
+        the input as shown below:
+
+
+        ``` json
+
+        "webhook": {
+          "flowRunStatus": "[https://webhook.site/9b888dac-ba87-429a-8de3-d6716ce113f9](https://webhook.site/9b888dac-ba87-429a-8de3-d6716ce113f9)",
+          "addOnParams": {
+            "application": "APP091234",
+            "customerSegment": "hni"
+          }
+        }
+
+
+        ```
+
+
+        where, `flowRunStatus` is the dedicated endpoint on your server as a
+        webhook listener that can recieve POST requests on flow run status
+        changes.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+    parameters:
+      - name: workspace
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: flowId
+        in: path
+        required: true
+        schema:
+          type: string
+  /{workspace}/dp/nerv/{flowId}/{requestId}/status:
+    get:
+      summary: Nerv Get Status
+      tags:
+        - Workflows
+        - Nerv
+        - Consent + Data Fetch
+      responses:
+        '200':
+          description: Nerv Get Status
+          headers:
+            Date:
+              schema:
+                type: string
+            Content-Length:
+              schema:
+                type: integer
+            Connection:
+              schema:
+                type: string
+            Vary:
+              schema:
+                type: string
+            Cache-Control:
+              schema:
+                type: string
+            Pragma:
+              schema:
+                type: string
+            Expires:
+              schema:
+                type: integer
+            X-Content-Type-Options:
+              schema:
+                type: string
+            Strict-Transport-Security:
+              schema:
+                type: string
+            X-Frame-Options:
+              schema:
+                type: string
+            X-XSS-Protection:
+              schema:
+                type: integer
+            Content-Security-Policy:
+              schema:
+                type: string
+            Referrer-Policy:
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  requestId:
+                    type: string
+                  state:
+                    type: object
+                    properties:
+                      state:
+                        type: string
+                      consentStatus:
+                        type: string
+                      dataFetchStatus:
+                        type: string
+    parameters:
+      - name: workspace
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: flowId
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: requestId
+        in: path
+        required: true
+        schema:
+          type: string
+  /{workspace}/dp/nerv/{flowId}/{requestId}/result:
+    get:
+      summary: Nerv Get Result
+      tags:
+        - Workflows
+        - Nerv
+        - Consent + Data Fetch
+      responses:
+        '200':
+          description: Nerv Get Result
+          headers:
+            Date:
+              schema:
+                type: string
+            Content-Length:
+              schema:
+                type: integer
+            Connection:
+              schema:
+                type: string
+            Vary:
+              schema:
+                type: string
+            Cache-Control:
+              schema:
+                type: string
+            Pragma:
+              schema:
+                type: string
+            Expires:
+              schema:
+                type: integer
+            X-Content-Type-Options:
+              schema:
+                type: string
+            Strict-Transport-Security:
+              schema:
+                type: string
+            X-Frame-Options:
+              schema:
+                type: string
+            X-XSS-Protection:
+              schema:
+                type: integer
+            Content-Security-Policy:
+              schema:
+                type: string
+            Referrer-Policy:
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  requestId:
+                    type: string
+                  state:
+                    type: object
+                    properties:
+                      state:
+                        type: string
+                      consentStatus:
+                        type: string
+                      dataFetchStatus:
+                        type: string
+                  data:
+                    type: object
+                    properties:
+                      equities.transactions:
+                        type: array
+                        items:
+                          type: array
+                          items:
+                            type: string
+                      deposit.holders:
+                        type: array
+                        items:
+                          type: array
+                          items:
+                            type: string
+                      recurring_deposit.holders:
+                        type: array
+                        items:
+                          type: array
+                          items:
+                            type: string
+                      nps.summary:
+                        type: array
+                        items:
+                          type: array
+                          items:
+                            type: string
+                      deposit.statement.meta:
+                        type: object
+                        properties:
+                          toTimestamp:
+                            type: integer
+                          fromTimestamp:
+                            type: integer
+                          fromDate:
+                            type: string
+                            format: color
+                          noOfDays:
+                            type: integer
+                          toDate:
+                            type: string
+                            format: color
+                      recurring_deposit.transactions:
+                        type: array
+                        items:
+                          type: array
+                          items:
+                            type: string
+                      insurance_policies.riders:
+                        type: array
+                        items:
+                          type: array
+                          items:
+                            type: string
+                      term_deposit.holders:
+                        type: array
+                        items:
+                          type: array
+                          items:
+                            type: string
+                      insurance_policies.summary:
+                        type: array
+                        items:
+                          type: array
+                          items:
+                            type: string
+                      deposit.transactions:
+                        type: array
+                        items:
+                          type: array
+                          items:
+                            type: string
+                      equities.summary:
+                        type: array
+                        items:
+                          type: array
+                          items:
+                            type: string
+                      term_deposit.summary:
+                        type: array
+                        items:
+                          type: array
+                          items:
+                            type: string
+                      mutual_funds.transactions:
+                        type: array
+                        items:
+                          type: array
+                          items:
+                            type: string
+                      nps.transactions:
+                        type: array
+                        items:
+                          type: array
+                          items:
+                            type: string
+                      insurance_policies.holders:
+                        type: array
+                        items:
+                          type: array
+                          items:
+                            type: string
+                      recurring_deposit.summary:
+                        type: array
+                        items:
+                          type: array
+                          items:
+                            type: string
+                      term_deposit.transactions:
+                        type: array
+                        items:
+                          type: array
+                          items:
+                            type: string
+                      mutual_funds.summary:
+                        type: array
+                        items:
+                          type: array
+                          items:
+                            type: string
+                      nps.holders:
+                        type: array
+                        items:
+                          type: array
+                          items:
+                            type: string
+                      deposit.transactions.meta:
+                        type: object
+                        properties:
+                          accountWiseMeta:
+                            type: array
+                            items:
+                              type: object
+                              properties:
+                                noOfTransactions:
+                                  type: integer
+                                toTimestamp:
+                                  type: integer
+                                maskedAccNumber:
+                                  type: string
+                                fromTimestamp:
+                                  type: integer
+                                fromDate:
+                                  type: string
+                                  format: color
+                                noOfDays:
+                                  type: integer
+                                toDate:
+                                  type: string
+                                  format: color
+                                noOfMonths:
+                                  type: integer
+                          noOfTransactions:
+                            type: integer
+                          toTimestamp:
+                            type: integer
+                          fromTimestamp:
+                            type: integer
+                          fromDate:
+                            type: string
+                            format: color
+                          noOfDays:
+                            type: integer
+                          toDate:
+                            type: string
+                            format: color
+                          noOfMonths:
+                            type: integer
+                      insurance_policies.transactions:
+                        type: array
+                        items:
+                          type: array
+                          items:
+                            type: string
+                      equities.holders:
+                        type: array
+                        items:
+                          type: array
+                          items:
+                            type: string
+                      mutual_funds.holders:
+                        type: array
+                        items:
+                          type: array
+                          items:
+                            type: string
+                      dataReportDetails:
+                        type: object
+                        properties:
+                          downloadUrl:
+                            type: string
+                          downloadUrlExpirationInSeconds:
+                            type: integer
+                      deposit.summary:
+                        type: array
+                        items:
+                          type: array
+                          items:
+                            type: string
+                  addOnParams:
+                    type: object
+                    properties:
+                      application:
+                        type: string
+                      customerSegment:
+                        type: string
+                      other-key-1:
+                        type: string
+    parameters:
+      - name: workspace
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: flowId
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: requestId
+        in: path
+        required: true
+        schema:
+          type: string
+  /{workspace}/dp/nerv/fetch/{flowId}:
+    post:
+      summary: New Recurring Run
+      tags:
+        - Workflows
+        - Nerv
+        - Recurring Data Fetch
+      responses:
+        '200':
+          description: New Recurring Run
+          headers:
+            Date:
+              schema:
+                type: string
+            Content-Length:
+              schema:
+                type: integer
+            Connection:
+              schema:
+                type: string
+            Vary:
+              schema:
+                type: string
+            Cache-Control:
+              schema:
+                type: string
+            Pragma:
+              schema:
+                type: string
+            Expires:
+              schema:
+                type: integer
+            X-Content-Type-Options:
+              schema:
+                type: string
+            Strict-Transport-Security:
+              schema:
+                type: string
+            X-Frame-Options:
+              schema:
+                type: string
+            X-XSS-Protection:
+              schema:
+                type: integer
+            Content-Security-Policy:
+              schema:
+                type: string
+            Referrer-Policy:
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  requestId:
+                    type: string
+      description: >-
+        # Input parameters
+
+
+        | Parameter | Description | Type | M/O |
+
+        | --- | --- | --- | --- |
+
+        | `mobileNumber` | Mobile number of the customer (also used to send SMS
+        with Anubhav link, if enabled) | String | M |
+
+        | `applicationNo` | Your internal system application number (insurance
+        policy identifier, loan application identifier etc.). This will also
+        reflect on the Anubhav Service Console (dedicated UI to track all
+        Anubhav flows). | String | M |
+
+        | `emailId` | Email address of the customer (also used to send email
+        with Anubhav link, if enabled) | String | O |
+
+
+        # Webhooks
+
+
+        Anubhav Financial insights endpoint currently supports one webhook:
+
+
+        - Flow Run Status (key: `flowRunStatus`)
+            
+
+        ## Flow Run Status
+
+
+        Fired when the flow run status changes.  
+
+        To register a dynamic webhook, you can pass an additional parameter in
+        the input as shown below:
+
+
+        ``` json
+
+        "webhook": {
+          "flowRunStatus": "[https://webhook.site/9b888dac-ba87-429a-8de3-d6716ce113f9](https://webhook.site/9b888dac-ba87-429a-8de3-d6716ce113f9)",
+          "addOnParams": {
+            "application": "APP091234",
+            "customerSegment": "hni"
+          }
+        }
+
+
+        ```
+
+
+        where, `flowRunStatus` is the dedicated endpoint on your server as a
+        webhook listener that can recieve POST requests on flow run status
+        changes.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+    parameters:
+      - name: workspace
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: flowId
+        in: path
+        required: true
+        schema:
+          type: string
+  /{workspace}/dp/itreya:
+    post:
+      summary: Itreya New Request
+      tags:
+        - Workflows
+        - Itreya Redirection Flow
+      responses:
+        default:
+          description: Default response
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+    parameters:
+      - name: workspace
+        in: path
+        required: true
+        schema:
+          type: string
+  /{workspace}/dp/itreya/{requestId}/status:
+    get:
+      summary: Itreya Get Status
+      tags:
+        - Workflows
+        - Itreya Redirection Flow
+      responses:
+        default:
+          description: Default response
+    parameters:
+      - name: workspace
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: requestId
+        in: path
+        required: true
+        schema:
+          type: string
+  /{workspace}/dp/itreya/{requestId}/result:
+    get:
+      summary: Itreya Get Result
+      tags:
+        - Workflows
+        - Itreya Redirection Flow
+      responses:
+        default:
+          description: Default response
+    parameters:
+      - name: workspace
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: requestId
+        in: path
+        required: true
+        schema:
+          type: string
+  /{workspace}/dp/shnu/{flowId}:
+    post:
+      summary: New Run
+      tags:
+        - Workflows
+        - Shnu
+        - Multi-Consent + Data Fetch
+      responses:
+        '200':
+          description: example
+          headers:
+            Date:
+              schema:
+                type: string
+            Content-Length:
+              schema:
+                type: integer
+            Connection:
+              schema:
+                type: string
+            Vary:
+              schema:
+                type: string
+            Cache-Control:
+              schema:
+                type: string
+            Pragma:
+              schema:
+                type: string
+            Expires:
+              schema:
+                type: integer
+            X-Content-Type-Options:
+              schema:
+                type: string
+            Strict-Transport-Security:
+              schema:
+                type: string
+            X-Frame-Options:
+              schema:
+                type: string
+            X-XSS-Protection:
+              schema:
+                type: integer
+            Content-Security-Policy:
+              schema:
+                type: string
+            Referrer-Policy:
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  requestId:
+                    type: string
+                  consentHandles:
+                    type: object
+                    properties:
+                      id2:
+                        type: object
+                        properties:
+                          consentHandle:
+                            type: string
+                      id1:
+                        type: object
+                        properties:
+                          consentHandle:
+                            type: string
+                  redirectUrl:
+                    type: string
+                    format: uri
+      description: >-
+        # Input parameters
+
+
+        | Parameter | Description | Type | M/O |
+
+        | --- | --- | --- | --- |
+
+        | `mobileNumber` | Mobile number of the customer (also used to send SMS
+        with Anubhav link, if enabled) | String | M |
+
+        | `applicationNo` | Your internal system application number (insurance
+        policy identifier, loan application identifier etc.). This will also
+        reflect on the Anubhav Service Console (dedicated UI to track all
+        Anubhav flows). | String | M |
+
+        | `emailId` | Email address of the customer (also used to send email
+        with Anubhav link, if enabled) | String | O |
+
+
+        # Webhooks
+
+
+        Anubhav Financial insights endpoint currently supports one webhook:
+
+
+        - Flow Run Status (key: `flowRunStatus`)
+            
+
+        ## Flow Run Status
+
+
+        Fired when the flow run status changes.  
+
+        To register a dynamic webhook, you can pass an additional parameter in
+        the input as shown below:
+
+
+        ``` json
+
+        "webhook": {
+          "flowRunStatus": "[https://webhook.site/9b888dac-ba87-429a-8de3-d6716ce113f9](https://webhook.site/9b888dac-ba87-429a-8de3-d6716ce113f9)",
+          "addOnParams": {
+            "application": "APP091234",
+            "customerSegment": "hni"
+          }
+        }
+
+         ```
+
+        where, `flowRunStatus` is the dedicated endpoint on your server as a
+        webhook listener that can recieve POST requests on flow run status
+        changes.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+    parameters:
+      - name: workspace
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: flowId
+        in: path
+        required: true
+        schema:
+          type: string
+  /{workspace}/dp/shnu/{flowId}/{requestId}/status:
+    get:
+      summary: Get Status
+      tags:
+        - Workflows
+        - Shnu
+        - Multi-Consent + Data Fetch
+      responses:
+        '200':
+          description: example
+          headers:
+            Date:
+              schema:
+                type: string
+            Content-Length:
+              schema:
+                type: integer
+            Connection:
+              schema:
+                type: string
+            Vary:
+              schema:
+                type: string
+            Cache-Control:
+              schema:
+                type: string
+            Pragma:
+              schema:
+                type: string
+            Expires:
+              schema:
+                type: integer
+            X-Content-Type-Options:
+              schema:
+                type: string
+            Strict-Transport-Security:
+              schema:
+                type: string
+            X-Frame-Options:
+              schema:
+                type: string
+            X-XSS-Protection:
+              schema:
+                type: integer
+            Content-Security-Policy:
+              schema:
+                type: string
+            Referrer-Policy:
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  requestId:
+                    type: string
+                  state:
+                    type: object
+                    properties:
+                      id1:
+                        type: object
+                        properties:
+                          state:
+                            type: string
+                          consentHandle:
+                            type: string
+                          consentStatus:
+                            type: string
+                          dataPushStatus:
+                            type: string
+                          dataFetchStatus:
+                            type: string
+                          analyzedDataPush:
+                            nullable: true
+                      id2:
+                        type: object
+                        properties:
+                          state:
+                            type: string
+                          consentHandle:
+                            type: string
+                          consentStatus:
+                            type: string
+                          dataPushStatus:
+                            nullable: true
+                          dataFetchStatus:
+                            nullable: true
+                          analyzedDataPush:
+                            nullable: true
+                      requestId:
+                        type: string
+    parameters:
+      - name: workspace
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: flowId
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: requestId
+        in: path
+        required: true
+        schema:
+          type: string
+  /{workspace}/dp/shnu/{flowId}/{requestId}/result:
+    get:
+      summary: Get Result
+      tags:
+        - Workflows
+        - Shnu
+        - Multi-Consent + Data Fetch
+      responses:
+        '200':
+          description: example
+          headers:
+            Date:
+              schema:
+                type: string
+            Content-Length:
+              schema:
+                type: integer
+            Connection:
+              schema:
+                type: string
+            Vary:
+              schema:
+                type: string
+            Cache-Control:
+              schema:
+                type: string
+            Pragma:
+              schema:
+                type: string
+            Expires:
+              schema:
+                type: integer
+            X-Content-Type-Options:
+              schema:
+                type: string
+            Strict-Transport-Security:
+              schema:
+                type: string
+            X-Frame-Options:
+              schema:
+                type: string
+            X-XSS-Protection:
+              schema:
+                type: integer
+            Content-Security-Policy:
+              schema:
+                type: string
+            Referrer-Policy:
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  requestId:
+                    type: string
+                  state:
+                    type: object
+                    properties:
+                      state:
+                        type: string
+                      consentStatus:
+                        type: string
+                      dataFetchStatus:
+                        type: string
+                  data:
+                    type: object
+                    properties:
+                      depositAccounts:
+                        type: object
+                        properties:
+                          accounts:
+                            type: array
+                            items:
+                              type: object
+                              properties:
+                                accountDetails:
+                                  type: object
+                                  properties:
+                                    currentODLimit:
+                                      type: string
+                                      format: utc-millisec
+                                    openingDate:
+                                      type: string
+                                      format: date
+                                    pendingTransactionType:
+                                      type: string
+                                    fipName:
+                                      type: string
+                                    maskedAccNumber:
+                                      type: string
+                                    branch:
+                                      type: string
+                                    account_type:
+                                      type: string
+                                    currentBalance:
+                                      type: string
+                                    drawingLimit:
+                                      type: string
+                                      format: utc-millisec
+                                    accountAgeInDays:
+                                      type: integer
+                                    status:
+                                      type: string
+                                    micrCode:
+                                      type: string
+                                      format: utc-millisec
+                                    pendingAmount:
+                                      type: integer
+                                    balanceDateTime:
+                                      type: string
+                                      format: style
+                                    currency:
+                                      type: string
+                                    ifscCode:
+                                      type: string
+                                    type:
+                                      type: string
+                                    facility:
+                                      type: string
+                                    exchgeRate:
+                                      type: string
+                                insights:
+                                  type: object
+                                  properties:
+                                    balance:
+                                      type: object
+                                      properties:
+                                        quarterlySummaries:
+                                          type: array
+                                          items:
+                                            type: object
+                                            properties:
+                                              financialYear:
+                                                type: integer
+                                              quarter:
+                                                type: integer
+                                              avgEODBalance:
+                                                type: integer
+                                        nDaySummaries:
+                                          type: object
+                                          properties:
+                                            avgEODBalance:
+                                              type: array
+                                              items:
+                                                type: object
+                                                properties:
+                                                  days:
+                                                    type: integer
+                                                  avgEODBalance:
+                                                    type: number
+                                            avgEodBalanceRatio:
+                                              type: array
+                                              items:
+                                                type: object
+                                                properties:
+                                                  value:
+                                                    type: number
+                                                  ratioOf:
+                                                    type: string
+                                        monthlySummaries:
+                                          type: array
+                                          items:
+                                            type: object
+                                            properties:
+                                              dailyEODBalance:
+                                                type: array
+                                                items:
+                                                  type: number
+                                              eodBalanceOn2nd:
+                                                nullable: true
+                                              eodBalanceOn25th:
+                                                type: number
+                                              transactionStart:
+                                                type: string
+                                                format: style
+                                              year:
+                                                type: string
+                                                format: utc-millisec
+                                              openingBalance:
+                                                type: number
+                                              eodBalanceOn30th:
+                                                type: number
+                                              transactionEnd:
+                                                type: string
+                                              minEODBalance:
+                                                type: number
+                                              eodBalanceOn20th:
+                                                type: number
+                                              eodBalanceOn10th:
+                                                nullable: true
+                                              eodBalanceOn5th:
+                                                nullable: true
+                                              maxEODBalance:
+                                                type: number
+                                              endOfMonthBalance:
+                                                type: number
+                                              avgEODBalance:
+                                                type: number
+                                              eodBalanceOn15th:
+                                                type: number
+                                              month:
+                                                type: string
+                                    debit:
+                                      type: object
+                                      properties:
+                                        overallSummary:
+                                          type: object
+                                          properties:
+                                            noOfChequeBouncedInward:
+                                              type: integer
+                                            noOfCashTransaction:
+                                              type: integer
+                                            amountOfLoanPayments:
+                                              type: number
+                                            amountOfChequeIssued:
+                                              type: integer
+                                            totalAmountNonPenaltyBankCharges:
+                                              type: number
+                                            noOfChequeWithdrawals:
+                                              type: integer
+                                            totalAmountEcsIssue:
+                                              type: integer
+                                            totalAmountDebited:
+                                              type: number
+                                            noOfEcsIssues:
+                                              type: integer
+                                            amountOfCashTransactions:
+                                              type: integer
+                                            amountOfPenaltyTransactions:
+                                              type: integer
+                                            totalInvestment:
+                                              type: integer
+                                            noOfDebitTransactions:
+                                              type: integer
+                                            noOfPenaltyTransactions:
+                                              type: integer
+                                            noOfLoanPayments:
+                                              type: integer
+                                            inwardBouncePercentOfTotalDebit:
+                                              type: integer
+                                            cashDebitPercentOfTotalDebit:
+                                              type: integer
+                                            noOfChequeBouncedOutward:
+                                              type: integer
+                                            totalAmountChequeBouncedInward:
+                                              type: integer
+                                            noOfNonPenaltyBankCharges:
+                                              type: integer
+                                            totalAmountECSBouncesInward:
+                                              type: integer
+                                        nDaySummaries:
+                                          type: array
+                                          items:
+                                            type: object
+                                            properties:
+                                              noOfDebits:
+                                                type: integer
+                                              totalAmountDebited:
+                                                type: number
+                                              walletRecharge:
+                                                type: object
+                                                properties:
+                                                  noOfDebits:
+                                                    type: integer
+                                                  totalAmountDebited:
+                                                    type: integer
+                                              loan:
+                                                type: object
+                                                properties:
+                                                  noOfDebits:
+                                                    type: integer
+                                                  totalAmountDebited:
+                                                    type: number
+                                                  maxAmountDebited:
+                                                    type: number
+                                              maxAmountDebited:
+                                                type: integer
+                                              bankBounce:
+                                                type: object
+                                                properties:
+                                                  noOfDebits:
+                                                    type: integer
+                                                  totalAmountDebited:
+                                                    type: integer
+                                                  maxAmountDebited:
+                                                    type: integer
+                                              avgAmountDebited:
+                                                type: integer
+                                              avgDailyDebits:
+                                                type: integer
+                                              days:
+                                                type: integer
+                                        monthlySummaries:
+                                          type: array
+                                          items:
+                                            type: object
+                                            properties:
+                                              noOfChequeBouncedInward:
+                                                type: integer
+                                              noOfTransactions:
+                                                type: integer
+                                              expense:
+                                                type: object
+                                                properties:
+                                                  bankCharges:
+                                                    type: integer
+                                                  noOfTransactions:
+                                                    type: integer
+                                                  utilityExpenses:
+                                                    type: number
+                                                  recurringDebits:
+                                                    type: integer
+                                                  totalAmountOfTransaction:
+                                                    type: number
+                                                  creditCardExpenses:
+                                                    type: integer
+                                              top10HighValueDebitsTxnIndices:
+                                                type: array
+                                                items:
+                                                  type: integer
+                                              noOfCashTransaction:
+                                                type: integer
+                                              totalAmountChequeBouncedOutward:
+                                                type: integer
+                                              noOfECSBouncedInward:
+                                                type: integer
+                                              transactionStart:
+                                                type: string
+                                                format: style
+                                              amountOfChequeIssued:
+                                                type: integer
+                                              noOfChequeWithdrawals:
+                                                type: integer
+                                              year:
+                                                type: string
+                                                format: utc-millisec
+                                              drawingLimit:
+                                                nullable: true
+                                              amountOfCashTransactions:
+                                                type: integer
+                                              amountOfPenaltyTransactions:
+                                                type: integer
+                                              totalInvestment:
+                                                type: integer
+                                              loan:
+                                                type: object
+                                                properties:
+                                                  noOfTransactions:
+                                                    type: integer
+                                                  totalAmountOfTransaction:
+                                                    type: number
+                                                  noOfEmiBounces:
+                                                    type: integer
+                                                  amountOfEmiBounces:
+                                                    type: integer
+                                              transactionEnd:
+                                                type: string
+                                              totalAmountOfTransaction:
+                                                type: number
+                                              odLimit:
+                                                nullable: true
+                                              noOfPenaltyTransactions:
+                                                type: integer
+                                              inwardBouncePercentOfTotalDebit:
+                                                type: integer
+                                              cashDebitPercentOfTotalDebit:
+                                                type: integer
+                                              noOfChequeBouncedOutward:
+                                                type: integer
+                                              amountOfTop5:
+                                                type: number
+                                              totalAmountChequeBouncedInward:
+                                                type: integer
+                                              month:
+                                                type: string
+                                              totalAmountECSBouncesInward:
+                                                type: integer
+                                        regularDebitsTxnIndices:
+                                          type: array
+                                          items:
+                                            type: array
+                                            items:
+                                              type: integer
+                                    credit:
+                                      type: object
+                                      properties:
+                                        overallSummary:
+                                          type: object
+                                          properties:
+                                            amountOfChequeDeposits:
+                                              type: integer
+                                            salaryDateVariation:
+                                              type: boolean
+                                            salaryIdentified:
+                                              type: boolean
+                                            noOfSalTxnInLast180Days:
+                                              type: integer
+                                            noOfCashTransaction:
+                                              type: integer
+                                            noOfChequeDeposits:
+                                              type: integer
+                                            totalAmountCredited:
+                                              type: number
+                                            salaryStats:
+                                              type: object
+                                              properties:
+                                                variance:
+                                                  type: number
+                                                interQuartileRange:
+                                                  type: number
+                                                range:
+                                                  type: number
+                                                average:
+                                                  type: number
+                                                standardDeviation:
+                                                  type: number
+                                                dateVariance:
+                                                  type: number
+                                            salaryAmountVariation:
+                                              type: boolean
+                                            amountOfCashTransactions:
+                                              type: integer
+                                            totalInvestment:
+                                              type: number
+                                            salary:
+                                              type: number
+                                            cashCreditPercentOfTotalCredit:
+                                              type: integer
+                                            noOfSalaryCredits:
+                                              type: integer
+                                            avgMonthlySalInLast180Days:
+                                              type: number
+                                            totalLoanCredited:
+                                              type: integer
+                                            noOfLoanCredits:
+                                              type: integer
+                                            noOfCreditTransactions:
+                                              type: integer
+                                        nDaySummaries:
+                                          type: array
+                                          items:
+                                            type: object
+                                            properties:
+                                              nonLoan:
+                                                type: object
+                                                properties:
+                                                  noOfCredits:
+                                                    type: integer
+                                                  totalAmountCredited:
+                                                    type: number
+                                                  maxAmountCredited:
+                                                    type: integer
+                                              maxAmountCredited:
+                                                type: integer
+                                              totalAmountCredited:
+                                                type: number
+                                              noOfCredits:
+                                                type: integer
+                                              salary:
+                                                type: object
+                                                properties:
+                                                  noOfCredits:
+                                                    type: integer
+                                                  totalAmountCredited:
+                                                    type: integer
+                                                  maxAmountCredited:
+                                                    type: number
+                                              loan:
+                                                type: object
+                                                properties:
+                                                  noOfCredits:
+                                                    type: integer
+                                                  totalAmountCredited:
+                                                    type: integer
+                                                  maxAmountCredited:
+                                                    type: integer
+                                              days:
+                                                type: integer
+                                        monthlySummaries:
+                                          type: array
+                                          items:
+                                            type: object
+                                            properties:
+                                              amountOfChequeDeposits:
+                                                type: integer
+                                              noOfTransactions:
+                                                type: integer
+                                              noOfCashTransaction:
+                                                type: integer
+                                              noOfChequeDeposits:
+                                                type: integer
+                                              transactionStart:
+                                                type: string
+                                                format: style
+                                              year:
+                                                type: string
+                                                format: utc-millisec
+                                              amountOfCashTransactions:
+                                                type: integer
+                                              transactionEnd:
+                                                type: string
+                                              totalAmountOfTransaction:
+                                                type: number
+                                              income:
+                                                type: object
+                                                properties:
+                                                  noOfTransactions:
+                                                    type: integer
+                                                  salarySource:
+                                                    nullable: true
+                                                  salary:
+                                                    type: integer
+                                                  totalAmountOfTransaction:
+                                                    type: number
+                                                  interest:
+                                                    type: number
+                                                  noOfSalaryCredits:
+                                                    type: integer
+                                                  investment:
+                                                    type: integer
+                                                  loanCredit:
+                                                    type: integer
+                                                  noOfLoanCredits:
+                                                    type: integer
+                                                  salaryCreditDate:
+                                                    nullable: true
+                                              amountOfTop5:
+                                                type: number
+                                              top10HighValueCreditsTxnIndices:
+                                                type: array
+                                                items:
+                                                  type: integer
+                                              month:
+                                                type: string
+                                        regularCreditsTxnIndices:
+                                          type: array
+                                          items:
+                                            type: array
+                                            items:
+                                              type: integer
+                                    fcuIndicators:
+                                      type: array
+                                      items:
+                                        type: object
+                                        properties:
+                                          indicator:
+                                            type: string
+                                          present:
+                                            type: boolean
+                                          txnIndices:
+                                            type: array
+                                            items:
+                                              type: integer
+                                accountHolder:
+                                  type: object
+                                  properties:
+                                    name:
+                                      type: string
+                                    email:
+                                      type: string
+                                      format: email
+                                    dob:
+                                      type: string
+                                      format: date
+                                    landLine:
+                                      nullable: true
+                                    address:
+                                      type: string
+                                    ckycCompliance:
+                                      type: boolean
+                                    type:
+                                      type: string
+                                    mobile:
+                                      type: string
+                                      format: utc-millisec
+                                    pan:
+                                      type: string
+                                    nominee:
+                                      type: string
+                                statementMeta:
+                                  type: object
+                                  properties:
+                                    noOfTransactions:
+                                      type: integer
+                                    statementVintage:
+                                      type: object
+                                      properties:
+                                        from:
+                                          type: string
+                                          format: style
+                                        to:
+                                          type: string
+                                    transactionStart:
+                                      type: string
+                                      format: style
+                                    secondLastCompleteMonthYear:
+                                      type: object
+                                      properties:
+                                        month:
+                                          type: string
+                                        year:
+                                          type: string
+                                          format: utc-millisec
+                                    thirdLastCompleteMonthYear:
+                                      type: object
+                                      properties:
+                                        month:
+                                          type: string
+                                        year:
+                                          type: string
+                                          format: utc-millisec
+                                    transactionEnd:
+                                      type: string
+                                      format: style
+                                    latestCompleteMonthYear:
+                                      type: object
+                                      properties:
+                                        month:
+                                          type: string
+                                        year:
+                                          type: string
+                                          format: utc-millisec
+                                transactions:
+                                  type: array
+                                  items:
+                                    type: object
+                                    properties:
+                                      reference:
+                                        type: string
+                                      txnId:
+                                        type: string
+                                      transactionTimestamp:
+                                        type: string
+                                        format: style
+                                      currentBalance:
+                                        type: number
+                                      amount:
+                                        type: number
+                                      valueDate:
+                                        type: string
+                                        format: date
+                                      narration:
+                                        type: string
+                                        format: style
+                                      mode:
+                                        type: string
+                                      category:
+                                        type: array
+                                        items:
+                                          type: string
+                                      type:
+                                        type: string
+                                      index:
+                                        type: integer
+                      meta:
+                        type: object
+                        properties:
+                          version:
+                            type: string
+                      lendingInsightReportDetails:
+                        type: object
+                        properties:
+                          storageRef:
+                            type: object
+                            properties:
+                              fileName:
+                                type: string
+                          downloadUrl:
+                            type: string
+                            format: uri
+                          downloadUrlExpirationInSeconds:
+                            type: integer
+                  addOnParams:
+                    type: object
+                    properties:
+                      type:
+                        type: string
+                      caller-key1:
+                        type: string
+    parameters:
+      - name: workspace
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: flowId
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: requestId
+        in: path
+        required: true
+        schema:
+          type: string
+  /{workspace}/dp/shnu/fetch/{flowId}:
+    post:
+      summary: New Run
+      tags:
+        - Workflows
+        - Shnu
+        - Recurring Data Fetch
+      responses:
+        default:
+          description: Default response
+      description: >-
+        # Input parameters
+
+
+        | Parameter | Description | Type | M/O |
+
+        | --- | --- | --- | --- |
+
+        | `mobileNumber` | Mobile number of the customer (also used to send SMS
+        with Anubhav link, if enabled) | String | M |
+
+        | `applicationNo` | Your internal system application number (insurance
+        policy identifier, loan application identifier etc.). This will also
+        reflect on the Anubhav Service Console (dedicated UI to track all
+        Anubhav flows). | String | M |
+
+        | `emailId` | Email address of the customer (also used to send email
+        with Anubhav link, if enabled) | String | O |
+
+
+        # Webhooks
+
+
+        Anubhav Financial insights endpoint currently supports one webhook:
+
+
+        - Flow Run Status (key: `flowRunStatus`)
+            
+
+        ## Flow Run Status
+
+
+        Fired when the flow run status changes.  
+
+        To register a dynamic webhook, you can pass an additional parameter in
+        the input as shown below:
+
+
+        ``` json
+
+        "webhook": {
+          "flowRunStatus": "[https://webhook.site/9b888dac-ba87-429a-8de3-d6716ce113f9](https://webhook.site/9b888dac-ba87-429a-8de3-d6716ce113f9)",
+          "addOnParams": {
+            "application": "APP091234",
+            "customerSegment": "hni"
+          }
+        }
+
+
+        ```
+
+
+        where, `flowRunStatus` is the dedicated endpoint on your server as a
+        webhook listener that can recieve POST requests on flow run status
+        changes.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+    parameters:
+      - name: workspace
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: flowId
+        in: path
+        required: true
+        schema:
+          type: string
+  /{workspace}/dp/itreya/{flowId}:
+    post:
+      summary: New Run
+      tags:
+        - Workflows
+        - Itreya2 Redirection Flow-encr
+      responses:
+        default:
+          description: Default response
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+    parameters:
+      - name: workspace
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: flowId
+        in: path
+        required: true
+        schema:
+          type: string
+  /{workspace}/dp/itreya/{flowId}/{requestId}/status:
+    get:
+      summary: Get Status
+      tags:
+        - Workflows
+        - Itreya2 Redirection Flow-encr
+      responses:
+        default:
+          description: Default response
+    parameters:
+      - name: workspace
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: flowId
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: requestId
+        in: path
+        required: true
+        schema:
+          type: string
+  /{workspace}/dp/itreya/{flowId}/{requestId}/result:
+    get:
+      summary: Get Result
+      tags:
+        - Workflows
+        - Itreya2 Redirection Flow-encr
+      responses:
+        default:
+          description: Default response
+    parameters:
+      - name: workspace
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: flowId
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: requestId
+        in: path
+        required: true
+        schema:
+          type: string
+  /{workspace}/dp/nesh/{flowId}:
+    post:
+      summary: New Run
+      tags:
+        - Workflows
+        - Nesh
+        - Consent + Data Fetch
+      responses:
+        default:
+          description: Default response
+      description: >-
+        # Input parameters
+
+
+        | Parameter | Description | Type | M/O |
+
+        | --- | --- | --- | --- |
+
+        | `mobileNumber` | Mobile number of the customer (also used to send SMS
+        with Anubhav link, if enabled) | String | M |
+
+        | `applicationNo` | Your internal system application number (insurance
+        policy identifier, loan application identifier etc.). This will also
+        reflect on the Anubhav Service Console (dedicated UI to track all
+        Anubhav flows). | String | M |
+
+        | `emailId` | Email address of the customer (also used to send email
+        with Anubhav link, if enabled) | String | O |
+
+
+        # Webhooks
+
+
+        Anubhav Financial insights endpoint currently supports one webhook:
+
+
+        - Flow Run Status (key: `flowRunStatus`)
+            
+
+        ## Flow Run Status
+
+
+        Fired when the flow run status changes.  
+
+        To register a dynamic webhook, you can pass an additional parameter in
+        the input as shown below:
+
+
+        ``` json
+
+        "webhook": {
+          "flowRunStatus": "[https://webhook.site/9b888dac-ba87-429a-8de3-d6716ce113f9](https://webhook.site/9b888dac-ba87-429a-8de3-d6716ce113f9)",
+          "addOnParams": {
+            "application": "APP091234",
+            "customerSegment": "hni"
+          }
+        }
+
+         ```
+
+        where, `flowRunStatus` is the dedicated endpoint on your server as a
+        webhook listener that can recieve POST requests on flow run status
+        changes.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+    parameters:
+      - name: workspace
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: flowId
+        in: path
+        required: true
+        schema:
+          type: string
+  /{workspace}/dp/nesh/{flowId}/{requestId}/status:
+    get:
+      summary: Get Status
+      tags:
+        - Workflows
+        - Nesh
+        - Consent + Data Fetch
+      responses:
+        default:
+          description: Default response
+    parameters:
+      - name: workspace
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: flowId
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: requestId
+        in: path
+        required: true
+        schema:
+          type: string
+  /{workspace}/dp/nesh/{flowId}/{requestId}/result:
+    get:
+      summary: Get Result
+      tags:
+        - Workflows
+        - Nesh
+        - Consent + Data Fetch
+      responses:
+        default:
+          description: Default response
+    parameters:
+      - name: workspace
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: flowId
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: requestId
+        in: path
+        required: true
+        schema:
+          type: string
+  /{workspace}/dp/nesh/fetch/{flowId}:
+    post:
+      summary: New Run
+      tags:
+        - Workflows
+        - Nesh
+        - Recurring Data Fetch
+      responses:
+        default:
+          description: Default response
+      description: >-
+        # Input parameters
+
+
+        | Parameter | Description | Type | M/O |
+
+        | --- | --- | --- | --- |
+
+        | `mobileNumber` | Mobile number of the customer (also used to send SMS
+        with Anubhav link, if enabled) | String | M |
+
+        | `applicationNo` | Your internal system application number (insurance
+        policy identifier, loan application identifier etc.). This will also
+        reflect on the Anubhav Service Console (dedicated UI to track all
+        Anubhav flows). | String | M |
+
+        | `emailId` | Email address of the customer (also used to send email
+        with Anubhav link, if enabled) | String | O |
+
+
+        # Webhooks
+
+
+        Anubhav Financial insights endpoint currently supports one webhook:
+
+
+        - Flow Run Status (key: `flowRunStatus`)
+            
+
+        ## Flow Run Status
+
+
+        Fired when the flow run status changes.  
+
+        To register a dynamic webhook, you can pass an additional parameter in
+        the input as shown below:
+
+
+        ``` json
+
+        "webhook": {
+          "flowRunStatus": "[https://webhook.site/9b888dac-ba87-429a-8de3-d6716ce113f9](https://webhook.site/9b888dac-ba87-429a-8de3-d6716ce113f9)",
+          "addOnParams": {
+            "application": "APP091234",
+            "customerSegment": "hni"
+          }
+        }
+
+
+        ```
+
+
+        where, `flowRunStatus` is the dedicated endpoint on your server as a
+        webhook listener that can recieve POST requests on flow run status
+        changes.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+    parameters:
+      - name: workspace
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: flowId
+        in: path
+        required: true
+        schema:
+          type: string
+  /{workspace}/dp/consent-revoke/{flowId}:
+    post:
+      summary: Consent revoke
+      tags:
+        - Workflows
+        - ConsentRevoke
+      responses:
+        '200':
+          description: example
+          headers:
+            Date:
+              schema:
+                type: string
+            Content-Length:
+              schema:
+                type: integer
+            Connection:
+              schema:
+                type: string
+            Vary:
+              schema:
+                type: string
+            Cache-Control:
+              schema:
+                type: string
+            Pragma:
+              schema:
+                type: string
+            Expires:
+              schema:
+                type: integer
+            X-Content-Type-Options:
+              schema:
+                type: string
+            Strict-Transport-Security:
+              schema:
+                type: string
+            X-Frame-Options:
+              schema:
+                type: string
+            X-XSS-Protection:
+              schema:
+                type: integer
+            Content-Security-Policy:
+              schema:
+                type: string
+            Referrer-Policy:
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  requestId:
+                    type: string
+                  journeyUrl:
+                    type: string
+                    format: uri
+      description: >-
+        # Input parameters
+
+
+        | Parameter | Description | Type | M/O |
+
+        | --- | --- | --- | --- |
+
+        | `mobileNumber` | Mobile number of the customer (also used to send SMS
+        with Anubhav link, if enabled) | String | M |
+
+        | `applicationNo` | Your internal system application number (insurance
+        policy identifier, loan application identifier etc.). This will also
+        reflect on the Anubhav Service Console (dedicated UI to track all
+        Anubhav flows). | String | M |
+
+        | `emailId` | Email address of the customer (also used to send email
+        with Anubhav link, if enabled) | String | O |
+
+
+        # Webhooks
+
+
+        Anubhav Financial insights endpoint currently supports one webhook:
+
+
+        - Flow Run Status (key: `flowRunStatus`)
+            
+
+        ## Flow Run Status
+
+
+        Fired when the flow run status changes.  
+
+        To register a dynamic webhook, you can pass an additional parameter in
+        the input as shown below:
+
+
+        ``` json
+
+        "webhook": {
+          "flowRunStatus": "[https://webhook.site/9b888dac-ba87-429a-8de3-d6716ce113f9](https://webhook.site/9b888dac-ba87-429a-8de3-d6716ce113f9)",
+          "addOnParams": {
+            "application": "APP091234",
+            "customerSegment": "hni"
+          }
+        }
+
+         ```
+
+        where, `flowRunStatus` is the dedicated endpoint on your server as a
+        webhook listener that can recieve POST requests on flow run status
+        changes.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+    parameters:
+      - name: workspace
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: flowId
+        in: path
+        required: true
+        schema:
+          type: string
+  /{workspace}/run/flow/status/{flowId}/{requestId}:
+    get:
+      summary: Get Status
+      tags:
+        - Workflows
+        - ConsentRevoke
+      responses:
+        default:
+          description: example
+          content:
+            application/json:
+              schema:
+                type: object
+    parameters:
+      - name: workspace
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: flowId
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: requestId
+        in: path
+        required: true
+        description: consentHandle
+        schema:
+          type: string
+  /endpoint/health:
+    get:
+      summary: Health check
+      tags:
+        - Healthcheck
+      responses:
+        default:
+          description: Health check
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                  endpoints:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        path:
+                          type: string
+                          format: style
+                        status:
+                          type: string
+  /{workspace}/consent/aa/template:
+    get:
+      summary: Browse consent templates
+      tags:
+        - Other endpoints — Auth, meta etc.
+        - Consent templates
+      responses:
+        default:
+          description: Default response
+    parameters:
+      - name: workspace
+        in: path
+        required: true
+        schema:
+          type: string
+    post:
+      summary: Create new Consent Template
+      tags:
+        - Other endpoints — Auth, meta etc.
+        - Consent templates
+      responses:
+        default:
+          description: Default response
+      description: >-
+        | **Parameter Name** | **Description** |
+
+        | --- | --- |
+
+        | consentStartOffset | Example: `1m` — 1 minute in future when consent
+        is raised.  <br>  <br>If consent is raised at `2021-11-16T08:57:11.111Z`
+        then **consentStart** will be set to: `2021-11-16T09:57:11.111Z` |
+
+        | consentExpiryDuration | Example: `1d` — 1 day from **consentStart**. 
+        <br>  <br>If **consentStart** is `2021-11-16T09:57:11.111Z`, then
+        **consentExpiry** will be set to: `2021-11-17T09:57:11.111Z` |
+
+        | consentMode | Same as standard API.  <br>One of: VIEW / STORE / QUERY
+        / STREAM |
+
+        | consentTypes | Any or all of: PROFILE / SUMMARY / TRANSACTIONS |
+
+        | fiTypes | FITypes names should be as defined in the AA Technical
+        Specification. |
+
+        | purposeCode | One of: 101 / 102 / 103 / 104 / 105 |
+
+        | fetchType | One of: ONETIME / PERIODIC |
+
+        | consentTemplateDataRange | See following table for more details. |
+
+        | frequency | Frequency information for periodic (\`fetchType =
+        PERIODIC\`) information access.  <br>  <br>Example: `6h` — means **6**
+        FI request per hour.  <br>  <br>Supported Units: **h** / **d** / **M** /
+        **y** / **i** <br>(Refer note about Time notations at the bottom) |
+
+        | dataLife | How long to store data when `consentMode = STORE`.  <br> 
+        <br>Supported Units: **d** / **M** / **y** / **i** <br>(Refer note
+        about Time notations at the bottom) |
+
+
+        ## **Consent Template Data Range**
+
+
+        | **Data Range****Type Enumerations** | **Example (s)** | Description |
+
+        | --- | --- | --- |
+
+        | FINANCIAL_YEAR | For current FY, use:  <br>`{ "type":
+        "FINANCIAL_YEAR", "year": "0" }`  <br>  <br>For current and last 1 FY,
+        use:  <br>`{ "type": "FINANCIAL_YEAR", "year": "1" }` | If consent is
+        raised on `2021-11-16` then date range generated for consent is:  <br> 
+        <br>`{ "from": "2021-04-01T00:00:00.000Z", "to":
+        "2022-03-31T23:59:59.999Z" }` |
+
+        | FIXED | `{ "type": "FIXED", "from": "2020-04-01T00:00:00.000Z", "to":
+        "2022-03-31T23:59:59.999Z" }` | Values specified in the consent Template
+        will be considered. |
+
+        | SAME_AS_CONSENT | `{ "type": "SAME_AS_CONSENT" }` | If
+        **consentStart**: `2021-11-16T09:57:11.111Z` and **consentExpiry**:
+        `2021-11-17T09:57:11.111Z`, then  <br>data range will be as follows: 
+        <br>  <br>`{ "from": "2021-11-16T09:57:11.111Z", "to":
+        "2021-11-17T09:57:11.111Z" }` |
+
+        | CONSENT_START_RELATIVE | Date range will be relative to
+        resolved`consentStart` and `consentEnd`  <br>  <br>`{ "type":
+        "CONSENT_START_RELATIVE", "from": "-6M", "to": "0m" }` | If
+        **consentStart**: `2021-11-16T18:47:08.235Z` and **consentExpiry**:
+        `2021-11-17T18:47:08.235Z`, then data range will be as follows:  <br> 
+        <br>`{ "from": "2021-05-16T18:47:08.235", "to":
+        "2all 1-11-16T18:47:08.235" }` |
+
+
+        ### Time/Duration Notations
+
+
+        The time/duration notations expected in the Consent template definition
+        use the follow notations.
+
+
+        | **Notation** | **Time Unit** |
+
+        | --- | --- |
+
+        | s | Seconds |
+
+        | m | Minute |
+
+        | h | Hour |
+
+        | d | Day |
+
+        | w | Week |
+
+        | M | Month |
+
+        | y | Year |
+
+        | i | Infinite^ |
+
+
+        **^** Only supported in some fields: dataExpiry and frequency.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+  /{workspace}/consent/aa/template/{id}:
+    get:
+      summary: Get consent template by identifier
+      tags:
+        - Other endpoints — Auth, meta etc.
+        - Consent templates
+      responses:
+        default:
+          description: Default response
+    parameters:
+      - name: workspace
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: id
+        in: path
+        required: true
+        description: Identifier for the template
+        schema:
+          type: string
+  /{workspace}/institutions/aa/fip:
+    get:
+      summary: Get FIPs on AA network
+      tags:
+        - Other endpoints — Auth, meta etc.
+        - Institutions
+      responses:
+        '200':
+          description: Factory / Institutions / FIPs
+          headers:
+            Date:
+              schema:
+                type: string
+            Content-Length:
+              schema:
+                type: integer
+            Connection:
+              schema:
+                type: string
+            Vary:
+              schema:
+                type: string
+            Cache-Control:
+              schema:
+                type: string
+            Pragma:
+              schema:
+                type: string
+            Expires:
+              schema:
+                type: integer
+            X-Content-Type-Options:
+              schema:
+                type: string
+            Strict-Transport-Security:
+              schema:
+                type: string
+            X-Frame-Options:
+              schema:
+                type: string
+            X-XSS-Protection:
+              schema:
+                type: integer
+            Content-Security-Policy:
+              schema:
+                type: string
+            Referrer-Policy:
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  content:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        version:
+                          type: string
+                          format: utc-millisec
+                        name:
+                          type: string
+                        id:
+                          type: string
+                        fiTypes:
+                          type: array
+                          items:
+                            type: string
+                  pageable:
+                    type: object
+                    properties:
+                      sort:
+                        type: object
+                        properties:
+                          sorted:
+                            type: boolean
+                          empty:
+                            type: boolean
+                          unsorted:
+                            type: boolean
+                      pageSize:
+                        type: integer
+                      pageNumber:
+                        type: integer
+                      offset:
+                        type: integer
+                      paged:
+                        type: boolean
+                      unpaged:
+                        type: boolean
+                  totalPages:
+                    type: integer
+                  totalElements:
+                    type: integer
+                  last:
+                    type: boolean
+                  number:
+                    type: integer
+                  size:
+                    type: integer
+                  numberOfElements:
+                    type: integer
+                  sort:
+                    type: object
+                    properties:
+                      sorted:
+                        type: boolean
+                      empty:
+                        type: boolean
+                      unsorted:
+                        type: boolean
+                  first:
+                    type: boolean
+                  empty:
+                    type: boolean
+    parameters:
+      - name: workspace
+        in: path
+        required: true
+        schema:
+          type: string
+    patch:
+      summary: Update (enable/disable) FIP(s) status
+      tags:
+        - Other endpoints — Auth, meta etc.
+        - Institutions
+      responses:
+        '202':
+          description: Update FIP
+          headers:
+            Date:
+              schema:
+                type: string
+            Content-Length:
+              schema:
+                type: integer
+            Connection:
+              schema:
+                type: string
+            Vary:
+              schema:
+                type: string
+            Cache-Control:
+              schema:
+                type: string
+            Pragma:
+              schema:
+                type: string
+            Expires:
+              schema:
+                type: integer
+            X-Content-Type-Options:
+              schema:
+                type: string
+            Strict-Transport-Security:
+              schema:
+                type: string
+            X-Frame-Options:
+              schema:
+                type: string
+            X-XSS-Protection:
+              schema:
+                type: integer
+            Content-Security-Policy:
+              schema:
+                type: string
+            Referrer-Policy:
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  txnId:
+                    type: string
+                  timestamp:
+                    type: string
+                    format: date-time
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                fips:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      fipId:
+                        type: string
+                      enabled:
+                        type: boolean
+  /{workspace}/institutions/aa/fip/status:
+    get:
+      summary: Get FIP Health Status
+      tags:
+        - Other endpoints — Auth, meta etc.
+        - Institutions
+      responses:
+        default:
+          description: Get FIP Status-detailed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  fipHealthStats:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        fip:
+                          type: string
+                        journeyMetric:
+                          type: object
+                          properties:
+                            UserDiscoveryResponse:
+                              type: integer
+                            ConsentPostResponse:
+                              type: integer
+                        dataFetchSuccessRate:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              duration:
+                                type: string
+                              value:
+                                type: number
+                        cause:
+                          type: string
+                        preferredAction:
+                          type: string
+    parameters:
+      - name: workspace
+        in: path
+        required: true
+        schema:
+          type: string

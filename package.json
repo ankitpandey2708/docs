@@ -1,0 +1,38 @@
+{
+  "name": "my-app",
+  "version": "0.1.0",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "dev": "concurrently \"npm run server\" \"zudoku dev\"",
+    "build": "zudoku build",
+    "server": "tsx server.ts",
+    "lint": "eslint"
+  },
+  "dependencies": {
+    "@clerk/clerk-js": "^5.102.0",
+    "concurrently": "^8.2.2",
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2",
+    "http-proxy-middleware": "^2.0.6",
+    "js-yaml": "^4.1.0",
+    "jsonwebtoken": "^9.0.2",
+    "jwks-rsa": "^3.1.0",
+    "pagefind": "^1.4.0",
+    "react": ">=19.0.0",
+    "react-dom": ">=19.0.0",
+    "zudoku": "0.62"
+  },
+  "devDependencies": {
+    "@types/js-yaml": "^4.0.9",
+    "@types/node": "^22",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "@typescript-eslint/eslint-plugin": "^8",
+    "@typescript-eslint/parser": "^8",
+    "eslint": "^8",
+    "tsx": "^4.20.6",
+    "typescript": "^5"
+  }
+}

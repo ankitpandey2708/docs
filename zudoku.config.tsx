@@ -14,6 +14,9 @@ const config: ZudokuConfig = {
       width: "130px",
     },
   },
+  search: {
+    type: "pagefind",
+  },
   navigation: [
     {
       type: "category",

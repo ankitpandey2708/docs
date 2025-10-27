@@ -4,7 +4,7 @@
   "type": "module",
   "private": true,
   "scripts": {
-    "dev": "concurrently \"npm run server\" \"zudoku dev\"",
+    "dev": "concurrently \"zudoku dev\"",
     "build": "zudoku build",
     "preview": "zudoku preview",
     "server": "tsx server.ts",

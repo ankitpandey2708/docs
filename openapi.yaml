@@ -5,7 +5,9 @@ info:
   contact: {}
 servers:
 - url: https://api.finarkein.in/factory/v1
-- url: '{{AUTH_TOKEN_URL}}'
+  description: Factory API Server
+- url: https://id.finarkein.com/auth/realms/fin-dev/protocol/openid-connect
+  description: Authentication Server
 paths:
   /{workspace}/dp/nerv/{flowId}:
     post:
@@ -14,6 +16,8 @@ paths:
       summary: New Run
       description: New Run
       operationId: newRun
+      security:
+      - bearerAuth: []
       requestBody:
         content:
           application/json:
@@ -157,6 +161,8 @@ paths:
       tags:
       - Nerv
       summary: New Recurring Run
+      security:
+      - bearerAuth: []
       description: "# Input parameters\n\n| Parameter | Description | Type | M/O |\n\
         | --- | --- | --- | --- |\n| `mobileNumber` | Mobile number of the customer\
         \ (also used to send SMS with Anubhav link, if enabled) | String | M |\n|\
@@ -304,6 +310,8 @@ paths:
       summary: Get Status
       description: Get Status
       operationId: getStatus
+      security:
+      - bearerAuth: []
       responses:
         '200':
           description: Get Status
@@ -414,6 +422,8 @@ paths:
       summary: Get Result
       description: Get Result
       operationId: getResult
+      security:
+      - bearerAuth: []
       requestBody:
         content:
           application/json:
@@ -1124,6 +1134,8 @@ paths:
       summary: Browse consent templates
       description: Browse consent templates
       operationId: browseConsentTemplates
+      security:
+      - bearerAuth: []
       responses:
         '200':
           description: ''
@@ -1191,6 +1203,8 @@ paths:
       tags:
       - Consent templates
       summary: Create new Consent Template
+      security:
+      - bearerAuth: []
       description: '| **Parameter Name** | **Description** |
 
         | --- | --- |
@@ -1371,6 +1385,8 @@ paths:
       summary: Get consent template by identifier
       description: Get consent template by identifier
       operationId: getConsentTemplateByIdentifier
+      security:
+      - bearerAuth: []
       responses:
         '200':
           description: ''
@@ -1455,6 +1471,8 @@ paths:
       summary: Get FIPs on AA network
       description: Get FIPs on AA network
       operationId: getFipsOnAaNetwork
+      security:
+      - bearerAuth: []
       responses:
         '200':
           description: Factory / Institutions / FIPs
@@ -1661,6 +1679,8 @@ paths:
       summary: Update (enable/disable) FIP(s) status
       description: Update (enable/disable) FIP(s) status
       operationId: updateEnableDisableFipSStatus
+      security:
+      - bearerAuth: []
       requestBody:
         content:
           application/json:
@@ -1777,6 +1797,8 @@ paths:
       summary: Get FIP Health Status
       description: Get FIP Health Status
       operationId: getFipHealthStatus
+      security:
+      - bearerAuth: []
       responses:
         '200':
           description: ''
@@ -2031,6 +2053,20 @@ components:
     basicAuth:
       type: http
       scheme: basic
+      description: Basic authentication using client_id as username and client_secret as password
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: Bearer token obtained from the Generate Access token endpoint
+    oauth2:
+      type: oauth2
+      flows:
+        clientCredentials:
+          tokenUrl: https://id.finarkein.com/auth/realms/fin-dev/protocol/openid-connect/token
+          scopes:
+            email: Access to email
+            profile: Access to profile
 tags:
 - name: Nerv
 - name: Consent templates

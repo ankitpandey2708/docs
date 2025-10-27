@@ -85,16 +85,12 @@ const config: ZudokuConfig = {
     createApiIdentityPlugin({
       getIdentities: async (context) => [
         {
-          id: "abc",
-          label: "xyz",
+          id: "oauth2-client-credentials",
+          label: "OAuth 2.0 Client Credentials",
           authorizeRequest: async (request) => {
-            const token = await context.authentication?.getAccessToken();
- 
-            if (token) {
-              request.headers.set("Authorization", `Bearer ${token}`);
-            } else {
-            }
-
+            // The OAuth2 token will be automatically managed by Zudoku
+            // when users use the "Authorize" button in the OpenAPI UI
+            // Zudoku reads the security scheme from openapi.yaml and handles the token exchange
             return request;
           },
         },

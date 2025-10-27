@@ -5,6 +5,7 @@ info:
   description: ''
 servers:
   - url: https://api.finarkein.in/factory/v1
+  - url: https://id.finarkein.com
 paths:
   /{workspace}/dp/nerv/{flowId}:
     servers:

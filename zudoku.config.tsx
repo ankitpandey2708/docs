@@ -17,10 +17,15 @@ const config: ZudokuConfig = {
   search: {
     type: "pagefind",
   },
+  docs: {
+    defaultOptions: {
+      showLastModified: false
+    }
+  },
   navigation: [
     {
       type: "category",
-      label: "Finarkein Documentation",
+      label: "User Documentation",
       items: [
         {
           type: "category",

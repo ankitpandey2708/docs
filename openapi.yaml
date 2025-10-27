@@ -4,8 +4,7 @@ info:
   version: 1.0.0
   description: ''
 servers:
-  - url: '{{FACTORY_API}}'
-  - url: '{{AUTH_TOKEN_URL}}'
+  - url: https://api.finarkein.in/factory/v1
 paths:
   /{workspace}/dp/nerv/{flowId}:
     post:
@@ -559,11 +558,6 @@ paths:
                         type: string
                       other-key-1:
                         type: string
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
     parameters:
       - name: workspace
         in: path
@@ -1133,3 +1127,5 @@ paths:
             X-Content-Type-Options:
               schema:
                 deprecated: false
+      servers:
+        - url: https://id.finarkein.com/auth/realms/fin-dev/protocol/openid-connect/token

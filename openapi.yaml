@@ -1,7 +1,34 @@
 openapi: 3.0.3
 info:
-  title: Finarkein
+  title: Finarkein API
   version: 1.0.0
+  description: |
+    # Finarkein API Documentation
+
+    ## Authentication
+
+    This API uses OAuth 2.0 Client Credentials flow for authentication.
+
+    ### Getting Your Credentials
+
+    Each workspace has unique credentials:
+    - **Client ID**: Your workspace-specific client identifier
+    - **Client Secret**: Your workspace-specific secret key
+    - **Workspace ID**: Your workspace identifier (e.g., "tsfsl", "demo")
+
+    ### How to Authenticate
+
+    1. Click the "Authorize" button above
+    2. Select **basicAuth** or **oauth2**
+    3. Enter your workspace-specific credentials:
+       - Username/Client ID: `client-{workspace}-{id}`
+       - Password/Client Secret: Your secret key
+    4. Zudoku will obtain a bearer token automatically
+    5. All API requests will include this token
+
+    ### Workspace Parameters
+
+    Most endpoints require a `workspace` path parameter. Replace this with your actual workspace ID when testing.
   contact: {}
 servers:
 - url: https://api.finarkein.in/factory/v1
@@ -147,15 +174,28 @@ paths:
     - name: workspace
       in: path
       required: true
+      description: Your workspace identifier. Contact your administrator for your workspace ID.
       schema:
         type: string
-        example: <string>
+        example: tsfsl
+      examples:
+        production:
+          value: tsfsl
+          summary: Production workspace
+        demo:
+          value: demo
+          summary: Demo workspace
     - name: flowId
       in: path
       required: true
+      description: The Nerv flow identifier. Use your workspace-specific flow ID for one-time consent.
       schema:
         type: string
-        example: <string>
+        example: 376b71fe-009b-4154-850c-fa0eb65b4d5a
+      examples:
+        default:
+          value: 376b71fe-009b-4154-850c-fa0eb65b4d5a
+          summary: Example flow ID (replace with yours)
   /{workspace}/dp/nerv/fetch/{flowId}:
     post:
       tags:
@@ -294,15 +334,28 @@ paths:
     - name: workspace
       in: path
       required: true
+      description: Your workspace identifier. Contact your administrator for your workspace ID.
       schema:
         type: string
-        example: <string>
+        example: tsfsl
+      examples:
+        production:
+          value: tsfsl
+          summary: Production workspace
+        demo:
+          value: demo
+          summary: Demo workspace
     - name: flowId
       in: path
       required: true
+      description: The Nerv flow identifier. Use your workspace-specific flow ID for one-time consent.
       schema:
         type: string
-        example: <string>
+        example: 376b71fe-009b-4154-850c-fa0eb65b4d5a
+      examples:
+        default:
+          value: 376b71fe-009b-4154-850c-fa0eb65b4d5a
+          summary: Example flow ID (replace with yours)
   /{workspace}/dp/nerv/{flowId}/{requestId}/status:
     get:
       tags:
@@ -400,15 +453,28 @@ paths:
     - name: workspace
       in: path
       required: true
+      description: Your workspace identifier. Contact your administrator for your workspace ID.
       schema:
         type: string
-        example: <string>
+        example: tsfsl
+      examples:
+        production:
+          value: tsfsl
+          summary: Production workspace
+        demo:
+          value: demo
+          summary: Demo workspace
     - name: flowId
       in: path
       required: true
+      description: The Nerv flow identifier. Use your workspace-specific flow ID for one-time consent.
       schema:
         type: string
-        example: <string>
+        example: 376b71fe-009b-4154-850c-fa0eb65b4d5a
+      examples:
+        default:
+          value: 376b71fe-009b-4154-850c-fa0eb65b4d5a
+          summary: Example flow ID (replace with yours)
     - name: requestId
       in: path
       required: true
@@ -1112,15 +1178,28 @@ paths:
     - name: workspace
       in: path
       required: true
+      description: Your workspace identifier. Contact your administrator for your workspace ID.
       schema:
         type: string
-        example: <string>
+        example: tsfsl
+      examples:
+        production:
+          value: tsfsl
+          summary: Production workspace
+        demo:
+          value: demo
+          summary: Demo workspace
     - name: flowId
       in: path
       required: true
+      description: The Nerv flow identifier. Use your workspace-specific flow ID for one-time consent.
       schema:
         type: string
-        example: <string>
+        example: 376b71fe-009b-4154-850c-fa0eb65b4d5a
+      examples:
+        default:
+          value: 376b71fe-009b-4154-850c-fa0eb65b4d5a
+          summary: Example flow ID (replace with yours)
     - name: requestId
       in: path
       required: true
@@ -1375,9 +1454,17 @@ paths:
     - name: workspace
       in: path
       required: true
+      description: Your workspace identifier. Contact your administrator for your workspace ID.
       schema:
         type: string
-        example: 'false'
+        example: tsfsl
+      examples:
+        production:
+          value: tsfsl
+          summary: Production workspace
+        demo:
+          value: demo
+          summary: Demo workspace
   /{workspace}/consent/aa/template/{id}:
     get:
       tags:
@@ -1787,9 +1874,17 @@ paths:
     - name: workspace
       in: path
       required: true
+      description: Your workspace identifier. Contact your administrator for your workspace ID.
       schema:
         type: string
-        example: 'false'
+        example: tsfsl
+      examples:
+        production:
+          value: tsfsl
+          summary: Production workspace
+        demo:
+          value: demo
+          summary: Demo workspace
   /{workspace}/institutions/aa/fip/status:
     get:
       tags:

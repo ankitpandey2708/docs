@@ -135,9 +135,19 @@ const config: ZudokuConfig = {
             id: `basic-auth-${credentials.workspace}`,
             label: `${credentials.workspace.toUpperCase()} - Basic Auth (for /token endpoint)`,
             authorizeRequest: async (request) => {
-              // Use Basic Auth with client_id:client_secret
+              console.log('[Zudoku] authorizeRequest called for:', request.url);
+              console.log('[Zudoku] Request method:', request.method);
+              console.log('[Zudoku] Request headers before:', Array.from(request.headers.entries()));
+              
               const basicAuth = btoa(`${credentials.clientId}:${credentials.clientSecret}`);
+              
+              // Add the Basic Auth header
               request.headers.set('Authorization', `Basic ${basicAuth}`);
+              request.headers.set('Content-Type', 'application/x-www-form-urlencoded');
+              
+              console.log('[Zudoku] Request headers after:', Array.from(request.headers.entries()));
+              console.log('[Zudoku] Has body?:', request.body !== null);
+              
               return request;
             },
           },
@@ -147,6 +157,14 @@ const config: ZudokuConfig = {
             id: `bearer-${credentials.workspace}`,
             label: `${credentials.workspace.toUpperCase()} - Bearer Token (for API endpoints)`,
             authorizeRequest: async (request) => {
+              const url = new URL(request.url);
+              
+              // Don't use this identity for /token endpoint - use Basic Auth identity instead
+              if (url.pathname.includes('/token')) {
+                console.warn('Bearer Token identity should not be used for /token endpoint. Please select the Basic Auth identity instead.');
+                return request;
+              }
+              
               // Exchange credentials for bearer token using backend proxy
               try {
                 const tokenResponse = await fetch(`${API_BASE_URL}/api/token/exchange`, {
@@ -162,7 +180,6 @@ const config: ZudokuConfig = {
                   request.headers.set('Authorization', `Bearer ${tokenData.access_token}`);
 
                   // Auto-fill workspace and flowId parameters in the URL
-                  const url = new URL(request.url);
 
                   // Replace {workspace} placeholder in path
                   if (url.pathname.includes('{workspace}')) {

@@ -2020,7 +2020,7 @@ paths:
         \ (x-www-form-urlencoded)\n- **`grant_type`** (required): Must be set to `client_credentials`\
         \ to indicate the OAuth 2.0 grant type being used\n\n### Headers\n- **`Accept`**:\
         \ `application/json` - Indicates the client expects a JSON response\n- **`Content-Type`**:\
-        \ `application/json` - Specifies the content type of the request\n\n## Response\
+        \ `application/x-www-form-urlencoded` - Specifies the content type of the request\n\n## Response\
         \ Format\nThe endpoint returns a JSON object containing:\n\n```json\n{\n \
         \ \"access_token\": \"eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwi...\",\n  \"\
         expires_in\": 86400,\n  \"refresh_expires_in\": 0,\n  \"token_type\": \"Bearer\"\
@@ -2050,14 +2050,19 @@ paths:
         \ Error**: Server-side error during token generation"
       operationId: generateAccessToken
       requestBody:
+        required: true
         content:
           application/x-www-form-urlencoded:
             schema:
               type: object
+              required:
+                - grant_type
               properties:
                 grant_type:
                   type: string
                   example: client_credentials
+                  enum:
+                    - client_credentials
             examples:
               Generate Access token:
                 value:

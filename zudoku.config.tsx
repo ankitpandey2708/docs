@@ -123,75 +123,89 @@ const config: ZudokuConfig = {
           // Return default identity if credentials not available
           return [{
             id: "default",
-            label: "Default (Unauthorized)",
+            label: "No Authentication",
             authorizeRequest: async (request) => request,
           }];
         }
 
-        // Return identity that auto-injects OAuth2 token
-        return [{
-          id: `workspace-${credentials.workspace}`,
-          label: `${credentials.workspace.toUpperCase()} Workspace`,
-          authorizeRequest: async (request) => {
-            // Exchange credentials for bearer token using backend proxy
-            try {
-              const tokenResponse = await fetch(`${API_BASE_URL}/api/token/exchange`, {
-                method: 'POST',
-                headers: {
-                  'Authorization': `Bearer ${await context.authentication?.getAccessToken()}`,
-                  'Content-Type': 'application/json'
-                }
-              });
-
-              if (tokenResponse.ok) {
-                const tokenData = await tokenResponse.json();
-                request.headers.set('Authorization', `Bearer ${tokenData.access_token}`);
-
-                // Auto-fill workspace and flowId parameters in the URL
-                const url = new URL(request.url);
-
-                // Replace {workspace} placeholder in path
-                if (url.pathname.includes('{workspace}')) {
-                  url.pathname = url.pathname.replace('{workspace}', credentials.workspace);
-                }
-
-                // Replace {flowId} placeholder in path
-                if (url.pathname.includes('{flowId}')) {
-                  // Default to nerv flow, unless it's a recurring endpoint
-                  const flowId = url.pathname.includes('/fetch/')
-                    ? credentials.flowIds.recurring
-                    : credentials.flowIds.nerv;
-                  url.pathname = url.pathname.replace('{flowId}', flowId);
-                }
-
-                // Also replace {requestId} if present
-                if (url.pathname.includes('{requestId}')) {
-                  // Extract requestId from URL parameters or use a default
-                  const urlParams = new URLSearchParams(url.search);
-                  const requestId = urlParams.get('requestId') || 'sample-request-id';
-                  url.pathname = url.pathname.replace('{requestId}', requestId);
-                }
-
-                // Replace any remaining template variables in the path
-                url.pathname = url.pathname.replace(/\{[^}]+\}/g, (match) => {
-                  const param = match.slice(1, -1); // Remove { }
-                  switch (param) {
-                    case 'id':
-                      return 'sample-id';
-                    default:
-                      return match;
+        // Return MULTIPLE identities for different use cases
+        return [
+          // Identity 1: For testing /token endpoint with Basic Auth
+          {
+            id: `basic-auth-${credentials.workspace}`,
+            label: `${credentials.workspace.toUpperCase()} - Basic Auth (for /token endpoint)`,
+            authorizeRequest: async (request) => {
+              // Use Basic Auth with client_id:client_secret
+              const basicAuth = btoa(`${credentials.clientId}:${credentials.clientSecret}`);
+              request.headers.set('Authorization', `Basic ${basicAuth}`);
+              return request;
+            },
+          },
+          
+          // Identity 2: For testing regular API endpoints with Bearer token
+          {
+            id: `bearer-${credentials.workspace}`,
+            label: `${credentials.workspace.toUpperCase()} - Bearer Token (for API endpoints)`,
+            authorizeRequest: async (request) => {
+              // Exchange credentials for bearer token using backend proxy
+              try {
+                const tokenResponse = await fetch(`${API_BASE_URL}/api/token/exchange`, {
+                  method: 'POST',
+                  headers: {
+                    'Authorization': `Bearer ${await context.authentication?.getAccessToken()}`,
+                    'Content-Type': 'application/json'
                   }
                 });
 
-                return new Request(url.toString(), request);
-              }
-            } catch (error) {
-              console.error('Failed to exchange token:', error);
-            }
+                if (tokenResponse.ok) {
+                  const tokenData = await tokenResponse.json();
+                  request.headers.set('Authorization', `Bearer ${tokenData.access_token}`);
 
-            return request;
+                  // Auto-fill workspace and flowId parameters in the URL
+                  const url = new URL(request.url);
+
+                  // Replace {workspace} placeholder in path
+                  if (url.pathname.includes('{workspace}')) {
+                    url.pathname = url.pathname.replace('{workspace}', credentials.workspace);
+                  }
+
+                  // Replace {flowId} placeholder in path
+                  if (url.pathname.includes('{flowId}')) {
+                    // Default to nerv flow, unless it's a recurring endpoint
+                    const flowId = url.pathname.includes('/fetch/')
+                      ? credentials.flowIds.recurring
+                      : credentials.flowIds.nerv;
+                    url.pathname = url.pathname.replace('{flowId}', flowId);
+                  }
+
+                  // Replace {requestId} if present
+                  if (url.pathname.includes('{requestId}')) {
+                    const urlParams = new URLSearchParams(url.search);
+                    const requestId = urlParams.get('requestId') || 'sample-request-id';
+                    url.pathname = url.pathname.replace('{requestId}', requestId);
+                  }
+
+                  // Replace any remaining template variables in the path
+                  url.pathname = url.pathname.replace(/\{[^}]+\}/g, (match) => {
+                    const param = match.slice(1, -1); // Remove { }
+                    switch (param) {
+                      case 'id':
+                        return 'sample-id';
+                      default:
+                        return match;
+                    }
+                  });
+
+                  return new Request(url.toString(), request);
+                }
+              } catch (error) {
+                console.error('Failed to exchange token:', error);
+              }
+
+              return request;
+            },
           },
-        }];
+        ];
       },
     }),
   ]

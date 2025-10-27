@@ -198,10 +198,12 @@ app.post('/api/token/exchange', verifyClerkToken, async (req, res) => {
     });
 
     if (!tokenResponse.ok) {
+      console.error('Token exchange failed:', tokenResponse.status, tokenResponse.statusText);
       throw new Error(`Token exchange failed: ${tokenResponse.statusText}`);
     }
 
     const tokenData = await tokenResponse.json();
+    console.log('Token exchange successful for workspace:', workspace);
 
     res.json({
       access_token: tokenData.access_token,

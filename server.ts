@@ -7,7 +7,6 @@ import jwksClient from 'jwks-rsa';
 dotenv.config();
 
 const app = express();
-const PORT = process.env.PORT || 3001;
 
 // CORS configuration
 app.use(cors({
@@ -19,7 +18,7 @@ app.use(express.json());
 
 // Clerk JWT verification
 const client = jwksClient({
-  jwksUri: process.env.CLERK_JWKS_URI || 'https://your-clerk-domain.clerk.accounts.dev/.well-known/jwks.json',
+  jwksUri: process.env.CLERK_JWKS_URI,
   cache: true,
   rateLimit: true,
   jwksRequestsPerMinute: 5,
@@ -223,14 +222,15 @@ app.post('/api/token/exchange', verifyClerkToken, async (req, res) => {
   }
 });
 
-app.listen(PORT, () => {
-  console.log(`🚀 Server running on port ${PORT}`);
+
+app.listen(process.env.PORT || (process.env.NODE_ENV === 'production' ? 3000 : 3001), () => {
   console.log(`📍 API endpoints:`);
   console.log(`   - GET  /api/health`);
   console.log(`   - GET  /api/workspace/credentials`);
   console.log(`   - POST /api/token/exchange`);
   console.log(`🔐 Keycloak: ${process.env.KEYCLOAK_URL ? 'Configured ✅' : 'Not configured (using .env fallback)'}`);
   console.log(`🌍 Frontend URL: ${process.env.FRONTEND_URL || 'http://localhost:3000'}`);
+
 });
 
 export default app;

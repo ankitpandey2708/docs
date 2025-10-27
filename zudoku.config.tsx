@@ -85,10 +85,9 @@ const config: ZudokuConfig = {
     createApiIdentityPlugin({
       getIdentities: async (context) => [
         {
-          id: "clerk-auth",
-          label: "Authenticated API Access",
+          id: "abc",
+          label: "xyz",
           authorizeRequest: async (request) => {
-            // Get the access token from Clerk authentication provider (await the Promise)
             const token = await context.authentication?.getAccessToken();
  
             if (token) {

@@ -20,13 +20,6 @@ const EXAMPLE_KEYS = [
     expiresOn: ninetyDaysFromNow.toISOString(),
   },
   {
-    id: "test-key-1",
-    description: "Testing Environment Key",
-    key: "test-key-abc-456",
-    createdOn: now.toISOString(),
-    expiresOn: thirtyDaysFromNow.toISOString(),
-  },
-  {
     id: "dev-key-1",
     description: "Development Key (No Expiration)",
     key: "dev-key-def-789",

@@ -97,8 +97,8 @@ function fetchFromEnv(workspace: string): WorkspaceCredentials {
     clientId,
     clientSecret,
     workspace,
-    tokenUrl: process.env.AUTH_TOKEN_URL || 'https://id.finarkein.com/auth/realms/fin-dev/protocol/openid-connect/token',
-    apiBaseUrl: process.env.FACTORY_API || 'https://api.finarkein.in/factory/v1',
+    tokenUrl: process.env.AUTH_TOKEN_URL
+    apiBaseUrl: process.env.FACTORY_API,
     flowIds: {
       nerv: nervFlowId || '',
       recurring: recurringFlowId || ''
@@ -128,7 +128,7 @@ app.get('/api/workspace/credentials', verifyClerkToken, async (req, res) => {
 
     // Extract workspace from user's public metadata
     // Clerk stores custom data in publicMetadata
-    const workspace = user.publicMetadata?.workspace || user.workspace || process.env.workspace || 'tsfsl';
+    const workspace = user.publicMetadata?.workspace || user.workspace || process.env.workspace;
 
     console.log(`Fetching credentials for workspace: ${workspace}`);
 
@@ -179,8 +179,8 @@ app.get('/api/health', (req, res) => {
 app.post('/api/token/exchange', verifyClerkToken, async (req, res) => {
   try {
     const user = (req as any).user;
-    const workspace = user.publicMetadata?.workspace || user.workspace || process.env.workspace || 'tsfsl';
-
+    const workspace = user.publicMetadata?.workspace || user.workspace || process.env.workspace;
+    console.log(`Fetching credentials for workspace: ${workspace}`);
     // Get credentials
     let credentials: WorkspaceCredentials | null = null;
     if (process.env.KEYCLOAK_URL) {
@@ -229,7 +229,7 @@ app.listen(process.env.PORT || (process.env.NODE_ENV === 'production' ? 3000 : 3
   console.log(`   - GET  /api/workspace/credentials`);
   console.log(`   - POST /api/token/exchange`);
   console.log(`🔐 Keycloak: ${process.env.KEYCLOAK_URL ? 'Configured ✅' : 'Not configured (using .env fallback)'}`);
-  console.log(`🌍 Frontend URL: ${process.env.FRONTEND_URL || 'http://localhost:3000'}`);
+  console.log(`🌍 Frontend URL: ${process.env.FRONTEND_URL}`);
 
 });
 

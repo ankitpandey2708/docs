@@ -1,13 +1,11 @@
 import type { ZudokuConfig } from "zudoku";
-import { createApiIdentityPlugin } from "zudoku/plugins";
 import { apiKeyPlugin } from "zudoku/plugins/api-keys";
 import { MyApiKeyService } from "./src/MyApiKeyService";
-
 
 const config: ZudokuConfig = {
   site: {
     showPoweredBy: false,
-    title: "Documentation",
+    title: "Finarkein API Documentation",
     logo: {
       src: { light: "/finarkein.svg", dark: "/finarkein_dark.svg" },
       alt: "Finarkein",
@@ -75,6 +73,8 @@ const config: ZudokuConfig = {
       path: "/api",
     }
   ],
+  // Clerk authentication is only for the documentation pages
+  // API authentication is handled via OAuth2/Bearer tokens defined in OpenAPI spec
   authentication: {
     type: "clerk",
     clerkPubKey:"pk_test_b3Blbi1ibHVlamF5LTMwLmNsZXJrLmFjY291bnRzLmRldiQ"
@@ -82,20 +82,6 @@ const config: ZudokuConfig = {
   protectedRoutes: ["/*"],
   plugins: [
     apiKeyPlugin(MyApiKeyService),
-    createApiIdentityPlugin({
-      getIdentities: async (context) => [
-        {
-          id: "oauth2-client-credentials",
-          label: "OAuth 2.0 Client Credentials",
-          authorizeRequest: async (request) => {
-            // The OAuth2 token will be automatically managed by Zudoku
-            // when users use the "Authorize" button in the OpenAPI UI
-            // Zudoku reads the security scheme from openapi.yaml and handles the token exchange
-            return request;
-          },
-        },
-      ],
-    }),
   ]
 };
 

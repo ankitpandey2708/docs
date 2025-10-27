@@ -19,7 +19,7 @@ const config: ZudokuConfig = {
   },
   docs: {
     defaultOptions: {
-      showLastModified: false
+      showLastModified: true
     }
   },
   navigation: [

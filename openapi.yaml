@@ -3,7 +3,6 @@ info:
   title: Finarkein
   version: 1.0.0
   contact: {}
-  description: ''
 servers:
 - url: '{{FACTORY_API}}'
 - url: '{{AUTH_TOKEN_URL}}'
@@ -322,12 +321,12 @@ paths:
     get:
       tags:
       - Nerv
-      summary: Nerv Get Status
-      description: Nerv Get Status
-      operationId: nervGetStatus
+      summary: Get Status
+      description: Get Status
+      operationId: getStatus
       responses:
         '200':
-          description: Nerv Get Status
+          description: Get Status
           headers:
             Cache-Control:
               schema:
@@ -402,7 +401,7 @@ paths:
                         type: string
                         example: SUCCESS
               examples:
-                Nerv Get Status:
+                Get Status:
                   value:
                     requestId: bf75efbb-5604-42d8-8163-f29cc7a0f5c6
                     state:
@@ -434,18 +433,24 @@ paths:
     get:
       tags:
       - Nerv
-      summary: Nerv Get Result
-      description: Nerv Get Result
-      operationId: nervGetResult
+      summary: Get Result
+      description: Get Result
+      operationId: getResult
       parameters:
       - name: ''
         in: query
         schema:
           type: string
           example: ''
+      requestBody:
+        content:
+          application/json:
+            examples:
+              Get Result:
+                value: ''
       responses:
         '200':
-          description: Nerv Get Result
+          description: Get Result
           headers:
             Cache-Control:
               schema:
@@ -1834,7 +1839,7 @@ paths:
                         type: string
                         example: SUCCESS
               examples:
-                Nerv Get Result:
+                Get Result:
                   value:
                     addOnParams:
                       application: APP091234
@@ -2604,6 +2609,68 @@ paths:
       responses:
         '200':
           description: ''
+        '404':
+          description: Browse consent templates
+          headers:
+            Cache-Control:
+              schema:
+                type: string
+                example: no-cache, no-store, max-age=0, must-revalidate
+            Connection:
+              schema:
+                type: string
+                example: keep-alive
+            Content-Length:
+              schema:
+                type: string
+                example: '0'
+            Content-Security-Policy:
+              schema:
+                type: string
+                example: default-src 'none';
+            Date:
+              schema:
+                type: string
+                example: Mon, 27 Oct 2025 11:41:54 GMT
+            Expires:
+              schema:
+                type: string
+                example: '0'
+            Pragma:
+              schema:
+                type: string
+                example: no-cache
+            Referrer-Policy:
+              schema:
+                type: string
+                example: no-referrer
+            Server:
+              schema:
+                type: string
+                example: awselb/2.0
+            Strict-Transport-Security:
+              schema:
+                type: string
+                example: max-age=31536000 ; includeSubDomains
+            Vary:
+              schema:
+                type: string
+                example: Access-Control-Request-Headers
+            X-Content-Type-Options:
+              schema:
+                type: string
+                example: nosniff
+            X-Frame-Options:
+              schema:
+                type: string
+                example: DENY
+            X-XSS-Protection:
+              schema:
+                type: string
+                example: 1 ; mode=block
+          content: {}
+      security:
+      - bearerAuth: []
     post:
       tags:
       - Consent templates
@@ -2714,6 +2781,8 @@ paths:
       responses:
         '200':
           description: ''
+      security:
+      - bearerAuth: []
     parameters:
     - name: workspace
       in: path
@@ -2731,19 +2800,81 @@ paths:
       responses:
         '200':
           description: ''
+        '404':
+          description: Get consent template by identifier
+          headers:
+            Cache-Control:
+              schema:
+                type: string
+                example: no-cache, no-store, max-age=0, must-revalidate
+            Connection:
+              schema:
+                type: string
+                example: keep-alive
+            Content-Length:
+              schema:
+                type: string
+                example: '0'
+            Content-Security-Policy:
+              schema:
+                type: string
+                example: default-src 'none';
+            Date:
+              schema:
+                type: string
+                example: Mon, 27 Oct 2025 11:42:22 GMT
+            Expires:
+              schema:
+                type: string
+                example: '0'
+            Pragma:
+              schema:
+                type: string
+                example: no-cache
+            Referrer-Policy:
+              schema:
+                type: string
+                example: no-referrer
+            Server:
+              schema:
+                type: string
+                example: awselb/2.0
+            Strict-Transport-Security:
+              schema:
+                type: string
+                example: max-age=31536000 ; includeSubDomains
+            Vary:
+              schema:
+                type: string
+                example: Access-Control-Request-Headers
+            X-Content-Type-Options:
+              schema:
+                type: string
+                example: nosniff
+            X-Frame-Options:
+              schema:
+                type: string
+                example: DENY
+            X-XSS-Protection:
+              schema:
+                type: string
+                example: 1 ; mode=block
+          content: {}
+      security:
+      - bearerAuth: []
     parameters:
     - name: workspace
       in: path
       required: true
       schema:
         type: string
-        example: <string>
+        example: '{{workspace}}'
     - name: id
       in: path
       required: true
       schema:
         type: string
-        example: <string>
+        example: ''
       description: Identifier for the template
   /{workspace}/institutions/aa/fip:
     get:
@@ -2754,7 +2885,7 @@ paths:
       operationId: getFipsOnAaNetwork
       responses:
         '200':
-          description: Factory / Institutions / FIPs / Factory / Institutions / FIPs
+          description: Factory / Institutions / FIPs
           headers:
             Cache-Control:
               schema:
@@ -3077,101 +3208,6 @@ paths:
       responses:
         '200':
           description: ''
-        '500':
-          description: Get FIP Status-detailed / Get FIP Status-detailed
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  fipHealthStats:
-                    type: array
-                    items:
-                      type: object
-                      properties:
-                        cause:
-                          type: string
-                          example: <string>
-                        dataFetchSuccessRate:
-                          type: array
-                          items:
-                            type: object
-                            properties:
-                              duration:
-                                type: string
-                                example: <string>
-                              value:
-                                type: string
-                                example: <number>
-                          example:
-                          - duration: <string>
-                            value: <number>
-                          - duration: <string>
-                            value: <number>
-                        fip:
-                          type: string
-                          example: <string>
-                        journeyMetric:
-                          type: object
-                          properties:
-                            ConsentPostResponse:
-                              type: string
-                              example: <integer>
-                            UserDiscoveryResponse:
-                              type: string
-                              example: <integer>
-                        preferredAction:
-                          type: string
-                          example: <string>
-                    example:
-                    - cause: <string>
-                      dataFetchSuccessRate:
-                      - duration: <string>
-                        value: <number>
-                      - duration: <string>
-                        value: <number>
-                      fip: <string>
-                      journeyMetric:
-                        ConsentPostResponse: <integer>
-                        UserDiscoveryResponse: <integer>
-                      preferredAction: <string>
-                    - cause: <string>
-                      dataFetchSuccessRate:
-                      - duration: <string>
-                        value: <number>
-                      - duration: <string>
-                        value: <number>
-                      fip: <string>
-                      journeyMetric:
-                        ConsentPostResponse: <integer>
-                        UserDiscoveryResponse: <integer>
-                      preferredAction: <string>
-              examples:
-                Get FIP Status-detailed:
-                  value:
-                    fipHealthStats:
-                    - cause: <string>
-                      dataFetchSuccessRate:
-                      - duration: <string>
-                        value: <number>
-                      - duration: <string>
-                        value: <number>
-                      fip: <string>
-                      journeyMetric:
-                        ConsentPostResponse: <integer>
-                        UserDiscoveryResponse: <integer>
-                      preferredAction: <string>
-                    - cause: <string>
-                      dataFetchSuccessRate:
-                      - duration: <string>
-                        value: <number>
-                      - duration: <string>
-                        value: <number>
-                      fip: <string>
-                      journeyMetric:
-                        ConsentPostResponse: <integer>
-                        UserDiscoveryResponse: <integer>
-                      preferredAction: <string>
     parameters:
     - name: workspace
       in: path
@@ -3199,7 +3235,85 @@ paths:
                   grant_type: client_credentials
       responses:
         '200':
-          description: ''
+          description: Generate new access token
+          headers:
+            Cache-Control:
+              schema:
+                type: string
+                example: no-store
+            Connection:
+              schema:
+                type: string
+                example: keep-alive
+            Content-Length:
+              schema:
+                type: string
+                example: '1584'
+            Date:
+              schema:
+                type: string
+                example: Mon, 27 Oct 2025 11:22:36 GMT
+            Pragma:
+              schema:
+                type: string
+                example: no-cache
+            Referrer-Policy:
+              schema:
+                type: string
+                example: no-referrer
+            Set-Cookie:
+              schema:
+                type: string
+                example: KC_RESTART=; Version=1; Expires=Thu, 01-Jan-1970 00:00:10
+                  GMT; Max-Age=0; Path=/auth/realms/fin-dev/; Secure; HttpOnly
+            Strict-Transport-Security:
+              schema:
+                type: string
+                example: max-age=31536000; includeSubDomains
+            X-Content-Type-Options:
+              schema:
+                type: string
+                example: nosniff
+            X-Frame-Options:
+              schema:
+                type: string
+                example: SAMEORIGIN
+            X-XSS-Protection:
+              schema:
+                type: string
+                example: 1; mode=block
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  access_token:
+                    type: string
+                    example: xyz
+                  expires_in:
+                    type: number
+                    example: 86400
+                  not-before-policy:
+                    type: number
+                    example: 0
+                  refresh_expires_in:
+                    type: number
+                    example: 0
+                  scope:
+                    type: string
+                    example: email profile
+                  token_type:
+                    type: string
+                    example: Bearer
+              examples:
+                Generate new access token:
+                  value:
+                    access_token: xyz
+                    expires_in: 86400
+                    not-before-policy: 0
+                    refresh_expires_in: 0
+                    scope: email profile
+                    token_type: Bearer
       security:
       - basicAuth: []
 components:

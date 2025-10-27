@@ -1,5 +1,4 @@
 import type { ZudokuConfig } from "zudoku";
-import { createApiIdentityPlugin } from "zudoku/plugins";
 import { apiKeyPlugin } from "zudoku/plugins/api-keys";
 import { MyApiKeyService } from "./src/MyApiKeyService";
 
@@ -73,6 +72,9 @@ const config: ZudokuConfig = {
       type: "file",
       input: "./openapi.yaml",
       path: "/api",
+      auth: {
+        type: "oauth2-client-credentials",
+      },
     }
   ],
   authentication: {
@@ -82,24 +84,6 @@ const config: ZudokuConfig = {
   protectedRoutes: ["/*"],
   plugins: [
     apiKeyPlugin(MyApiKeyService),
-    createApiIdentityPlugin({
-      getIdentities: async (context) => [
-        {
-          id: "abc",
-          label: "xyz",
-          authorizeRequest: async (request) => {
-            const token = await context.authentication?.getAccessToken();
- 
-            if (token) {
-              request.headers.set("Authorization", `Bearer ${token}`);
-            } else {
-            }
-
-            return request;
-          },
-        },
-      ],
-    }),
   ]
 };
 

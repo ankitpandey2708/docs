@@ -1904,8 +1904,10 @@ paths:
       schema:
         type: string
         example: <string>
-  /:
+  /token:
     post:
+      tags:
+      - Authentication
       summary: Generate Access token
       description: "# Generate OAuth 2.0 Access Token\n\n## Overview\nThis endpoint\
         \ generates an OAuth 2.0 access token using the **Client Credentials Grant**\
@@ -2048,6 +2050,9 @@ paths:
                     token_type: Bearer
       security:
       - basicAuth: []
+    servers:
+    - url: https://id.finarkein.com/auth/realms/fin-dev/protocol/openid-connect
+      description: Authentication Server
 components:
   securitySchemes:
     basicAuth:
@@ -2068,6 +2073,8 @@ components:
             email: Access to email
             profile: Access to profile
 tags:
+- name: Authentication
+  description: Endpoints for obtaining access tokens
 - name: Nerv
 - name: Consent templates
 - name: Institutions

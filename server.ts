@@ -97,7 +97,7 @@ function fetchFromEnv(workspace: string): WorkspaceCredentials {
     clientId,
     clientSecret,
     workspace,
-    tokenUrl: process.env.AUTH_TOKEN_URL
+    tokenUrl: process.env.AUTH_TOKEN_URL,
     apiBaseUrl: process.env.FACTORY_API,
     flowIds: {
       nerv: nervFlowId || '',

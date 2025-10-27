@@ -1,8 +1,9 @@
 openapi: 3.0.3
 info:
-  title: Tradesmart
+  title: Finarkein
   version: 1.0.0
   contact: {}
+  description: ''
 servers:
 - url: '{{FACTORY_API}}'
 - url: '{{AUTH_TOKEN_URL}}'
@@ -442,12 +443,6 @@ paths:
         schema:
           type: string
           example: ''
-      requestBody:
-        content:
-          application/json:
-            examples:
-              Nerv Get Result:
-                value: ''
       responses:
         '200':
           description: Nerv Get Result

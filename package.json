@@ -4,10 +4,10 @@
   "type": "module",
   "private": true,
   "scripts": {
-    "dev": "concurrently \"zudoku dev\"",
+    "dev": "concurrently \"npm run server\" \"zudoku dev\"",
+    "server": "tsx server.ts",
     "build": "zudoku build",
     "preview": "zudoku preview",
-    "server": "tsx server.ts",
     "lint": "eslint"
   },
   "dependencies": {
@@ -25,7 +25,10 @@
     "zudoku": "0.62"
   },
   "devDependencies": {
+    "@types/cors": "^2.8.17",
+    "@types/express": "^4.17.21",
     "@types/js-yaml": "^4.0.9",
+    "@types/jsonwebtoken": "^9.0.6",
     "@types/node": "^22",
     "@types/react": "^19",
     "@types/react-dom": "^19",

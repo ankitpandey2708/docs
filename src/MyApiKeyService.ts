@@ -1,113 +1,149 @@
 import { createApiKeyService } from "zudoku/plugins/api-keys";
 
-const now = new Date();
-const thirtyDaysFromNow = new Date(now);
-thirtyDaysFromNow.setDate(now.getDate() + 30);
+const API_BASE_URL = typeof window !== 'undefined'
+  ? (window.location.hostname === 'localhost' ? 'http://localhost:3001' : window.location.origin)
+  : 'http://localhost:3001';
 
-const ninetyDaysFromNow = new Date(now);
-ninetyDaysFromNow.setDate(now.getDate() + 90);
+interface WorkspaceCredentials {
+  clientId: string;
+  clientSecret: string;
+  workspace: string;
+  tokenUrl: string;
+  apiBaseUrl: string;
+  flowIds: {
+    nerv: string;
+    recurring: string;
+  };
+}
 
 /**
- * Sample API keys for demonstration purposes.
- * In a real implementation, these would typically come from a database.
+ * Fetch workspace credentials from backend API
+ * This retrieves the user's workspace-specific OAuth2 credentials
  */
-const EXAMPLE_KEYS = [
-  {
-    id: "prod-key-1",
-    description: "Production API Key",
-    key: "prod-key-xyz-123",
-    createdOn: now.toISOString(),
-    expiresOn: ninetyDaysFromNow.toISOString(),
-  },
-  {
-    id: "dev-key-1",
-    description: "Development Key (No Expiration)",
-    key: "dev-key-def-789",
-    createdOn: now.toISOString(),
-  },
-];
+async function fetchWorkspaceCredentials(context: any): Promise<WorkspaceCredentials | null> {
+  try {
+    // Get Clerk token from context
+    const token = await context.authentication?.getAccessToken?.();
+
+    if (!token) {
+      console.warn('No Clerk token available');
+      return null;
+    }
+
+    const response = await fetch(`${API_BASE_URL}/api/workspace/credentials`, {
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      }
+    });
+
+    if (!response.ok) {
+      console.error('Failed to fetch workspace credentials:', response.statusText);
+      return null;
+    }
+
+    const credentials = await response.json();
+    return credentials;
+  } catch (error) {
+    console.error('Error fetching workspace credentials:', error);
+    return null;
+  }
+}
 
 /**
- * Example implementation of an API Key Service that stores keys in memory.
- * This implementation demonstrates the basic functionality required for managing API keys:
- * - Listing all keys
- * - Creating new keys
- * - Deleting keys
- * - Rolling (regenerating) keys
- * - Updating key descriptions
+ * Workspace-aware API Key Service
  *
- * Note: This is a simple in-memory implementation for demonstration purposes.
- * In a real environment, you would typically:
- * - Store keys in a secure database
- * - Implement proper encryption for the key values
- * - Add validation for key operations
- * - Implement rate limiting and usage tracking
- * - Add audit logging for key operations
+ * This service fetches the user's workspace-specific OAuth2 credentials
+ * and displays them in the /settings/api-keys page.
+ *
+ * Flow:
+ * 1. User logs in with Clerk (workspace is in JWT metadata)
+ * 2. Service fetches credentials from backend based on workspace
+ * 3. Backend returns workspace-specific CLIENT_ID, CLIENT_SECRET, FLOW_IDs
+ * 4. Credentials are displayed to the user (they don't need to input anything)
+ * 5. These credentials are auto-used when testing APIs
  */
-let keys = [...EXAMPLE_KEYS];
 export const MyApiKeyService = createApiKeyService({
+  /**
+   * Get consumers (workspace credentials)
+   * Returns the user's workspace-specific OAuth2 credentials
+   */
   getConsumers: async (context) => {
-    // Convert keys to consumers format
-    return keys.map(key => ({
-      id: key.id,
-      label: key.description || "API Key",
-      apiKeys: [key],
-      createdOn: key.createdOn,
-      expiresOn: key.expiresOn,
-    }));
+    const credentials = await fetchWorkspaceCredentials(context);
+
+    if (!credentials) {
+      // Return empty array if no credentials found
+      // This happens when user is not authenticated or backend is down
+      return [];
+    }
+
+    const now = new Date();
+    const ninetyDaysFromNow = new Date(now);
+    ninetyDaysFromNow.setDate(now.getDate() + 90);
+
+    // Return credentials as "API Keys" for display
+    return [
+      {
+        id: `workspace-${credentials.workspace}`,
+        label: `${credentials.workspace.toUpperCase()} Workspace Credentials`,
+        apiKeys: [
+          {
+            id: `client-id-${credentials.workspace}`,
+            description: "OAuth2 Client ID",
+            key: credentials.clientId,
+            createdOn: now.toISOString(),
+          },
+          {
+            id: `client-secret-${credentials.workspace}`,
+            description: "OAuth2 Client Secret",
+            key: credentials.clientSecret,
+            createdOn: now.toISOString(),
+          },
+          {
+            id: `nerv-flow-${credentials.workspace}`,
+            description: "Nerv Flow ID (One-time)",
+            key: credentials.flowIds.nerv,
+            createdOn: now.toISOString(),
+          },
+          {
+            id: `recurring-flow-${credentials.workspace}`,
+            description: "Recurring Flow ID",
+            key: credentials.flowIds.recurring,
+            createdOn: now.toISOString(),
+          },
+        ],
+        createdOn: now.toISOString(),
+        expiresOn: ninetyDaysFromNow.toISOString(),
+      },
+    ];
   },
 
   /**
-   * Creates a new API key.
-   * Demonstrates:
-   * - Generating secure random IDs and key values
-   * - Handling optional expiration dates
-   * - Setting creation timestamps
+   * Create key - Not applicable for workspace credentials
+   * Workspace credentials are managed by administrators, not end users
    */
   createKey: async ({ apiKey }) => {
-    const newKey = {
-      id: crypto.randomUUID(),
-      description: apiKey.description,
-      key: `key-${crypto.randomUUID()}`,
-      createdOn: new Date().toISOString(),
-      expiresOn: apiKey.expiresOn,
-    } as const;
-    keys.push(newKey);
+    throw new Error('Workspace credentials cannot be created by users. Contact your administrator.');
   },
 
   /**
-   * Deletes an API key by ID.
-   * In a real implementation, you might want to:
-   * - Add soft delete functionality
-   * - Archive deleted keys
-   * - Add validation for protected keys
+   * Delete key - Not applicable for workspace credentials
    */
   deleteKey: async (consumerId, keyId, _context) => {
-    keys = keys.filter((key) => key.id !== keyId);
+    throw new Error('Workspace credentials cannot be deleted by users. Contact your administrator.');
   },
 
   /**
-   * Rolls (regenerates) an API key while maintaining its metadata.
-   * This is useful when a key might have been compromised.
-   * The key ID stays the same but gets a new value.
+   * Roll key - Not applicable for workspace credentials
    */
   rollKey: async (consumerId, _context) => {
-    const key = keys.find((k) => k.id === consumerId);
-    if (key) {
-      key.key = `key-${crypto.randomUUID()}`;
-    }
+    throw new Error('Workspace credentials cannot be regenerated by users. Contact your administrator.');
   },
 
   /**
-   * Updates the description of an API key.
-   * Demonstrates:
-   * - Finding and updating specific keys
-   * - Maintaining update timestamps
+   * Update consumer - Not applicable for workspace credentials
    */
   updateConsumer: async (consumer, context) => {
-    const key = keys.find((k) => k.id === consumer.id);
-    if (key) {
-      key.description = consumer.label;
-    }
+    throw new Error('Workspace credentials cannot be updated by users. Contact your administrator.');
   },
 });

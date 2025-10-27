@@ -1,4 +1,5 @@
 import type { ZudokuConfig } from "zudoku";
+import { createApiIdentityPlugin } from "zudoku/plugins";
 import { apiKeyPlugin } from "zudoku/plugins/api-keys";
 import { MyApiKeyService } from "./src/MyApiKeyService";
 
@@ -72,9 +73,6 @@ const config: ZudokuConfig = {
       type: "file",
       input: "./openapi.yaml",
       path: "/api",
-      auth: {
-        type: "oauth2-client-credentials",
-      },
     }
   ],
   authentication: {
@@ -84,6 +82,20 @@ const config: ZudokuConfig = {
   protectedRoutes: ["/*"],
   plugins: [
     apiKeyPlugin(MyApiKeyService),
+    createApiIdentityPlugin({
+      getIdentities: async (context) => [
+        {
+          id: "oauth2-client-credentials",
+          label: "OAuth 2.0 Client Credentials",
+          authorizeRequest: async (request) => {
+            // The OAuth2 token will be automatically managed by Zudoku
+            // when users use the "Authorize" button in the OpenAPI UI
+            // Zudoku reads the security scheme from openapi.yaml and handles the token exchange
+            return request;
+          },
+        },
+      ],
+    }),
   ]
 };
 

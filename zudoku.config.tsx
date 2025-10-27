@@ -106,7 +106,7 @@ const config: ZudokuConfig = {
             });
 
             if (!response.ok) {
-              console.error('Failed to fetch workspace credentials for API identity');
+              console.error('Failed to fetch workspace credentials for API identity:', response.statusText);
               return null;
             }
 
@@ -163,6 +163,25 @@ const config: ZudokuConfig = {
                     : credentials.flowIds.nerv;
                   url.pathname = url.pathname.replace('{flowId}', flowId);
                 }
+
+                // Also replace {requestId} if present
+                if (url.pathname.includes('{requestId}')) {
+                  // Extract requestId from URL parameters or use a default
+                  const urlParams = new URLSearchParams(url.search);
+                  const requestId = urlParams.get('requestId') || 'sample-request-id';
+                  url.pathname = url.pathname.replace('{requestId}', requestId);
+                }
+
+                // Replace any remaining template variables in the path
+                url.pathname = url.pathname.replace(/\{[^}]+\}/g, (match) => {
+                  const param = match.slice(1, -1); // Remove { }
+                  switch (param) {
+                    case 'id':
+                      return 'sample-id';
+                    default:
+                      return match;
+                  }
+                });
 
                 return new Request(url.toString(), request);
               }

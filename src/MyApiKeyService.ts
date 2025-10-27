@@ -119,6 +119,7 @@ export const MyApiKeyService = createApiKeyService({
   },
 
   /**
+   * https://github.com/zuplo/zudoku/blob/main/examples/api-key-service/src/MyApiKeyService.ts
    * Create key - Not applicable for workspace credentials
    * Workspace credentials are managed by administrators, not end users
    */

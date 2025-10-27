@@ -2781,6 +2781,66 @@ paths:
       responses:
         '200':
           description: ''
+        '404':
+          description: Create new Consent Template
+          headers:
+            Cache-Control:
+              schema:
+                type: string
+                example: no-cache, no-store, max-age=0, must-revalidate
+            Connection:
+              schema:
+                type: string
+                example: keep-alive
+            Content-Length:
+              schema:
+                type: string
+                example: '0'
+            Content-Security-Policy:
+              schema:
+                type: string
+                example: default-src 'none';
+            Date:
+              schema:
+                type: string
+                example: Mon, 27 Oct 2025 11:48:07 GMT
+            Expires:
+              schema:
+                type: string
+                example: '0'
+            Pragma:
+              schema:
+                type: string
+                example: no-cache
+            Referrer-Policy:
+              schema:
+                type: string
+                example: no-referrer
+            Server:
+              schema:
+                type: string
+                example: awselb/2.0
+            Strict-Transport-Security:
+              schema:
+                type: string
+                example: max-age=31536000 ; includeSubDomains
+            Vary:
+              schema:
+                type: string
+                example: Access-Control-Request-Headers
+            X-Content-Type-Options:
+              schema:
+                type: string
+                example: nosniff
+            X-Frame-Options:
+              schema:
+                type: string
+                example: DENY
+            X-XSS-Protection:
+              schema:
+                type: string
+                example: 1 ; mode=block
+          content: {}
       security:
       - bearerAuth: []
     parameters:

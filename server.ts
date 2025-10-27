@@ -130,8 +130,6 @@ app.get('/api/workspace/credentials', verifyClerkToken, async (req, res) => {
     // Clerk stores custom data in publicMetadata
     const workspace = user.publicMetadata?.workspace || user.workspace || process.env.workspace;
 
-    console.log(`Fetching credentials for workspace: ${workspace}`);
-
     let credentials: WorkspaceCredentials | null = null;
 
     // Try Keycloak first (if configured)
@@ -180,8 +178,7 @@ app.post('/api/token/exchange', verifyClerkToken, async (req, res) => {
   try {
     const user = (req as any).user;
     const workspace = user.publicMetadata?.workspace || user.workspace || process.env.workspace;
-    console.log(`Fetching credentials for workspace: ${workspace}`);
-    // Get credentials
+    
     let credentials: WorkspaceCredentials | null = null;
     if (process.env.KEYCLOAK_URL) {
       credentials = await fetchFromKeycloak(workspace);
@@ -224,13 +221,7 @@ app.post('/api/token/exchange', verifyClerkToken, async (req, res) => {
 
 
 app.listen(process.env.PORT || (process.env.NODE_ENV === 'production' ? 3000 : 3001), () => {
-  console.log(`📍 API endpoints:`);
-  console.log(`   - GET  /api/health`);
-  console.log(`   - GET  /api/workspace/credentials`);
-  console.log(`   - POST /api/token/exchange`);
   console.log(`🔐 Keycloak: ${process.env.KEYCLOAK_URL ? 'Configured ✅' : 'Not configured (using .env fallback)'}`);
-  console.log(`🌍 Frontend URL: ${process.env.FRONTEND_URL}`);
-
 });
 
 export default app;

@@ -71,70 +71,32 @@ An authenticated API documentation site built with Zudoku. Users log in via Cler
 
 Express server that fetches workspace credentials.
 
-**Endpoints:**
+**Endpoint:**
 - `GET /api/workspace/credentials?workspace=xxx` - Returns OAuth2 credentials
 
-**Credential Resolution Flow:**
-1. Try Keycloak first (if configured)
-2. Fall back to environment variables
-3. Return `WorkspaceCredentials` object
-
-**Environment Variables:**
-```bash
-# Keycloak (optional)
-KEYCLOAK_URL=https://keycloak.example.com
-KEYCLOAK_REALM=my-realm
-KEYCLOAK_CLIENT_ID=admin-cli
-KEYCLOAK_CLIENT_SECRET=secret
-
-# Fallback credentials (required if no Keycloak)
-AUTH_CLIENT_ID=your-client-id
-AUTH_CLIENT_SECRET=your-secret
-AUTH_TOKEN_URL=https://id.finarkein.com/auth/realms/fin-dev/protocol/openid-connect/token
-FACTORY_API=https://api.finarkein.in/factory/v1
-nerv.flow.id=flow-123
-recurring.nerv.flow.id=flow-456
-
-# Workspace-specific (optional)
-workspace_AUTH_CLIENT_ID=workspace-specific-id
-workspace_AUTH_CLIENT_SECRET=workspace-specific-secret
-```
+**Resolution:** Keycloak → env vars → return credentials
 
 ### `src/lib/http.ts` - Authenticated Fetch
 
-Wraps `fetch()` with automatic Bearer token injection and retry logic.
+Wraps `fetch()` with automatic Bearer token injection.
 
-**Usage:**
 ```typescript
 import { authenticatedFetch } from './lib/http';
 
-// Fetch with auto token injection
 const response = await authenticatedFetch(
   'https://api.example.com/endpoint',
   { method: 'GET' },
-  'my-workspace' // or WorkspaceCredentials object
+  'my-workspace'
 );
-
-// On 401, automatically:
-// 1. Clears cached token
-// 2. Gets new token
-// 3. Retries request once
 ```
 
-**How it works:**
-1. Fetches credentials (if workspace string provided)
-2. Gets/refreshes OAuth2 token via `getAccessToken()`
-3. Injects `Authorization: Bearer <token>` header
-4. Handles 401 with automatic retry
+On 401: clears token → gets new token → retries once.
 
 ### `src/auth/token.ts` - Token Management
 
 OAuth2 Client Credentials flow with in-memory caching.
 
-**Usage:**
 ```typescript
-import { getAccessToken } from './auth/token';
-
 const token = await getAccessToken({
   tokenUrl: 'https://id.example.com/token',
   clientId: 'client-123',
@@ -143,51 +105,22 @@ const token = await getAccessToken({
 });
 ```
 
-**Features:**
-- Caches tokens per workspace
-- Auto-refreshes before expiry (60s buffer)
-- Uses HTTP Basic Auth
-- Thread-safe (Map-based cache)
+Caches tokens per workspace. Auto-refreshes before expiry (60s buffer).
 
 ### `src/apiIdentity.ts` - Request Interceptor
 
-Zudoku plugin that intercepts "Try It" requests and injects Bearer tokens.
-
-**Flow:**
-1. User clicks "Try It" in API Reference
-2. `authorizeRequest()` is called
-3. Fetches credentials for user's workspace
-4. Replaces `{workspace}` and `{flowId}` in URL
-5. Calls `authenticatedFetch()` to inject token
-6. Returns response to Zudoku UI
-
-**Path Parameter Replacement:**
-- `{workspace}` → User's workspace ID
-- `{flowId}` → `nerv` flow ID (default) or `recurring` flow ID (for `/fetch/` endpoints)
+Intercepts "Try It" requests, injects Bearer tokens, replaces `{workspace}` and `{flowId}` in URLs.
 
 ### `src/CredentialsPage.tsx` - Credentials UI
 
-Custom page that displays user's credentials.
-
-**Features:**
-- Shows Client ID, Client Secret (masked)
-- Shows Flow IDs (masked)
-- Shows Token URL and API Base URL
-- Auto-fetches on mount based on Clerk auth context
-
-**Data Flow:**
-```typescript
-useAuth() → extract workspace → fetch /api/workspace/credentials → display
-```
+Displays user's credentials (masked). Auto-fetches on mount based on Clerk auth.
 
 ### `src/lib/utils.ts` - Shared Utilities
 
-**Functions:**
-- `getBackendUrl()` - Returns backend URL (localhost:3001 or current origin)
-- `buildCredentialsUrl(workspace?)` - Builds credentials endpoint URL
-- `extractWorkspace(authContext)` - Extracts workspace from Clerk auth
-- `getAttributeValue(attrs, upper, lower)` - Case-insensitive attribute getter
-- `validateResponse(response, message)` - Throws on non-2xx responses
+- `getBackendUrl()` - Backend URL
+- `buildCredentialsUrl(workspace?)` - Credentials endpoint URL
+- `extractWorkspace(authContext)` - Extract workspace from Clerk
+- `validateResponse(response, message)` - Throw on non-2xx
 
 ### `src/types/credentials.ts` - Shared Types
 
@@ -205,81 +138,102 @@ interface WorkspaceCredentials {
 }
 ```
 
-Used everywhere: server, frontend, token management.
-
 ## Authentication Flow
 
-### 1. User Authentication (Clerk)
+**User Auth:** `User → Clerk Login → Auth cookies → Docs access`
 
+**Credentials:** `Extract workspace → GET /api/workspace/credentials → Keycloak/env → Return JSON`
+
+**API Request:** `"Try It" → Intercept → Get token → Inject Bearer → Call API → Response`
+
+## CORS Configuration
+
+Three systems need CORS configured for "Try It" to work:
+
+### 1. Backend APIs (api.finarkein.in)
+
+```javascript
+const cors = require('cors');
+
+app.use(cors({
+  origin: [
+    'http://localhost:3000',
+    'https://docs.finarkein.com'
+  ],
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Authorization', 'Content-Type']
+}));
 ```
-User → Clerk Login → Clerk sets auth cookies → User sees docs
+
+**Test:**
+```bash
+curl -X OPTIONS \
+  -H "Origin: http://localhost:3000" \
+  -H "Access-Control-Request-Method: GET" \
+  https://api.finarkein.in/factory/v1/endpoint
 ```
 
-All routes protected by `protectedRoutes: ["/*"]` in `zudoku.config.tsx`.
+### 2. Keycloak Token Endpoint (id.finarkein.com)
 
-### 2. Credential Fetching
+**Keycloak Admin Console:**
+1. Login → **Clients** → Your Client → **Settings**
+2. Find **Web Origins** field
+3. Add:
+   ```
+   http://localhost:3000
+   https://docs.finarkein.com
+   ```
+4. Save
 
+**Test:**
+```bash
+curl -X OPTIONS \
+  -H "Origin: http://localhost:3000" \
+  https://id.finarkein.com/auth/realms/fin-dev/protocol/openid-connect/token
 ```
-Frontend extracts workspace from Clerk auth.providerData.user.publicMetadata.workspace
-         ↓
-GET /api/workspace/credentials?workspace=xxx
-         ↓
-Backend tries Keycloak → Falls back to env vars
-         ↓
-Returns WorkspaceCredentials JSON
-```
 
-### 3. API Request (Try It)
+### 3. Docs Backend (server.ts)
 
-```
-User clicks "Try It" in API Reference
-         ↓
-apiIdentity.authorizeRequest() intercepts
-         ↓
-Fetch credentials → Get/refresh token → Inject Bearer header
-         ↓
-Make actual API request → Return response to Zudoku
+Already configured in `server.ts` lines 13-32.
+
+### CORS Troubleshooting
+
+| Issue | Fix |
+|-------|-----|
+| CORS error on token fetch | Add origins in Keycloak client Web Origins |
+| CORS error on API calls | Add CORS middleware to backend APIs |
+| 401 on API calls | Check token injection in `apiIdentity.ts` |
+| 401 after some time | Verify token refresh on 401 in `http.ts` |
+
+**Quick Check:**
+```bash
+# Verify CORS headers present
+curl -I -X OPTIONS \
+  -H "Origin: http://localhost:3000" \
+  https://api.finarkein.in/factory/v1/endpoint
 ```
 
 ## Adding New Features
 
-### Add a New Shared Utility
+### Add Utility
 
 ```typescript
 // src/lib/utils.ts
-export function myNewUtility(param: string): string {
+export function myUtility(param: string): string {
   return `processed-${param}`;
 }
 ```
 
-### Add a New Component
+### Add Component
 
 ```typescript
 // src/components/MyComponent.tsx
-interface MyComponentProps {
-  data: string;
-}
-
-export const MyComponent: React.FC<MyComponentProps> = ({ data }) => (
+export const MyComponent: React.FC<{data: string}> = ({ data }) => (
   <div>{data}</div>
 );
 ```
 
-### Add a New API Endpoint (Backend)
-
-```typescript
-// server.ts
-app.get('/api/my-endpoint', async (req, res) => {
-  try {
-    const result = await someOperation();
-    res.json(result);
-  } catch (error) {
-    res.status(500).json({ error: 'Operation failed' });
-  }
-});
-```
-
-### Add a New Page
+### Add Page
 
 ```tsx
 // zudoku.config.tsx
@@ -290,7 +244,6 @@ navigation: [
     type: "custom-page",
     path: "/my-page",
     label: "My Page",
-    icon: "star",
     element: <MyPage />,
   }
 ]
@@ -304,35 +257,26 @@ navigation: [
 npm install
 ```
 
-### Run Development
+### Run
 
 ```bash
-npm run dev
-# Runs both Express backend (3001) and Zudoku frontend (3000)
-```
-
-### Build
-
-```bash
-npm run build
+npm run dev  # Runs backend (3001) + frontend (3000)
 ```
 
 ### Environment Variables
-
-Create `.env` file:
 
 ```bash
 # Required
 NODE_ENV=development
 PORT=3001
 
-# Optional: Keycloak
+# Keycloak (optional)
 KEYCLOAK_URL=https://keycloak.example.com
 KEYCLOAK_REALM=my-realm
 KEYCLOAK_CLIENT_ID=admin-cli
-KEYCLOAK_CLIENT_SECRET=admin-secret
+KEYCLOAK_CLIENT_SECRET=secret
 
-# Fallback credentials (required if no Keycloak)
+# Fallback (required if no Keycloak)
 AUTH_CLIENT_ID=client-id
 AUTH_CLIENT_SECRET=client-secret
 AUTH_TOKEN_URL=https://id.finarkein.com/auth/realms/fin-dev/protocol/openid-connect/token
@@ -349,178 +293,74 @@ recurring.nerv.flow.id=flow-456
 curl http://localhost:3001/api/workspace/credentials?workspace=test
 ```
 
-Should return JSON with `clientId`, `clientSecret`, `tokenUrl`, etc.
+### Check API Flow
 
-### Check Token Retrieval
-
-```typescript
-// In browser console (on /credentials page)
-const { getAccessToken } = await import('./src/auth/token.js');
-const token = await getAccessToken({
-  tokenUrl: 'https://id.example.com/token',
-  clientId: 'test',
-  clientSecret: 'test',
-  workspace: 'test'
-});
-console.log(token);
-```
-
-### Check API Request Flow
-
-Open browser DevTools → Network tab → Click "Try It" on any API endpoint → Check:
-1. Request to `/api/workspace/credentials`
-2. Request to token URL (if not cached)
-3. Request to actual API with `Authorization: Bearer <token>` header
+Open DevTools → Network → Click "Try It" → Verify:
+1. Request to `/api/workspace/credentials` → 200
+2. Request to token URL → 200 (if not cached)
+3. Request to API with `Authorization: Bearer <token>` → 200
 
 ### Common Issues
 
-**Issue**: "Credentials not found"
-- **Fix**: Check `.env` file has `AUTH_CLIENT_ID` and `AUTH_CLIENT_SECRET`
-
-**Issue**: "Failed to fetch credentials" (401/403)
-- **Fix**: Check Keycloak credentials or verify env vars are loaded
-
-**Issue**: "Token request failed"
-- **Fix**: Check `AUTH_TOKEN_URL` is correct and client credentials are valid
-
-**Issue**: Circular dependency errors
-- **Fix**: Ensure imports follow this pattern:
-  - `utils.ts` → no internal imports (base utilities)
-  - `constants.ts` → no internal imports
-  - `http.ts` → `utils`, `constants`, `token`
-  - `token.ts` → `utils`, `constants` (NOT http)
-
-**Issue**: CORS errors on API requests
-- **Fix**: Check `allowedOrigins` in `server.ts` includes your frontend URL
-
-## Code Conventions
-
-### Imports
-
-- **Shared types**: Import from `src/types/`
-- **Utilities**: Import from `src/lib/utils`
-- **Constants**: Import from `src/lib/constants`
-- **Components**: Import from `src/components/`
-
-### File Extensions
-
-- Use `.js` extension in imports (for ESM compatibility)
-- TypeScript will resolve `.ts`/`.tsx` files automatically
-
-### Error Handling
-
-Always use `validateResponse()` for fetch calls:
-
-```typescript
-import { validateResponse } from './lib/utils';
-
-const response = await fetch(url);
-await validateResponse(response, 'Operation failed');
-const data = await response.json();
-```
-
-### Token Management
-
-Never call token endpoints directly. Always use `getAccessToken()`:
-
-```typescript
-// ❌ Don't do this
-const response = await fetch(tokenUrl, { ... });
-
-// ✅ Do this
-const token = await getAccessToken(config);
-```
+| Issue | Fix |
+|-------|-----|
+| "Credentials not found" | Check `.env` has `AUTH_CLIENT_ID` and `AUTH_CLIENT_SECRET` |
+| "Token request failed" | Verify `AUTH_TOKEN_URL` and credentials are valid |
+| Circular dependency | Ensure `token.ts` imports from `utils`, not `http` |
+| CORS errors | Check origins in `server.ts` and backend APIs |
 
 ## Deployment
 
-### Vercel (Recommended)
+### Vercel
 
 ```json
 // vercel.json
 {
   "buildCommand": "npm run build",
-  "outputDirectory": ".zudoku/dist",
-  "installCommand": "npm install"
+  "outputDirectory": ".zudoku/dist"
 }
 ```
 
-Set environment variables in Vercel dashboard.
-
-### Environment Variables (Production)
-
-Same as development, but use production URLs:
-- `KEYCLOAK_URL` → Production Keycloak
-- `AUTH_TOKEN_URL` → Production token endpoint
-- `FACTORY_API` → Production API base URL
+Set env vars in Vercel dashboard (same as dev, but production URLs).
 
 ## Performance
 
-### Token Caching
+**Token Caching:** Tokens cached in memory per workspace. Expire 60s before actual expiry.
 
-Tokens are cached in memory per workspace. Cache expires 60 seconds before actual token expiry.
+**Credentials:** Fetched once per page load. Not cached in localStorage (security).
 
-**Cache hits** (no network call):
-```typescript
-getAccessToken(config) // First call: fetches token
-getAccessToken(config) // Second call: returns cached token
-```
+## Security
 
-**Cache misses** (network call):
-- Token expired or near expiry
-- `clearCachedToken(workspace)` called (after 401)
-- Different workspace
+- No credentials in browser storage (memory only)
+- No token logging
+- CORS restricted to specific origins
+- All routes protected by Clerk
+- Workspace isolation
 
-### Credentials Fetching
-
-Credentials are fetched once per page load. Not cached in localStorage for security.
-
-## Security Notes
-
-- **No credentials in browser storage**: All credentials stay in memory only
-- **No token logging**: Tokens never logged to console
-- **CORS restricted**: Backend only allows specific origins
-- **Clerk authentication**: All routes protected by default
-- **Workspace isolation**: Each workspace gets different credentials
-
-## Testing API Calls Manually
+## Testing API Manually
 
 ```bash
 # 1. Get credentials
-WORKSPACE="your-workspace"
-CREDS=$(curl -s "http://localhost:3001/api/workspace/credentials?workspace=$WORKSPACE")
-
-CLIENT_ID=$(echo $CREDS | jq -r '.clientId')
-CLIENT_SECRET=$(echo $CREDS | jq -r '.clientSecret')
-TOKEN_URL=$(echo $CREDS | jq -r '.tokenUrl')
-API_BASE=$(echo $CREDS | jq -r '.apiBaseUrl')
+CREDS=$(curl -s "http://localhost:3001/api/workspace/credentials?workspace=test")
 
 # 2. Get token
-TOKEN=$(curl -s -X POST "$TOKEN_URL" \
+TOKEN=$(curl -s -X POST "$(echo $CREDS | jq -r '.tokenUrl')" \
   -H "Content-Type: application/x-www-form-urlencoded" \
-  -u "$CLIENT_ID:$CLIENT_SECRET" \
+  -u "$(echo $CREDS | jq -r '.clientId'):$(echo $CREDS | jq -r '.clientSecret')" \
   -d "grant_type=client_credentials" | jq -r '.access_token')
 
-# 3. Make API request
-curl -X GET "$API_BASE/endpoint" \
+# 3. Call API
+curl "$(echo $CREDS | jq -r '.apiBaseUrl')/endpoint" \
   -H "Authorization: Bearer $TOKEN"
 ```
 
 ## Recent Changes
 
-### 2024-10-28: Code Refactoring
-- Removed unused exports (`authenticatedGet`, `authenticatedPost`, `clearAllTokens`)
-- Eliminated code duplication (~30-40% reduction)
-- Created shared utilities, types, and constants
+### 2024-10-28
+- Removed unused exports and code duplication (~30-40% reduction)
 - Fixed circular dependency between `http.ts` and `token.ts`
-- Added `CredentialField` component for reusable UI
-
-## Support
-
-For issues or questions, check:
-1. This README
-2. Browser DevTools console
-3. Backend logs (`npm run server`)
-4. Network tab for failed requests
+- Added shared utilities, types, constants
+- Added `CredentialField` component
 
 ---
 

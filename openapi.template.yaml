@@ -28,7 +28,7 @@ info:
     Most endpoints require a `workspace` path parameter. This will be automatically filled with your workspace ID.
   contact: {}
 servers:
-- url: http://localhost:3001/api
+- url: ${BACKEND_URL}/api
   description: Finarkein API (via secure proxy)
 paths:
   /{workspace}/dp/nerv/{flowId}:

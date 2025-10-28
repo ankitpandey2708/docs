@@ -3,22 +3,39 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import jwt from 'jsonwebtoken';
 import jwksClient from 'jwks-rsa';
+import { createProxyMiddleware } from 'http-proxy-middleware';
 
 dotenv.config();
 
 const app = express();
 
 // CORS configuration
+const allowedOrigins = [
+  process.env.FRONTEND_URL || 'http://localhost:3000',
+  'http://localhost:3000',
+  'https://docs.finarkein.com'
+].filter(Boolean);
+
 app.use(cors({
-  origin: process.env.FRONTEND_URL || 'http://localhost:3000',
+  origin: function (origin, callback) {
+    // Allow requests with no origin (mobile apps, curl, etc.)
+    if (!origin) return callback(null, true);
+
+    if (allowedOrigins.some(allowed => origin.startsWith(allowed))) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   credentials: true
 }));
 
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 // Clerk JWT verification
 const client = jwksClient({
-  jwksUri: process.env.CLERK_JWKS_URI,
+  jwksUri: process.env.CLERK_JWKS_URI!,
   cache: true,
   rateLimit: true,
   jwksRequestsPerMinute: 5,
@@ -63,24 +80,22 @@ async function verifyClerkToken(req: express.Request, res: express.Response, nex
   }
 }
 
-/**
- * Fetch credentials from Keycloak (stub for future implementation)
- */
-async function fetchFromKeycloak(workspace: string): Promise<WorkspaceCredentials | null> {
-  // TODO: Implement Keycloak integration
-  // Example:
-  // const keycloakClient = new KeycloakAdminClient({...});
-  // const client = await keycloakClient.clients.find({ clientId: `client-${workspace}` });
-  // return { clientId: client.clientId, clientSecret: client.secret, ... };
-
-  console.log(`Keycloak integration not yet implemented for workspace: ${workspace}`);
-  return null;
+interface WorkspaceCredentials {
+  clientId: string;
+  clientSecret: string;
+  workspace: string;
+  tokenUrl: string;
+  apiBaseUrl: string;
+  flowIds: {
+    nerv: string;
+    recurring: string;
+  };
 }
 
 /**
- * Fetch credentials from environment variables (development fallback)
+ * Fetch credentials from environment variables
  */
-function fetchFromEnv(workspace: string): WorkspaceCredentials {
+function fetchCredentials(workspace: string): WorkspaceCredentials {
   const workspaceUpper = workspace.toUpperCase();
 
   // Try workspace-specific env vars first
@@ -97,8 +112,8 @@ function fetchFromEnv(workspace: string): WorkspaceCredentials {
     clientId,
     clientSecret,
     workspace,
-    tokenUrl: process.env.AUTH_TOKEN_URL,
-    apiBaseUrl: process.env.FACTORY_API,
+    tokenUrl: process.env.AUTH_TOKEN_URL || 'https://id.finarkein.com/auth/realms/fin-dev/protocol/openid-connect/token',
+    apiBaseUrl: process.env.FACTORY_API || 'https://api.finarkein.in/factory/v1',
     flowIds: {
       nerv: nervFlowId || '',
       recurring: recurringFlowId || ''
@@ -106,124 +121,167 @@ function fetchFromEnv(workspace: string): WorkspaceCredentials {
   };
 }
 
-interface WorkspaceCredentials {
-  clientId: string;
-  clientSecret: string;
-  workspace: string;
-  tokenUrl: string;
-  apiBaseUrl: string;
-  flowIds: {
-    nerv: string;
-    recurring: string;
-  };
+// Cache for bearer tokens (keyed by workspace)
+const tokenCache: Map<string, { token: string; expiresAt: number }> = new Map();
+
+/**
+ * Get or refresh bearer token for a workspace
+ */
+async function getBearerToken(credentials: WorkspaceCredentials): Promise<string> {
+  const cached = tokenCache.get(credentials.workspace);
+  
+  // Check if we have a valid cached token (with 60 second buffer)
+  if (cached && cached.expiresAt > Date.now() + 60000) {
+    return cached.token;
+  }
+
+  // Fetch new token
+  console.log(`🔄 Fetching new token for workspace: ${credentials.workspace}`);
+  
+  const tokenResponse = await fetch(credentials.tokenUrl, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded',
+      'Authorization': `Basic ${Buffer.from(`${credentials.clientId}:${credentials.clientSecret}`).toString('base64')}`
+    },
+    body: 'grant_type=client_credentials'
+  });
+
+  if (!tokenResponse.ok) {
+    const errorText = await tokenResponse.text();
+    console.error('Token fetch failed:', tokenResponse.status, errorText);
+    throw new Error(`Token fetch failed: ${tokenResponse.statusText}`);
+  }
+
+  const tokenData = await tokenResponse.json();
+  
+  // Cache the token
+  tokenCache.set(credentials.workspace, {
+    token: tokenData.access_token,
+    expiresAt: Date.now() + (tokenData.expires_in * 1000)
+  });
+
+  return tokenData.access_token;
 }
 
 /**
- * GET /api/workspace/credentials
- * Returns workspace-specific credentials for the authenticated user
- */
-app.get('/api/workspace/credentials', verifyClerkToken, async (req, res) => {
-  try {
-    const user = (req as any).user;
-
-    // Extract workspace from user's public metadata
-    // Clerk stores custom data in publicMetadata
-    const workspace = user.publicMetadata?.workspace || user.workspace || process.env.workspace;
-
-    let credentials: WorkspaceCredentials | null = null;
-
-    // Try Keycloak first (if configured)
-    if (process.env.KEYCLOAK_URL) {
-      console.log('Attempting to fetch from Keycloak...');
-      credentials = await fetchFromKeycloak(workspace);
-    }
-
-    // Fallback to environment variables
-    if (!credentials) {
-      console.log('Falling back to environment variables');
-      credentials = fetchFromEnv(workspace);
-    }
-
-    // Return credentials (excluding sensitive data in logs)
-    console.log(`Successfully fetched credentials for workspace: ${credentials.workspace}`);
-
-    res.json(credentials);
-  } catch (error) {
-    console.error('Error fetching workspace credentials:', error);
-    res.status(500).json({
-      error: 'Failed to fetch workspace credentials',
-      message: error instanceof Error ? error.message : 'Unknown error'
-    });
-  }
-});
-
-/**
- * GET /api/health
  * Health check endpoint
  */
 app.get('/api/health', (req, res) => {
   res.json({
     status: 'ok',
     timestamp: new Date().toISOString(),
-    keycloakConfigured: !!process.env.KEYCLOAK_URL
+    environment: process.env.NODE_ENV || 'development'
   });
 });
 
 /**
- * POST /api/token/exchange
- * Exchange client credentials for access token
- * This endpoint can be used by the frontend to get tokens without exposing client_secret
+ * Universal API proxy middleware
+ * Proxies all /api/* requests to Finarkein API with automatic authentication
  */
-app.post('/api/token/exchange', verifyClerkToken, async (req, res) => {
+app.use('/api/*', verifyClerkToken, async (req, res, next) => {
   try {
     const user = (req as any).user;
     const workspace = user.publicMetadata?.workspace || user.workspace || process.env.workspace;
+
+    if (!workspace) {
+      return res.status(400).json({ error: 'Workspace not configured for user' });
+    }
+
+    // Fetch credentials for this workspace
+    const credentials = fetchCredentials(workspace);
+
+    // Extract the actual API path (remove /api prefix)
+    let apiPath = req.path.replace(/^\/api/, '');
     
-    let credentials: WorkspaceCredentials | null = null;
-    if (process.env.KEYCLOAK_URL) {
-      credentials = await fetchFromKeycloak(workspace);
-    }
-    if (!credentials) {
-      credentials = fetchFromEnv(workspace);
+    // Auto-fill path parameters
+    apiPath = apiPath.replace(/\{workspace\}/g, credentials.workspace);
+    
+    // Replace flowId based on the endpoint
+    if (apiPath.includes('{flowId}')) {
+      const flowId = apiPath.includes('/fetch/') 
+        ? credentials.flowIds.recurring 
+        : credentials.flowIds.nerv;
+      apiPath = apiPath.replace(/\{flowId\}/g, flowId);
     }
 
-    // Exchange for token
-    const tokenResponse = await fetch(credentials.tokenUrl, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
-        'Authorization': `Basic ${Buffer.from(`${credentials.clientId}:${credentials.clientSecret}`).toString('base64')}`
-      },
-      body: 'grant_type=client_credentials'
+    // Determine target URL and auth
+    let targetUrl: string;
+    let authHeader: string;
+
+    if (apiPath === '/token' || apiPath.endsWith('/token')) {
+      // For /token endpoint, use Keycloak and Basic Auth
+      targetUrl = credentials.tokenUrl;
+      authHeader = `Basic ${Buffer.from(`${credentials.clientId}:${credentials.clientSecret}`).toString('base64')}`;
+    } else {
+      // For all other endpoints, use Factory API and Bearer token
+      const bearerToken = await getBearerToken(credentials);
+      targetUrl = `${credentials.apiBaseUrl}${apiPath}`;
+      authHeader = `Bearer ${bearerToken}`;
+    }
+
+    // Make the proxied request
+    const proxyHeaders: any = {
+      'Authorization': authHeader,
+      'Content-Type': req.headers['content-type'] || 'application/json',
+    };
+
+    // Forward other relevant headers
+    if (req.headers['user-agent']) {
+      proxyHeaders['User-Agent'] = req.headers['user-agent'];
+    }
+
+    const proxyOptions: any = {
+      method: req.method,
+      headers: proxyHeaders,
+    };
+
+    // Include body for POST/PUT/PATCH requests
+    if (['POST', 'PUT', 'PATCH'].includes(req.method) && req.body) {
+      if (req.headers['content-type']?.includes('application/x-www-form-urlencoded')) {
+        proxyOptions.body = new URLSearchParams(req.body).toString();
+      } else {
+        proxyOptions.body = JSON.stringify(req.body);
+      }
+    }
+
+    console.log(`🔄 Proxying ${req.method} ${apiPath} -> ${targetUrl}`);
+
+    const response = await fetch(targetUrl, proxyOptions);
+    
+    // Forward response status
+    res.status(response.status);
+
+    // Forward response headers
+    response.headers.forEach((value, key) => {
+      res.setHeader(key, value);
     });
 
-    if (!tokenResponse.ok) {
-      console.error('Token exchange failed:', tokenResponse.status, tokenResponse.statusText);
-      throw new Error(`Token exchange failed: ${tokenResponse.statusText}`);
+    // Forward response body
+    const contentType = response.headers.get('content-type');
+    if (contentType?.includes('application/json')) {
+      const data = await response.json();
+      res.json(data);
+    } else {
+      const text = await response.text();
+      res.send(text);
     }
 
-    const tokenData = await tokenResponse.json();
-    console.log('Token exchange successful for workspace:', workspace);
-
-    res.json({
-      access_token: tokenData.access_token,
-      expires_in: tokenData.expires_in,
-      token_type: tokenData.token_type,
-      workspace: credentials.workspace,
-      flowIds: credentials.flowIds
-    });
   } catch (error) {
-    console.error('Token exchange error:', error);
+    console.error('Proxy error:', error);
     res.status(500).json({
-      error: 'Token exchange failed',
+      error: 'Proxy request failed',
       message: error instanceof Error ? error.message : 'Unknown error'
     });
   }
 });
 
+const PORT = process.env.PORT || (process.env.NODE_ENV === 'production' ? 3000 : 3001);
 
-app.listen(process.env.PORT || (process.env.NODE_ENV === 'production' ? 3000 : 3001), () => {
-  console.log(`🔐 Keycloak: ${process.env.KEYCLOAK_URL ? 'Configured ✅' : 'Not configured (using .env fallback)'}`);
+app.listen(PORT, () => {
+  console.log(`🚀 Finarkein API Proxy running on port ${PORT}`);
+  console.log(`   Environment: ${process.env.NODE_ENV || 'development'}`);
+  console.log(`   Allowed origins: ${allowedOrigins.join(', ')}`);
 });
 
 export default app;

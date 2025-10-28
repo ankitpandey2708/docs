@@ -229,13 +229,36 @@ app.get('/api/workspace/credentials', async (req, res) => {
  * Universal API proxy middleware
  * Proxies all /api/* requests to Finarkein API with automatic authentication
  */
-app.all('/api/*', verifyClerkToken, async (req, res) => {
+app.all('/api/*', async (req, res) => {
   try {
-    const user = (req as any).user;
-    const workspace = user.publicMetadata?.workspace || user.workspace || process.env.workspace;
+    // Try to verify Clerk token if provided, otherwise use default workspace
+    let workspace = process.env.workspace; // Default workspace
+
+    const authHeader = req.headers.authorization;
+    if (authHeader && authHeader.startsWith('Bearer ')) {
+      const token = authHeader.replace('Bearer ', '');
+      try {
+        const decoded = await new Promise((resolve, reject) => {
+          jwt.verify(token, getKey, {
+            algorithms: ['RS256']
+          }, (err, decoded: any) => {
+            if (err) reject(err);
+            else resolve(decoded);
+          });
+        });
+
+        const user = decoded as any;
+        workspace = user.publicMetadata?.workspace || user.workspace || workspace;
+        console.log('✓ Authenticated request, using workspace:', workspace);
+      } catch (error) {
+        console.log('Token verification failed, using default workspace:', workspace);
+      }
+    } else {
+      console.log('No auth token provided, using default workspace:', workspace);
+    }
 
     if (!workspace) {
-      return res.status(400).json({ error: 'Workspace not configured for user' });
+      return res.status(400).json({ error: 'Workspace not configured' });
     }
 
     // Fetch credentials for this workspace

@@ -5,45 +5,44 @@
  */
 
 import { getAccessToken, clearCachedToken } from '../auth/token';
+import type { WorkspaceCredentials } from '../types/credentials';
+import { buildCredentialsUrl } from './utils';
+import { HEADERS } from './constants';
 
-export interface WorkspaceCredentials {
-  clientId: string;
-  clientSecret: string;
-  workspace: string;
-  tokenUrl: string;
-  apiBaseUrl: string;
-  flowIds: {
-    nerv: string;
-    recurring: string;
-  };
+export type { WorkspaceCredentials };
+
+/**
+ * Validate HTTP response and throw error if not ok
+ * @param response Fetch response
+ * @param message Error message prefix
+ */
+export async function validateResponse(
+  response: Response,
+  message: string = 'Request failed'
+): Promise<void> {
+  if (!response.ok) {
+    const errorText = await response.text();
+    throw new Error(
+      `${message} (${response.status}): ${errorText || response.statusText}`
+    );
+  }
 }
 
 /**
  * Fetch workspace credentials from the backend
  * This maintains the existing credential resolution logic (Keycloak -> env)
- * 
+ *
  * @param workspace Workspace identifier (optional)
  * @returns Workspace credentials
  */
 async function fetchCredentials(workspace?: string): Promise<WorkspaceCredentials> {
-  const backendUrl = typeof window !== 'undefined' 
-    ? (window.location.hostname === 'localhost' ? 'http://localhost:3001' : window.location.origin)
-    : 'http://localhost:3001';
-
-  let url = `${backendUrl}/api/workspace/credentials`;
-  if (workspace) {
-    url += `?workspace=${encodeURIComponent(workspace)}`;
-  }
+  const url = buildCredentialsUrl(workspace);
 
   const response = await fetch(url, {
-    headers: {
-      'Content-Type': 'application/json',
-    },
+    headers: HEADERS.JSON,
   });
 
-  if (!response.ok) {
-    throw new Error(`Failed to fetch credentials: ${response.statusText}`);
-  }
+  await validateResponse(response, 'Failed to fetch credentials');
 
   return response.json();
 }
@@ -100,35 +99,4 @@ export async function authenticatedFetch(
   } catch (error) {
     throw error;
   }
-}
-
-/**
- * Helper to make authenticated GET requests
- */
-export async function authenticatedGet(
-  url: string,
-  workspace?: string
-): Promise<Response> {
-  return authenticatedFetch(url, { method: 'GET' }, workspace);
-}
-
-/**
- * Helper to make authenticated POST requests
- */
-export async function authenticatedPost(
-  url: string,
-  body?: any,
-  workspace?: string
-): Promise<Response> {
-  return authenticatedFetch(
-    url,
-    {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: body ? JSON.stringify(body) : undefined,
-    },
-    workspace
-  );
 }

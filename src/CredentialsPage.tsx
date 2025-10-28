@@ -4,30 +4,12 @@ import { useAuth } from "zudoku/hooks";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "zudoku/ui/Card";
 import { Badge } from "zudoku/ui/Badge";
 import { Alert, AlertDescription, AlertTitle } from "zudoku/ui/Alert";
-import { Secret } from "zudoku/ui/Secret";
-import { KeyIcon, AlertCircleIcon, CheckCircleIcon } from "zudoku/icons";
-
-// Determine backend URL based on environment
-const getBackendUrl = () => {
-  if (typeof window === 'undefined') {
-    return 'http://localhost:3001';
-  }
-  return window.location.hostname === 'localhost' 
-    ? 'http://localhost:3001' 
-    : window.location.origin;
-};
-
-interface WorkspaceCredentials {
-  clientId: string;
-  clientSecret: string;
-  workspace: string;
-  tokenUrl: string;
-  apiBaseUrl: string;
-  flowIds: {
-    nerv: string;
-    recurring: string;
-  };
-}
+import { KeyIcon, AlertCircleIcon } from "zudoku/icons";
+import type { WorkspaceCredentials } from "./types/credentials";
+import { buildCredentialsUrl, extractWorkspace } from "./lib/utils";
+import { validateResponse } from "./lib/http";
+import { HEADERS } from "./lib/constants";
+import { CredentialField } from "./components/CredentialField";
 
 export const CredentialsPage = () => {
   const [credentials, setCredentials] = useState<WorkspaceCredentials | null>(null);
@@ -39,24 +21,16 @@ export const CredentialsPage = () => {
     const fetchCredentials = async () => {
       try {
         // Extract workspace from auth context
-        const workspace = (auth as any).providerData?.user?.publicMetadata?.workspace;
-        
+        const workspace = extractWorkspace(auth);
+
         // Build URL with workspace parameter if available
-        let url = `${getBackendUrl()}/api/workspace/credentials`;
-        if (workspace) {
-          url += `?workspace=${encodeURIComponent(workspace)}`;
-        }
+        const url = buildCredentialsUrl(workspace);
 
         const response = await fetch(url, {
-          headers: {
-            'Content-Type': 'application/json'
-          }
+          headers: HEADERS.JSON,
         });
 
-        if (!response.ok) {
-          const errorText = await response.text();
-          throw new Error(`Failed to fetch credentials: ${response.statusText}`);
-        }
+        await validateResponse(response, 'Failed to fetch credentials');
 
         const data = await response.json();
         setCredentials(data);
@@ -151,26 +125,8 @@ export const CredentialsPage = () => {
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
-                <div>
-                  <label className="text-sm font-medium text-muted-foreground mb-2 block">
-                    Client ID
-                  </label>
-                  <Secret
-                    secret={credentials.clientId}
-                    status="active"
-                    preview={8}
-                  />
-                </div>
-                <div>
-                  <label className="text-sm font-medium text-muted-foreground mb-2 block">
-                    Client Secret
-                  </label>
-                  <Secret
-                    secret={credentials.clientSecret}
-                    status="active"
-                    preview={8}
-                  />
-                </div>
+                <CredentialField label="Client ID" secret={credentials.clientId} preview={8} />
+                <CredentialField label="Client Secret" secret={credentials.clientSecret} preview={8} />
               </CardContent>
             </Card>
 
@@ -183,26 +139,16 @@ export const CredentialsPage = () => {
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
-                <div>
-                  <label className="text-sm font-medium text-muted-foreground mb-2 block">
-                    Nerv Flow ID (One-time Consent)
-                  </label>
-                  <Secret
-                    secret={credentials.flowIds.nerv}
-                    status="active"
-                    preview={12}
-                  />
-                </div>
-                <div>
-                  <label className="text-sm font-medium text-muted-foreground mb-2 block">
-                    Recurring Flow ID (Recurring Consent)
-                  </label>
-                  <Secret
-                    secret={credentials.flowIds.recurring}
-                    status="active"
-                    preview={12}
-                  />
-                </div>
+                <CredentialField
+                  label="Nerv Flow ID (One-time Consent)"
+                  secret={credentials.flowIds.nerv}
+                  preview={12}
+                />
+                <CredentialField
+                  label="Recurring Flow ID (Recurring Consent)"
+                  secret={credentials.flowIds.recurring}
+                  preview={12}
+                />
               </CardContent>
             </Card>
 

@@ -1,6 +1,7 @@
 import type { ZudokuContext } from "zudoku";
 import { authenticatedFetch } from "./lib/http.js";
-import { getAccessToken } from "./auth/token.js";
+import { buildCredentialsUrl, extractWorkspace } from "./lib/utils.js";
+import { HEADERS } from "./lib/constants.js";
 
 export const getApiIdentities = async (context: ZudokuContext) => {
   return [
@@ -9,25 +10,13 @@ export const getApiIdentities = async (context: ZudokuContext) => {
       label: "Workspace Authentication",
       authorizeRequest: async (request) => {
         // Extract workspace from Clerk authentication context
-        const workspace = (context.authentication as any)?.providerData?.user
-          ?.publicMetadata?.workspace;
-
-        // Determine backend URL for credential fetching
-        const backendUrl =
-          typeof window !== "undefined"
-            ? window.location.hostname === "localhost"
-              ? "http://localhost:3001"
-              : window.location.origin
-            : "http://localhost:3001";
+        const workspace = extractWorkspace(context.authentication);
 
         // Fetch workspace credentials from backend (keeps Keycloak -> env resolution logic)
-        let credentialsUrl = `${backendUrl}/api/workspace/credentials`;
-        if (workspace) {
-          credentialsUrl += `?workspace=${encodeURIComponent(workspace)}`;
-        }
+        const credentialsUrl = buildCredentialsUrl(workspace);
 
         const credentialsResponse = await fetch(credentialsUrl, {
-          headers: { "Content-Type": "application/json" },
+          headers: HEADERS.JSON,
         });
 
         if (!credentialsResponse.ok) {

@@ -3,6 +3,9 @@
  * Handles OAuth2 client credentials flow with automatic token caching and refresh
  */
 
+import { HEADERS } from '../lib/constants';
+import { validateResponse } from '../lib/http';
+
 interface TokenResponse {
   access_token: string;
   expires_in: number;
@@ -47,20 +50,17 @@ export async function getAccessToken(config: TokenConfig): Promise<string> {
   try {
     // Make token request with Basic Auth
     const basicAuth = btoa(`${clientId}:${clientSecret}`);
-    
+
     const response = await fetch(tokenUrl, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
+        ...HEADERS.FORM_URLENCODED,
         'Authorization': `Basic ${basicAuth}`,
       },
       body: 'grant_type=client_credentials',
     });
 
-    if (!response.ok) {
-      const errorText = await response.text();
-      throw new Error(`Token request failed (${response.status}): ${errorText}`);
-    }
+    await validateResponse(response, 'Token request failed');
 
     const data: TokenResponse = await response.json();
 
@@ -79,16 +79,9 @@ export async function getAccessToken(config: TokenConfig): Promise<string> {
 
 /**
  * Clear cached token for a workspace (useful for forced refresh)
- * 
+ *
  * @param workspace Workspace identifier
  */
 export function clearCachedToken(workspace: string): void {
   tokenCache.delete(workspace);
-}
-
-/**
- * Clear all cached tokens
- */
-export function clearAllTokens(): void {
-  tokenCache.clear();
 }

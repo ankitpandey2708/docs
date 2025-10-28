@@ -1,6 +1,9 @@
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
+import type { WorkspaceCredentials } from './src/types/credentials.js';
+import { getAttributeValue } from './src/lib/utils.js';
+import { HEADERS } from './src/lib/constants.js';
 
 dotenv.config();
 
@@ -31,18 +34,6 @@ app.use(cors({
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-interface WorkspaceCredentials {
-  clientId: string;
-  clientSecret: string;
-  workspace: string;
-  tokenUrl: string;
-  apiBaseUrl: string;
-  flowIds: {
-    nerv: string;
-    recurring: string;
-  };
-}
-
 /**
  * Fetch credentials from Keycloak
  * Returns null if Keycloak is not configured or fetch fails
@@ -63,9 +54,7 @@ async function fetchCredentialsFromKeycloak(workspace: string): Promise<Workspac
     const tokenUrl = `${keycloakUrl}/realms/${keycloakRealm}/protocol/openid-connect/token`;
     const tokenResponse = await fetch(tokenUrl, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
-      },
+      headers: HEADERS.FORM_URLENCODED,
       body: new URLSearchParams({
         grant_type: 'client_credentials',
         client_id: keycloakClientId,
@@ -85,7 +74,7 @@ async function fetchCredentialsFromKeycloak(workspace: string): Promise<Workspac
     const clientsResponse = await fetch(clientsUrl, {
       headers: {
         'Authorization': `Bearer ${adminToken}`,
-        'Content-Type': 'application/json',
+        ...HEADERS.JSON,
       },
     });
 
@@ -102,12 +91,12 @@ async function fetchCredentialsFromKeycloak(workspace: string): Promise<Workspac
     const client = clients[0];
     const attributes = client.attributes || {};
 
-    const clientId = attributes.AUTH_CLIENT_ID || attributes.auth_client_id;
-    const clientSecret = attributes.AUTH_CLIENT_SECRET || attributes.auth_client_secret;
-    const tokenUrlAttr = attributes.AUTH_TOKEN_URL || attributes.auth_token_url;
-    const nervFlowId = attributes.NERV_FLOW_ID || attributes.nerv_flow_id;
-    const recurringFlowId = attributes.RECURRING_FLOW_ID || attributes.recurring_flow_id;
-    const apiBaseUrl = attributes.FACTORY_API || attributes.factory_api;
+    const clientId = getAttributeValue(attributes, 'AUTH_CLIENT_ID', 'auth_client_id');
+    const clientSecret = getAttributeValue(attributes, 'AUTH_CLIENT_SECRET', 'auth_client_secret');
+    const tokenUrlAttr = getAttributeValue(attributes, 'AUTH_TOKEN_URL', 'auth_token_url');
+    const nervFlowId = getAttributeValue(attributes, 'NERV_FLOW_ID', 'nerv_flow_id');
+    const recurringFlowId = getAttributeValue(attributes, 'RECURRING_FLOW_ID', 'recurring_flow_id');
+    const apiBaseUrl = getAttributeValue(attributes, 'FACTORY_API', 'factory_api');
 
     if (!clientId || !clientSecret) {
       return null;

@@ -9,9 +9,6 @@ import type { WorkspaceCredentials } from '../types/credentials';
 import { buildCredentialsUrl, validateResponse } from './utils';
 import { HEADERS } from './constants';
 
-export type { WorkspaceCredentials };
-export { validateResponse };
-
 /**
  * Fetch workspace credentials from the backend
  * This maintains the existing credential resolution logic (Keycloak -> env)
@@ -46,41 +43,37 @@ export async function authenticatedFetch(
   workspaceOrCredentials?: string | WorkspaceCredentials,
   retryOn401: boolean = true
 ): Promise<Response> {
-  try {
-    // Use provided credentials or fetch them
-    const credentials = typeof workspaceOrCredentials === 'object' && workspaceOrCredentials !== null
-      ? workspaceOrCredentials
-      : await fetchCredentials(typeof workspaceOrCredentials === 'string' ? workspaceOrCredentials : undefined);
+  // Use provided credentials or fetch them
+  const credentials = typeof workspaceOrCredentials === 'object' && workspaceOrCredentials !== null
+    ? workspaceOrCredentials
+    : await fetchCredentials(typeof workspaceOrCredentials === 'string' ? workspaceOrCredentials : undefined);
 
-    // Get or refresh access token
-    const accessToken = await getAccessToken({
-      tokenUrl: credentials.tokenUrl,
-      clientId: credentials.clientId,
-      clientSecret: credentials.clientSecret,
-      workspace: credentials.workspace,
-    });
+  // Get or refresh access token
+  const accessToken = await getAccessToken({
+    tokenUrl: credentials.tokenUrl,
+    clientId: credentials.clientId,
+    clientSecret: credentials.clientSecret,
+    workspace: credentials.workspace,
+  });
 
-    // Inject Authorization header
-    const headers = new Headers(options.headers);
-    headers.set('Authorization', `Bearer ${accessToken}`);
+  // Inject Authorization header
+  const headers = new Headers(options.headers);
+  headers.set('Authorization', `Bearer ${accessToken}`);
 
-    // Make the request
-    const response = await fetch(url, {
-      ...options,
-      headers,
-    });
+  // Make the request
+  const response = await fetch(url, {
+    ...options,
+    headers,
+  });
 
-    // Handle 401 with retry (if enabled and not already retrying)
-    if (response.status === 401 && retryOn401) {
-      // Clear the cached token to force refresh
-      clearCachedToken(credentials.workspace);
+  // Handle 401 with retry (if enabled and not already retrying)
+  if (response.status === 401 && retryOn401) {
+    // Clear the cached token to force refresh
+    clearCachedToken(credentials.workspace);
 
-      // Retry once with a new token, passing the same credentials to avoid re-fetching
-      return authenticatedFetch(url, options, credentials, false);
-    }
-
-    return response;
-  } catch (error) {
-    throw error;
+    // Retry once with a new token, passing the same credentials to avoid re-fetching
+    return authenticatedFetch(url, options, credentials, false);
   }
+
+  return response;
 }

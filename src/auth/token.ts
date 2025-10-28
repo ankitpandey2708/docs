@@ -47,34 +47,30 @@ export async function getAccessToken(config: TokenConfig): Promise<string> {
     return cached.token;
   }
 
-  try {
-    // Make token request with Basic Auth
-    const basicAuth = btoa(`${clientId}:${clientSecret}`);
+  // Make token request with Basic Auth
+  const basicAuth = btoa(`${clientId}:${clientSecret}`);
 
-    const response = await fetch(tokenUrl, {
-      method: 'POST',
-      headers: {
-        ...HEADERS.FORM_URLENCODED,
-        'Authorization': `Basic ${basicAuth}`,
-      },
-      body: 'grant_type=client_credentials',
-    });
+  const response = await fetch(tokenUrl, {
+    method: 'POST',
+    headers: {
+      ...HEADERS.FORM_URLENCODED,
+      'Authorization': `Basic ${basicAuth}`,
+    },
+    body: 'grant_type=client_credentials',
+  });
 
-    await validateResponse(response, 'Token request failed');
+  await validateResponse(response, 'Token request failed');
 
-    const data: TokenResponse = await response.json();
+  const data: TokenResponse = await response.json();
 
-    // Cache the token
-    const expiresAt = Date.now() + (data.expires_in * 1000);
-    tokenCache.set(workspace, {
-      token: data.access_token,
-      expiresAt,
-    });
+  // Cache the token
+  const expiresAt = Date.now() + (data.expires_in * 1000);
+  tokenCache.set(workspace, {
+    token: data.access_token,
+    expiresAt,
+  });
 
-    return data.access_token;
-  } catch (error) {
-    throw error;
-  }
+  return data.access_token;
 }
 
 /**

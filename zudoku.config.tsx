@@ -31,6 +31,15 @@ const config: ZudokuConfig = {
           icon: "sparkles",
           items: [
             "/introduction",
+            "/api-proxy",
+          ],
+        },
+        {
+          type: "category",
+          label: "Configuration",
+          icon: "settings",
+          items: [
+            "/keycloak-setup",
           ],
         }
       ],
@@ -52,7 +61,7 @@ const config: ZudokuConfig = {
   apis: [
     {
       type: "file",
-      input: "./openapi.yaml",
+      input: "./openapi2.yaml",
       path: "/api",
     }
   ],
@@ -77,15 +86,55 @@ const config: ZudokuConfig = {
               // Get Clerk access token
               const token = await context.authentication?.getAccessToken?.();
 
-              if (!token) {
-                return request;
+              // Extract the request URL
+              const originalUrl = new URL(request.url);
+
+              // Determine backend URL based on environment
+              const backendUrl = typeof window !== 'undefined'
+                ? (window.location.hostname === 'localhost' ? 'http://localhost:3001' : window.location.origin)
+                : 'http://localhost:3001';
+
+              // Route all API requests through our proxy
+              // The proxy will handle authentication and forward to the real API
+              let proxyPath = '';
+
+              if (originalUrl.pathname.includes('/factory/v1')) {
+                // Extract path after /factory/v1
+                proxyPath = originalUrl.pathname.split('/factory/v1')[1];
+              } else if (originalUrl.pathname.includes('/protocol/openid-connect/token')) {
+                // Token endpoint
+                proxyPath = '/token';
+              } else {
+                // Default: use the full pathname
+                proxyPath = originalUrl.pathname;
               }
 
-              // Pass the Clerk token to the proxy
-              request.headers.set('Authorization', `Bearer ${token}`);
+              // Create new URL pointing to our proxy
+              const proxyUrl = `${backendUrl}/api${proxyPath}${originalUrl.search}`;
 
-              return request;
+              console.log('[Zudoku Proxy] Original URL:', request.url);
+              console.log('[Zudoku Proxy] Proxied to:', proxyUrl);
+
+              // Create new request with proxy URL
+              const proxyRequest = new Request(proxyUrl, {
+                method: request.method,
+                headers: request.headers,
+                body: request.body,
+                credentials: request.credentials,
+                cache: request.cache,
+                redirect: request.redirect,
+                referrer: request.referrer,
+                integrity: request.integrity,
+              });
+
+              // Add Clerk token if available
+              if (token) {
+                proxyRequest.headers.set('Authorization', `Bearer ${token}`);
+              }
+
+              return proxyRequest;
             } catch (error) {
+              console.error('[Zudoku Proxy] Error:', error);
               return request;
             }
           },

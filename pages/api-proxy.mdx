@@ -1,0 +1,218 @@
+---
+title: API Proxy & Authentication
+---
+
+# API Proxy & Authentication
+
+This documentation uses the **real Finarkein API endpoints** that match your existing Postman collections. When you use the "Try it out" feature, requests are securely proxied through our backend for convenience.
+
+## Real API Endpoints
+
+All endpoints shown in the API Reference use the actual production URLs:
+
+```
+https://api.finarkein.in/factory/v1/{workspace}/dp/nerv/{flowId}
+https://id.finarkein.com/auth/realms/fin-dev/protocol/openid-connect/token
+```
+
+**Benefits:**
+- ✅ Same endpoints as your Postman collections
+- ✅ No confusion about different base URLs
+- ✅ Copy-paste directly into your code
+- ✅ Matches official API documentation
+
+## How "Try it out" Works
+
+When you click "Try it out" in the API Reference:
+
+1. **You see real endpoints** - matching Postman exactly
+2. **Request is proxied** - automatically routed through our secure backend
+3. **Authentication is handled** - workspace credentials injected automatically
+4. **Path parameters filled** - `{workspace}` and `{flowId}` auto-populated
+5. **Response returned** - from the real Finarkein API
+
+```
+┌─────────────────────┐
+│ You click "Try it"  │
+│ on API Reference    │
+└──────────┬──────────┘
+           │
+           ▼
+    Real API endpoint shown:
+    https://api.finarkein.in/factory/v1/tsfsl/dp/nerv/{flowId}
+           │
+           ▼
+    ┌───────────────────────┐
+    │  Zudoku intercepts    │
+    │  and proxies request  │
+    └──────────┬────────────┘
+               │
+               ▼
+    ┌──────────────────────────┐
+    │  Backend Proxy           │
+    │  - Fetches workspace     │
+    │    credentials           │
+    │  - Gets OAuth2 token     │
+    │  - Replaces {workspace}  │
+    │  - Replaces {flowId}     │
+    └──────────┬───────────────┘
+               │
+               ▼
+    ┌──────────────────────────┐
+    │  Real Finarkein API      │
+    │  https://api.finarkein.in│
+    └──────────┬───────────────┘
+               │
+               ▼
+         Response returned
+         to your browser
+```
+
+## Why Use a Proxy?
+
+**Without Proxy (Postman-style):**
+1. Manually get OAuth2 token with `client_credentials`
+2. Manually fill `{workspace}` parameter
+3. Manually fill `{flowId}` parameter
+4. Add Bearer token to Authorization header
+5. Make API request
+
+**With Proxy (Documentation):**
+1. Click "Try it out"
+2. Done! ✨
+
+The proxy eliminates manual steps while showing you the real endpoints.
+
+## For Your Own Integration
+
+When integrating the API in your application, **do NOT use the proxy**. Use the real endpoints directly:
+
+### Step 1: Get Access Token
+
+```bash
+curl -X POST https://id.finarkein.com/auth/realms/fin-dev/protocol/openid-connect/token \
+  -H "Content-Type: application/x-www-form-urlencoded" \
+  -u "YOUR_CLIENT_ID:YOUR_CLIENT_SECRET" \
+  -d "grant_type=client_credentials"
+```
+
+### Step 2: Call API with Token
+
+```bash
+curl -X POST https://api.finarkein.in/factory/v1/YOUR_WORKSPACE/dp/nerv/YOUR_FLOW_ID \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "consentTemplateId": "f2f86ccb-60fe-4ec4-b58d-3f90a4559938",
+    "customerMobileNumber": "9881908250"
+  }'
+```
+
+**Get your credentials from:** [/credentials](/credentials)
+
+## Proxy Configuration
+
+The proxy is configured in `zudoku.config.tsx`:
+
+```typescript
+authorizeRequest: async (request) => {
+  // Extract real API URL
+  const originalUrl = new URL(request.url);
+  // Example: https://api.finarkein.in/factory/v1/tsfsl/dp/nerv/{flowId}
+
+  // Route through proxy
+  const proxyUrl = `http://localhost:3001/api/tsfsl/dp/nerv/{flowId}`;
+
+  // Add Clerk authentication
+  request.headers.set('Authorization', `Bearer ${clerkToken}`);
+
+  return proxiedRequest;
+}
+```
+
+The proxy then:
+1. Extracts workspace from Clerk JWT
+2. Fetches workspace credentials (from Keycloak or env vars)
+3. Gets OAuth2 access token
+4. Replaces path parameters
+5. Forwards to real Finarkein API
+
+## Security
+
+**Client-side (Browser):**
+- Only Clerk authentication token exposed
+- No OAuth2 client secrets in browser
+- No direct access to workspace credentials
+
+**Server-side (Proxy):**
+- Secure credential storage (Keycloak/env vars)
+- Token caching (24-hour expiry)
+- Automatic token refresh
+- Audit logging
+
+**API-side (Finarkein):**
+- All requests use valid OAuth2 tokens
+- Proper workspace isolation
+- Standard OAuth2 security
+
+## Development vs Production
+
+| Environment | API Endpoints | Proxy URL | Credentials |
+|-------------|--------------|-----------|-------------|
+| **Development** | Real URLs shown | `http://localhost:3001/api` | Environment variables |
+| **Production** | Real URLs shown | `https://docs.finarkein.com/api` | Keycloak |
+
+## Comparison with Postman
+
+| Feature | Postman Collection | This Documentation |
+|---------|-------------------|-------------------|
+| **Endpoints** | Real API URLs | ✅ Same real API URLs |
+| **Base URL** | `https://api.finarkein.in/factory/v1` | ✅ Same base URL |
+| **Authentication** | Manual OAuth2 flow | ⚡ Automatic (via proxy) |
+| **Parameters** | Manual entry | ⚡ Auto-populated |
+| **Best for** | API development & testing | Quick testing & learning |
+
+## Logs & Debugging
+
+Check browser console for proxy logs:
+
+```
+[Zudoku Proxy] Original URL: https://api.finarkein.in/factory/v1/tsfsl/dp/nerv/376b...
+[Zudoku Proxy] Proxied to: http://localhost:3001/api/tsfsl/dp/nerv/376b...
+```
+
+Check server logs for credential fetching:
+
+```
+[Keycloak] ✓ Successfully fetched credentials for workspace: tsfsl
+[Universal Proxy] Using workspace from JWT: tsfsl
+[Universal Proxy] Proxying request to: https://api.finarkein.in/factory/v1/...
+```
+
+## FAQ
+
+**Q: Why don't you use the proxy URL in the documentation?**
+
+A: We show real endpoints so they match your Postman collections. This prevents confusion when copying endpoints to your code.
+
+**Q: Can I disable the proxy and use direct API calls?**
+
+A: The "Try it out" feature requires the proxy for authentication. For your own integration, always use direct API calls (see "For Your Own Integration" above).
+
+**Q: Will my API calls go through the proxy in production?**
+
+A: No! Only the documentation's "Try it out" feature uses the proxy. Your application should call the Finarkein API directly.
+
+**Q: What if I want to test without the documentation?**
+
+A: Use Postman, curl, or any HTTP client to call the real API endpoints directly. Get your credentials from [/credentials](/credentials).
+
+**Q: Is the proxy secure?**
+
+A: Yes. The proxy only handles authentication for the documentation. It doesn't log sensitive data, and credentials are stored securely in Keycloak (production) or environment variables (development).
+
+## Related Documentation
+
+- [Credentials Page](/credentials) - View your workspace credentials
+- [Keycloak Setup](/keycloak-setup) - Configure production credentials
+- [API Reference](/api) - Try the API endpoints

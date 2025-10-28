@@ -29,7 +29,8 @@ try {
   
   // Get workspace from environment (defaults to tsfsl)
   const workspace = process.env.workspace || 'tsfsl';
-  const nervFlowId = process.env[`${workspace}_NERV_FLOW_ID`] || process.env['nerv.flow.id'] || '376b71fe-009b-4154-850c-fa0eb65b4d5a';
+  const workspaceLower = workspace.toLowerCase();
+  const nervFlowId = process.env[`${workspaceLower}_NERV_FLOW_ID`] || process.env['nerv.flow.id'] || '376b71fe-009b-4154-850c-fa0eb65b4d5a';
   
   console.log(`   Workspace: ${workspace}`);
   console.log(`   Nerv Flow ID: ${nervFlowId}`);

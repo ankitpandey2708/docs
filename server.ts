@@ -91,18 +91,134 @@ interface WorkspaceCredentials {
 }
 
 /**
- * Fetch credentials from environment variables
+ * Fetch credentials from Keycloak
+ * Returns null if Keycloak is not configured or fetch fails
  */
-function fetchCredentials(workspace: string): WorkspaceCredentials {
-  // Try workspace-specific env vars first
-  const clientId = process.env[`${workspace}_AUTH_CLIENT_ID`] || process.env.AUTH_CLIENT_ID;
-  const clientSecret = process.env[`${workspace}_AUTH_CLIENT_SECRET`] || process.env.AUTH_CLIENT_SECRET;
-  const nervFlowId = process.env[`${workspace}_NERV_FLOW_ID`] || process.env['nerv.flow.id'];
-  const recurringFlowId = process.env[`${workspace}_RECURRING_FLOW_ID`] || process.env['recurring.nerv.flow.id'];
+async function fetchCredentialsFromKeycloak(workspace: string): Promise<WorkspaceCredentials | null> {
+  const keycloakUrl = process.env.KEYCLOAK_URL;
+  const keycloakRealm = process.env.KEYCLOAK_REALM;
+  const keycloakClientId = process.env.KEYCLOAK_CLIENT_ID;
+  const keycloakClientSecret = process.env.KEYCLOAK_CLIENT_SECRET;
+
+  // If Keycloak is not configured, return null to fall back to env vars
+  if (!keycloakUrl || !keycloakRealm || !keycloakClientId || !keycloakClientSecret) {
+    console.log('[Keycloak] Not configured, using environment variables');
+    return null;
+  }
+
+  try {
+    console.log(`[Keycloak] Fetching credentials for workspace: ${workspace}`);
+
+    // Step 1: Get admin access token from Keycloak
+    const tokenUrl = `${keycloakUrl}/realms/${keycloakRealm}/protocol/openid-connect/token`;
+    const tokenResponse = await fetch(tokenUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      body: new URLSearchParams({
+        grant_type: 'client_credentials',
+        client_id: keycloakClientId,
+        client_secret: keycloakClientSecret,
+      }),
+    });
+
+    if (!tokenResponse.ok) {
+      console.error(`[Keycloak] Failed to get admin token: ${tokenResponse.status}`);
+      return null;
+    }
+
+    const tokenData = await tokenResponse.json();
+    const adminToken = tokenData.access_token;
+
+    // Step 2: Fetch workspace credentials from Keycloak
+    // Note: This endpoint structure may need to be adjusted based on your Keycloak setup
+    // Common approaches:
+    // 1. Store as client attributes: GET /admin/realms/{realm}/clients/{client-id}
+    // 2. Store as realm attributes: GET /admin/realms/{realm}
+    // 3. Store in custom user attributes or groups
+
+    // Attempt 1: Try to get client with name matching workspace
+    const clientsUrl = `${keycloakUrl}/admin/realms/${keycloakRealm}/clients?clientId=${workspace}`;
+    const clientsResponse = await fetch(clientsUrl, {
+      headers: {
+        'Authorization': `Bearer ${adminToken}`,
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (!clientsResponse.ok) {
+      console.error(`[Keycloak] Failed to fetch clients: ${clientsResponse.status}`);
+      return null;
+    }
+
+    const clients = await clientsResponse.json();
+
+    if (!clients || clients.length === 0) {
+      console.log(`[Keycloak] No client found for workspace: ${workspace}`);
+      return null;
+    }
+
+    const client = clients[0];
+
+    // Step 3: Extract credentials from client attributes
+    // Assuming credentials are stored in client attributes like:
+    // - AUTH_CLIENT_ID
+    // - AUTH_CLIENT_SECRET
+    // - AUTH_TOKEN_URL
+    // - NERV_FLOW_ID
+    // - RECURRING_FLOW_ID
+    const attributes = client.attributes || {};
+
+    const clientId = attributes.AUTH_CLIENT_ID || attributes.auth_client_id;
+    const clientSecret = attributes.AUTH_CLIENT_SECRET || attributes.auth_client_secret;
+    const tokenUrlAttr = attributes.AUTH_TOKEN_URL || attributes.auth_token_url;
+    const nervFlowId = attributes.NERV_FLOW_ID || attributes.nerv_flow_id;
+    const recurringFlowId = attributes.RECURRING_FLOW_ID || attributes.recurring_flow_id;
+    const apiBaseUrl = attributes.FACTORY_API || attributes.factory_api;
+
+    if (!clientId || !clientSecret) {
+      console.log(`[Keycloak] Missing required credentials in client attributes for workspace: ${workspace}`);
+      return null;
+    }
+
+    console.log(`[Keycloak] ✓ Successfully fetched credentials for workspace: ${workspace}`);
+
+    return {
+      clientId,
+      clientSecret,
+      workspace,
+      tokenUrl: tokenUrlAttr || 'https://id.finarkein.com/auth/realms/fin-dev/protocol/openid-connect/token',
+      apiBaseUrl: apiBaseUrl || 'https://api.finarkein.in/factory/v1',
+      flowIds: {
+        nerv: nervFlowId || '',
+        recurring: recurringFlowId || '',
+      },
+    };
+  } catch (error) {
+    console.error('[Keycloak] Error fetching credentials:', error);
+    return null;
+  }
+}
+
+/**
+ * Fetch credentials from environment variables (fallback)
+ */
+function fetchCredentialsFromEnv(workspace: string): WorkspaceCredentials {
+  console.log(`[Environment] Fetching credentials for workspace: ${workspace}`);
+
+  // Try workspace-specific env vars first (lowercase workspace name)
+  const workspaceLower = workspace.toLowerCase();
+  const clientId = process.env[`${workspaceLower}_AUTH_CLIENT_ID`] || process.env.AUTH_CLIENT_ID;
+  const clientSecret = process.env[`${workspaceLower}_AUTH_CLIENT_SECRET`] || process.env.AUTH_CLIENT_SECRET;
+  const nervFlowId = process.env[`${workspaceLower}_NERV_FLOW_ID`] || process.env['nerv.flow.id'];
+  const recurringFlowId = process.env[`${workspaceLower}_RECURRING_FLOW_ID`] || process.env['recurring.nerv.flow.id'];
 
   if (!clientId || !clientSecret) {
     throw new Error(`Credentials not found for workspace: ${workspace}`);
   }
+
+  console.log(`[Environment] ✓ Successfully fetched credentials for workspace: ${workspace}`);
 
   return {
     clientId,
@@ -115,6 +231,21 @@ function fetchCredentials(workspace: string): WorkspaceCredentials {
       recurring: recurringFlowId || ''
     }
   };
+}
+
+/**
+ * Fetch credentials with Keycloak-first approach and env fallback
+ */
+async function fetchCredentials(workspace: string): Promise<WorkspaceCredentials> {
+  // Try Keycloak first (if configured)
+  const keycloakCredentials = await fetchCredentialsFromKeycloak(workspace);
+
+  if (keycloakCredentials) {
+    return keycloakCredentials;
+  }
+
+  // Fallback to environment variables
+  return fetchCredentialsFromEnv(workspace);
 }
 
 // Cache for bearer tokens (keyed by workspace)
@@ -268,9 +399,9 @@ app.get('/api/workspace/credentials', async (req, res) => {
     }
 
     // Fetch credentials for this workspace
-    const credentials = fetchCredentials(workspace);
+    const credentials = await fetchCredentials(workspace);
 
-    
+
     res.json(credentials);
   } catch (error) {
     res.status(500).json({
@@ -340,7 +471,7 @@ app.all('/api/*', async (req, res) => {
     }
 
     // Fetch credentials for this workspace
-    const credentials = fetchCredentials(workspace);
+    const credentials = await fetchCredentials(workspace);
 
     // Extract the actual API path (remove /api prefix)
     let apiPath = req.path.replace(/^\/api/, '');

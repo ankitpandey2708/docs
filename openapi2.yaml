@@ -1,11 +1,53 @@
 openapi: 3.0.3
 info:
-  title: Finarkein
+  title: Finarkein API
   version: 1.0.0
+  description: |
+    # Finarkein API Documentation
+
+    ## Important: Real API Endpoints
+
+    This documentation shows the **real production API endpoints** that match your existing Postman collections:
+    - Base URL: `https://api.finarkein.in/factory/v1`
+    - Token URL: `https://id.finarkein.com/auth/realms/fin-dev/protocol/openid-connect/token`
+
+    When you use the "Try it out" feature in this documentation, requests are automatically proxied through our backend for convenience. This handles authentication and parameter substitution for you.
+
+    **For your own integration:** Use the real endpoints directly. See the [API Proxy & Authentication](/api-proxy) guide for details.
+
+    ## Authentication
+
+    This API uses **OAuth 2.0 Client Credentials** flow:
+
+    1. **Get Access Token:**
+       ```bash
+       POST https://id.finarkein.com/auth/realms/fin-dev/protocol/openid-connect/token
+       Authorization: Basic base64(client_id:client_secret)
+       Content-Type: application/x-www-form-urlencoded
+
+       grant_type=client_credentials
+       ```
+
+    2. **Call API with Token:**
+       ```bash
+       Authorization: Bearer {access_token}
+       ```
+
+    Get your credentials from the [Credentials](/credentials) page.
+
+    ## Workspace Parameters
+
+    Most endpoints require `{workspace}` and `{flowId}` path parameters:
+    - `{workspace}`: Your workspace identifier (e.g., "tsfsl", "demo")
+    - `{flowId}`: Your flow identifier (different for one-time vs recurring)
+
+    When using "Try it out", these are automatically populated from your workspace credentials.
   contact: {}
 servers:
 - url: https://api.finarkein.in/factory/v1
-- url: '{{AUTH_TOKEN_URL}}'
+  description: Finarkein Factory API
+- url: https://id.finarkein.com/auth/realms/fin-dev/protocol/openid-connect
+  description: Authentication Server (OAuth2 Token Endpoint)
 paths:
   /{workspace}/dp/nerv/{flowId}:
     post:
@@ -1882,9 +1924,11 @@ paths:
       schema:
         type: string
         example: <string>
-  /:
+  /token:
     post:
-      summary: Generate Access token
+      summary: Generate Access Token
+      tags:
+      - Authentication
       description: "# Generate OAuth 2.0 Access Token\n\n## Overview\nThis endpoint\
         \ generates an OAuth 2.0 access token using the **Client Credentials Grant**\
         \ flow. The access token is required to authenticate subsequent API requests\

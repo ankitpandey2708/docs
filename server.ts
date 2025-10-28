@@ -176,10 +176,39 @@ app.get('/api/health', (req, res) => {
 });
 
 /**
+ * GET /api/workspace/credentials
+ * Returns workspace-specific credentials for the authenticated user
+ * Used by MyApiKeyService to display credentials in Settings > API Keys
+ */
+app.get('/api/workspace/credentials', verifyClerkToken, async (req, res) => {
+  try {
+    const user = (req as any).user;
+    const workspace = user.publicMetadata?.workspace || user.workspace || process.env.workspace;
+
+    if (!workspace) {
+      return res.status(400).json({ error: 'Workspace not configured for user' });
+    }
+
+    // Fetch credentials for this workspace
+    const credentials = fetchCredentials(workspace);
+
+    console.log(`Successfully fetched credentials for workspace: ${credentials.workspace}`);
+
+    res.json(credentials);
+  } catch (error) {
+    console.error('Error fetching workspace credentials:', error);
+    res.status(500).json({
+      error: 'Failed to fetch workspace credentials',
+      message: error instanceof Error ? error.message : 'Unknown error'
+    });
+  }
+});
+
+/**
  * Universal API proxy middleware
  * Proxies all /api/* requests to Finarkein API with automatic authentication
  */
-app.use('/api/*', verifyClerkToken, async (req, res, next) => {
+app.all('/api/*', verifyClerkToken, async (req, res) => {
   try {
     const user = (req as any).user;
     const workspace = user.publicMetadata?.workspace || user.workspace || process.env.workspace;
@@ -208,22 +237,37 @@ app.use('/api/*', verifyClerkToken, async (req, res, next) => {
     // Determine target URL and auth
     let targetUrl: string;
     let authHeader: string;
+    let requestBody: string | undefined;
 
     if (apiPath === '/token' || apiPath.endsWith('/token')) {
       // For /token endpoint, use Keycloak and Basic Auth
       targetUrl = credentials.tokenUrl;
       authHeader = `Basic ${Buffer.from(`${credentials.clientId}:${credentials.clientSecret}`).toString('base64')}`;
+      
+      // Always send grant_type=client_credentials for token endpoint
+      requestBody = 'grant_type=client_credentials';
     } else {
       // For all other endpoints, use Factory API and Bearer token
       const bearerToken = await getBearerToken(credentials);
       targetUrl = `${credentials.apiBaseUrl}${apiPath}`;
       authHeader = `Bearer ${bearerToken}`;
+      
+      // Include body for POST/PUT/PATCH requests
+      if (['POST', 'PUT', 'PATCH'].includes(req.method) && req.body) {
+        if (req.headers['content-type']?.includes('application/x-www-form-urlencoded')) {
+          requestBody = new URLSearchParams(req.body).toString();
+        } else {
+          requestBody = JSON.stringify(req.body);
+        }
+      }
     }
 
     // Make the proxied request
     const proxyHeaders: any = {
       'Authorization': authHeader,
-      'Content-Type': req.headers['content-type'] || 'application/json',
+      'Content-Type': apiPath.includes('/token') 
+        ? 'application/x-www-form-urlencoded'
+        : (req.headers['content-type'] || 'application/json'),
     };
 
     // Forward other relevant headers
@@ -236,13 +280,9 @@ app.use('/api/*', verifyClerkToken, async (req, res, next) => {
       headers: proxyHeaders,
     };
 
-    // Include body for POST/PUT/PATCH requests
-    if (['POST', 'PUT', 'PATCH'].includes(req.method) && req.body) {
-      if (req.headers['content-type']?.includes('application/x-www-form-urlencoded')) {
-        proxyOptions.body = new URLSearchParams(req.body).toString();
-      } else {
-        proxyOptions.body = JSON.stringify(req.body);
-      }
+    // Add body if present
+    if (requestBody) {
+      proxyOptions.body = requestBody;
     }
 
     console.log(`🔄 Proxying ${req.method} ${apiPath} -> ${targetUrl}`);

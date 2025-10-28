@@ -1,8 +1,14 @@
 import { createApiKeyService } from "zudoku/plugins/api-keys";
 
-const API_BASE_URL = typeof window !== 'undefined'
-  ? (window.location.hostname === 'localhost' ? 'http://localhost:3001' : window.location.origin)
-  : 'http://localhost:3001';
+// Determine backend URL based on environment
+const getBackendUrl = () => {
+  if (typeof window === 'undefined') {
+    return 'http://localhost:3001';
+  }
+  return window.location.hostname === 'localhost' 
+    ? 'http://localhost:3001' 
+    : window.location.origin;
+};
 
 interface WorkspaceCredentials {
   clientId: string;
@@ -30,7 +36,7 @@ async function fetchWorkspaceCredentials(context: any): Promise<WorkspaceCredent
       return null;
     }
 
-    const response = await fetch(`${API_BASE_URL}/api/workspace/credentials`, {
+    const response = await fetch(`${getBackendUrl()}/api/workspace/credentials`, {
       headers: {
         'Authorization': `Bearer ${token}`,
         'Content-Type': 'application/json'

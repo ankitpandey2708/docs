@@ -1,7 +1,5 @@
 import type { ZudokuConfig } from "zudoku";
 import { createApiIdentityPlugin } from "zudoku/plugins";
-import { apiKeyPlugin } from "zudoku/plugins/api-keys";
-import { MyApiKeyService } from "./src/MyApiKeyService";
 
 const config: ZudokuConfig = {
   site: {
@@ -82,7 +80,6 @@ const config: ZudokuConfig = {
   },
   protectedRoutes: ["/*"],
   plugins: [
-    apiKeyPlugin(MyApiKeyService),
     createApiIdentityPlugin({
       getIdentities: async (context) => {
         // Single identity that passes Clerk token to proxy

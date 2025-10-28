@@ -67,6 +67,33 @@ const config: ZudokuConfig = {
     // Handle authentication for API console
     createApiIdentityPlugin({
       getIdentities: async (context) => {
+        // Fetch workspace credentials from backend
+        let workspaceCredentials: any = null;
+
+        try {
+          const token = await context.authentication?.getAccessToken?.();
+          const backendUrl = typeof window !== 'undefined'
+            ? (window.location.hostname === 'localhost' ? 'http://localhost:3001' : window.location.origin)
+            : 'http://localhost:3001';
+
+          const headers: any = {
+            'Content-Type': 'application/json'
+          };
+
+          if (token) {
+            headers['Authorization'] = `Bearer ${token}`;
+          }
+
+          const response = await fetch(`${backendUrl}/api/workspace/credentials`, { headers });
+
+          if (response.ok) {
+            workspaceCredentials = await response.json();
+            console.log('[Zudoku] Fetched workspace credentials:', workspaceCredentials?.workspace);
+          }
+        } catch (error) {
+          console.error('[Zudoku] Failed to fetch workspace credentials:', error);
+        }
+
         // Single identity that passes Clerk token to proxy
         // The proxy handles all workspace-specific authentication
         return [{
@@ -76,7 +103,7 @@ const config: ZudokuConfig = {
             try {
               // Get Clerk access token
               const token = await context.authentication?.getAccessToken?.();
-              
+
               if (!token) {
                 console.warn('[Zudoku] No Clerk token available');
                 return request;
@@ -90,13 +117,26 @@ const config: ZudokuConfig = {
               // 4. Handle authentication to Finarkein API
               // 5. Auto-fill path parameters
               request.headers.set('Authorization', `Bearer ${token}`);
-              
+
               return request;
             } catch (error) {
               console.error('[Zudoku] Error in authorizeRequest:', error);
               return request;
             }
           },
+          // Provide default parameter values from backend
+          getDefaults: async () => {
+            if (!workspaceCredentials) {
+              return {};
+            }
+
+            return {
+              parameters: {
+                workspace: workspaceCredentials.workspace,
+                flowId: workspaceCredentials.flowIds.nerv // Default to nerv flow
+              }
+            };
+          }
         }];
       },
     }),

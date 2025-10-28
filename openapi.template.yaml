@@ -25,7 +25,16 @@ info:
 
     ### Workspace Parameters
 
-    Most endpoints require a `workspace` path parameter. This will be automatically filled with your workspace ID.
+    Most endpoints require `workspace` and `flowId` path parameters. **These are automatically populated from your workspace credentials stored on the backend.**
+
+    When you make an API request:
+    1. The proxy fetches your workspace credentials from the backend
+    2. Path parameters like `{workspace}` and `{flowId}` are automatically replaced with your actual values
+    3. You don't need to manually enter these values - they're handled for you!
+
+    The workspace value is determined by:
+    - Your authenticated user's workspace metadata (if logged in via Clerk)
+    - Or the default workspace configured in the backend environment
   contact: {}
 servers:
 - url: ${BACKEND_URL}/api
@@ -111,17 +120,19 @@ paths:
     - name: workspace
       in: path
       required: true
-      description: Your workspace identifier (auto-filled)
+      description: Your workspace identifier - **automatically populated from backend credentials**
       schema:
         type: string
         example: tsfsl
+      x-example-note: This value is automatically replaced by the proxy with your actual workspace ID
     - name: flowId
       in: path
       required: true
-      description: The Nerv flow identifier (auto-filled)
+      description: The Nerv flow identifier - **automatically populated from backend credentials**
       schema:
         type: string
         example: 376b71fe-009b-4154-850c-fa0eb65b4d5a
+      x-example-note: This value is automatically replaced by the proxy with your actual flow ID
   /{workspace}/dp/nerv/fetch/{flowId}:
     post:
       tags:
@@ -163,17 +174,19 @@ paths:
     - name: workspace
       in: path
       required: true
-      description: Your workspace identifier (auto-filled)
+      description: Your workspace identifier - **automatically populated from backend credentials**
       schema:
         type: string
         example: tsfsl
+      x-example-note: This value is automatically replaced by the proxy with your actual workspace ID
     - name: flowId
       in: path
       required: true
-      description: The Nerv flow identifier (auto-filled)
+      description: The Nerv flow identifier - **automatically populated from backend credentials**
       schema:
         type: string
         example: 376b71fe-009b-4154-850c-fa0eb65b4d5a
+      x-example-note: This value is automatically replaced by the proxy with your actual flow ID
   /{workspace}/dp/nerv/{flowId}/{requestId}/status:
     get:
       tags:
@@ -199,17 +212,19 @@ paths:
     - name: workspace
       in: path
       required: true
-      description: Your workspace identifier (auto-filled)
+      description: Your workspace identifier - **automatically populated from backend credentials**
       schema:
         type: string
         example: tsfsl
+      x-example-note: This value is automatically replaced by the proxy with your actual workspace ID
     - name: flowId
       in: path
       required: true
-      description: The Nerv flow identifier (auto-filled)
+      description: The Nerv flow identifier - **automatically populated from backend credentials**
       schema:
         type: string
         example: 376b71fe-009b-4154-850c-fa0eb65b4d5a
+      x-example-note: This value is automatically replaced by the proxy with your actual flow ID
     - name: requestId
       in: path
       required: true
@@ -235,17 +250,19 @@ paths:
     - name: workspace
       in: path
       required: true
-      description: Your workspace identifier (auto-filled)
+      description: Your workspace identifier - **automatically populated from backend credentials**
       schema:
         type: string
         example: tsfsl
+      x-example-note: This value is automatically replaced by the proxy with your actual workspace ID
     - name: flowId
       in: path
       required: true
-      description: The Nerv flow identifier (auto-filled)
+      description: The Nerv flow identifier - **automatically populated from backend credentials**
       schema:
         type: string
         example: 376b71fe-009b-4154-850c-fa0eb65b4d5a
+      x-example-note: This value is automatically replaced by the proxy with your actual flow ID
     - name: requestId
       in: path
       required: true
@@ -278,10 +295,11 @@ paths:
     - name: workspace
       in: path
       required: true
-      description: Your workspace identifier (auto-filled)
+      description: Your workspace identifier - **automatically populated from backend credentials**
       schema:
         type: string
         example: tsfsl
+      x-example-note: This value is automatically replaced by the proxy with your actual workspace ID
   /{workspace}/consent/aa/template/{id}:
     get:
       tags:
@@ -298,8 +316,10 @@ paths:
     - name: workspace
       in: path
       required: true
+      description: Your workspace identifier - **automatically populated from backend credentials**
       schema:
         type: string
+      x-example-note: This value is automatically replaced by the proxy with your actual workspace ID
     - name: id
       in: path
       required: true
@@ -347,10 +367,11 @@ paths:
     - name: workspace
       in: path
       required: true
-      description: Your workspace identifier (auto-filled)
+      description: Your workspace identifier - **automatically populated from backend credentials**
       schema:
         type: string
         example: tsfsl
+      x-example-note: This value is automatically replaced by the proxy with your actual workspace ID
   /{workspace}/institutions/aa/fip/status:
     get:
       tags:
@@ -367,8 +388,10 @@ paths:
     - name: workspace
       in: path
       required: true
+      description: Your workspace identifier - **automatically populated from backend credentials**
       schema:
         type: string
+      x-example-note: This value is automatically replaced by the proxy with your actual workspace ID
   /token:
     post:
       tags:

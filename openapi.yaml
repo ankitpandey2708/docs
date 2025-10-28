@@ -11,7 +11,6 @@ info:
     - Base URL: `https://api.finarkein.in/factory/v1`
     - Token URL: `https://id.finarkein.com/auth/realms/fin-dev/protocol/openid-connect/token`
 
-    When you use the "Try it out" feature in this documentation, requests are automatically proxied through our backend for convenience. This handles authentication and parameter substitution for you.
 
     **For your own integration:** Use the real endpoints directly. See the [API Proxy & Authentication](/api-proxy) guide for details.
 
@@ -41,7 +40,6 @@ info:
     - `{workspace}`: Your workspace identifier (e.g., "tsfsl", "demo")
     - `{flowId}`: Your flow identifier (different for one-time vs recurring)
 
-    When using "Try it out", these are automatically populated from your workspace credentials.
   contact: {}
 servers:
 - url: https://api.finarkein.in/factory/v1

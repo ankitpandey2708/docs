@@ -16,9 +16,6 @@
 # zudoku
 /dist/
 
-# generated files
-openapi.yaml
-
 # misc
 .DS_Store
 *.pem

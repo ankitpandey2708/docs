@@ -54,7 +54,6 @@ export const CredentialsPage = () => {
         });
 
         if (!response.ok) {
-          const errorText = await response.text();
           throw new Error(`Failed to fetch credentials: ${response.statusText}`);
         }
 

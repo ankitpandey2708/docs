@@ -1,6 +1,5 @@
 import type { ZudokuContext } from "zudoku";
 import { authenticatedFetch } from "./lib/http.js";
-import { getAccessToken } from "./auth/token.js";
 
 export const getApiIdentities = async (context: ZudokuContext) => {
   return [

@@ -98,37 +98,6 @@ export async function authenticatedFetch(
 
     return response;
   } catch (error) {
-    throw error;
+    throw new Error(`Authenticated fetch failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
   }
-}
-
-/**
- * Helper to make authenticated GET requests
- */
-export async function authenticatedGet(
-  url: string,
-  workspace?: string
-): Promise<Response> {
-  return authenticatedFetch(url, { method: 'GET' }, workspace);
-}
-
-/**
- * Helper to make authenticated POST requests
- */
-export async function authenticatedPost(
-  url: string,
-  body?: any,
-  workspace?: string
-): Promise<Response> {
-  return authenticatedFetch(
-    url,
-    {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: body ? JSON.stringify(body) : undefined,
-    },
-    workspace
-  );
 }

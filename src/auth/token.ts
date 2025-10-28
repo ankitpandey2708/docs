@@ -73,22 +73,15 @@ export async function getAccessToken(config: TokenConfig): Promise<string> {
 
     return data.access_token;
   } catch (error) {
-    throw error;
+    throw new Error(`Failed to acquire access token: ${error instanceof Error ? error.message : 'Unknown error'}`);
   }
 }
 
 /**
  * Clear cached token for a workspace (useful for forced refresh)
- * 
+ *
  * @param workspace Workspace identifier
  */
 export function clearCachedToken(workspace: string): void {
   tokenCache.delete(workspace);
-}
-
-/**
- * Clear all cached tokens
- */
-export function clearAllTokens(): void {
-  tokenCache.clear();
 }

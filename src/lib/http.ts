@@ -6,7 +6,7 @@
 
 import { getAccessToken, clearCachedToken } from '../auth/token';
 
-interface WorkspaceCredentials {
+export interface WorkspaceCredentials {
   clientId: string;
   clientSecret: string;
   workspace: string;
@@ -50,22 +50,24 @@ async function fetchCredentials(workspace?: string): Promise<WorkspaceCredential
 
 /**
  * Make an authenticated HTTP request with automatic token injection
- * 
+ *
  * @param url Request URL
  * @param options Fetch options
- * @param workspace Workspace identifier (optional, will use default if not provided)
+ * @param workspaceOrCredentials Workspace identifier (string) or pre-fetched credentials (object)
  * @param retryOn401 Whether to retry on 401 with token refresh (default: true)
  * @returns Response
  */
 export async function authenticatedFetch(
   url: string,
   options: RequestInit = {},
-  workspace?: string,
+  workspaceOrCredentials?: string | WorkspaceCredentials,
   retryOn401: boolean = true
 ): Promise<Response> {
   try {
-    // Fetch credentials for the workspace
-    const credentials = await fetchCredentials(workspace);
+    // Use provided credentials or fetch them
+    const credentials = typeof workspaceOrCredentials === 'object' && workspaceOrCredentials !== null
+      ? workspaceOrCredentials
+      : await fetchCredentials(typeof workspaceOrCredentials === 'string' ? workspaceOrCredentials : undefined);
 
     // Get or refresh access token
     const accessToken = await getAccessToken({
@@ -90,8 +92,8 @@ export async function authenticatedFetch(
       // Clear the cached token to force refresh
       clearCachedToken(credentials.workspace);
 
-      // Retry once with a new token
-      return authenticatedFetch(url, options, workspace, false);
+      // Retry once with a new token, passing the same credentials to avoid re-fetching
+      return authenticatedFetch(url, options, credentials, false);
     }
 
     return response;

@@ -55,11 +55,12 @@ export const getApiIdentities = async (context: ZudokuContext) => {
 
           // Use authenticatedFetch from specialized module
           // This handles token caching, 401 retry logic, and Bearer injection automatically
+          // Pass the credentials object directly to avoid a second API request
           const response = await authenticatedFetch(targetUrl, {
             method: request.method,
             headers: request.headers,
             body: request.body,
-          }, credentials.workspace);
+          }, credentials);
 
           // Convert the Response back to a Request for Zudoku compatibility
           const authenticatedRequest = new Request(targetUrl, {

@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { Head, Link } from "zudoku/components";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "zudoku/ui/Card";
 import { Badge } from "zudoku/ui/Badge";
@@ -5,23 +6,64 @@ import { Alert, AlertDescription, AlertTitle } from "zudoku/ui/Alert";
 import { Secret } from "zudoku/ui/Secret";
 import { KeyIcon, AlertCircleIcon, CheckCircleIcon } from "zudoku/icons";
 
-// Static credentials display for reference
-// These values match what's configured in your .env file
-// The actual authentication is handled automatically by the backend proxy
-const WORKSPACE_CREDENTIALS = {
-  clientId: 'client-tsfsl-03d952d6',
-  clientSecret: '(Hidden - managed by backend)',
-  workspace: 'tsfsl',
-  tokenUrl: 'https://id.finarkein.com/auth/realms/fin-dev/protocol/openid-connect/token',
-  apiBaseUrl: 'https://api.finarkein.in/factory/v1',
-  flowIds: {
-    nerv: '376b71fe-009b-4154-850c-fa0eb65b4d5a',
-    recurring: '(Contact administrator for recurring flow ID)'
+// Determine backend URL based on environment
+const getBackendUrl = () => {
+  if (typeof window === 'undefined') {
+    return 'http://localhost:3001';
   }
+  return window.location.hostname === 'localhost' 
+    ? 'http://localhost:3001' 
+    : window.location.origin;
 };
 
+interface WorkspaceCredentials {
+  clientId: string;
+  clientSecret: string;
+  workspace: string;
+  tokenUrl: string;
+  apiBaseUrl: string;
+  flowIds: {
+    nerv: string;
+    recurring: string;
+  };
+}
+
 export const CredentialsPage = () => {
-  const credentials = WORKSPACE_CREDENTIALS;
+  const [credentials, setCredentials] = useState<WorkspaceCredentials | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchCredentials = async () => {
+      try {
+        console.log('Fetching credentials from backend...');
+
+        // Make request without authentication - backend will use default workspace
+        const response = await fetch(`${getBackendUrl()}/api/workspace/credentials`, {
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        });
+
+        if (!response.ok) {
+          const errorText = await response.text();
+          console.error('Backend error:', response.status, errorText);
+          throw new Error(`Failed to fetch credentials: ${response.statusText}`);
+        }
+
+        const data = await response.json();
+        console.log('✓ Successfully fetched credentials');
+        setCredentials(data);
+      } catch (err) {
+        console.error('Error fetching credentials:', err);
+        setError(err instanceof Error ? err.message : 'Failed to fetch credentials');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchCredentials();
+  }, []);
 
   return (
     <>
@@ -38,13 +80,25 @@ export const CredentialsPage = () => {
           </p>
         </div>
 
-        <Alert className="mb-6">
-          <CheckCircleIcon className="h-4 w-4" />
-          <AlertTitle>Automatic Authentication</AlertTitle>
-          <AlertDescription>
-            When you test API endpoints in the <Link to="/api">API Reference</Link>, these credentials are automatically used. You don't need to manually configure anything.
-          </AlertDescription>
-        </Alert>
+      
+        {loading && (
+          <Card>
+            <CardContent className="py-8">
+              <div className="flex items-center justify-center">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+                <span className="ml-3 text-muted-foreground">Loading credentials...</span>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {error && (
+          <Alert variant="destructive">
+            <AlertCircleIcon className="h-4 w-4" />
+            <AlertTitle>Error</AlertTitle>
+            <AlertDescription>{error}</AlertDescription>
+          </Alert>
+        )}
 
         {credentials && (
           <div className="space-y-6">

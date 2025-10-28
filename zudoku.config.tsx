@@ -32,45 +32,21 @@ const config: ZudokuConfig = {
           icon: "sparkles",
           items: [
             "/introduction",
-            {
-              type: "link",
-              icon: "folder-cog",
-              badge: {
-                label: "New",
-                color: "purple",
-              },
-              label: "API Reference",
-              to: "/api",
-            },
-            {
-              type: "custom-page",
-              path: "/credentials",
-              label: "Credentials",
-              icon: "key",
-              element: <CredentialsPage />,
-            },
           ],
-        },
-        {
-          type: "category",
-          label: "Useful Links",
-          collapsible: false,
-          icon: "link",
-          items: [
-            {
-              type: "link",
-              icon: "book",
-              label: "Zudoku Docs",
-              to: "https://zudoku.dev/docs/",
-            },
-          ],
-        },
+        }
       ],
     },
     {
       type: "link",
       to: "/api",
       label: "API Reference",
+    },
+    {
+      type: "custom-page",
+      path: "/credentials",
+      label: "Credentials",
+      icon: "key",
+      element: <CredentialsPage />,
     },
   ],
   redirects: [{ from: "/", to: "/introduction" }],

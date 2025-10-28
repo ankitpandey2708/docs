@@ -116,6 +116,7 @@ const config: ZudokuConfig = {
               console.log('[Zudoku Proxy] Proxied to:', proxyUrl);
 
               // Create new request with proxy URL
+              // Need to specify duplex for requests with streaming bodies
               const proxyRequest = new Request(proxyUrl, {
                 method: request.method,
                 headers: request.headers,
@@ -125,7 +126,8 @@ const config: ZudokuConfig = {
                 redirect: request.redirect,
                 referrer: request.referrer,
                 integrity: request.integrity,
-              });
+                duplex: 'half', // Required for requests with a body
+              } as RequestInit);
 
               // Add Clerk token if available
               if (token) {

@@ -1,0 +1,228 @@
+---
+title: Keycloak Configuration Guide
+---
+
+# Keycloak Configuration for Production
+
+This guide explains how to configure Keycloak as the primary credential source for workspace management in production environments.
+
+## Overview
+
+The system supports two credential sources:
+1. **Keycloak (Primary)** - Used in production for centralized credential management
+2. **Environment Variables (Fallback)** - Used in development or when Keycloak is unavailable
+
+## How It Works
+
+When a workspace needs credentials:
+1. System checks if Keycloak is configured (all `KEYCLOAK_*` env vars are set)
+2. If yes, fetches credentials from Keycloak
+3. If no or if fetch fails, falls back to environment variables
+4. Credentials are cached for performance
+
+## Keycloak Setup
+
+### Step 1: Configure Keycloak Admin Access
+
+Set these environment variables in your production environment:
+
+```bash
+KEYCLOAK_URL=https://id.finarkein.com/auth
+KEYCLOAK_REALM=fin-dev
+KEYCLOAK_CLIENT_ID=your-admin-client-id
+KEYCLOAK_CLIENT_SECRET=your-admin-client-secret
+```
+
+**Requirements:**
+- The admin client must have permission to read client attributes
+- Use a service account with `view-clients` role in the realm
+
+### Step 2: Store Workspace Credentials in Keycloak
+
+For each workspace, create a Keycloak client with:
+
+**Client ID:** Match the workspace name (e.g., `tsfsl`, `demo`, `acme`)
+
+**Client Attributes:** Add these custom attributes:
+
+| Attribute Name | Description | Example |
+|---------------|-------------|---------|
+| `AUTH_CLIENT_ID` | OAuth2 client ID for API authentication | `client-tsfsl-03d952d6` |
+| `AUTH_CLIENT_SECRET` | OAuth2 client secret | `your-secret-key` |
+| `AUTH_TOKEN_URL` | Token endpoint URL | `https://id.finarkein.com/auth/realms/fin-dev/protocol/openid-connect/token` |
+| `NERV_FLOW_ID` | Nerv flow identifier | `376b71fe-009b-4154-850c-fa0eb65b4d5a` |
+| `RECURRING_FLOW_ID` | Recurring flow identifier | `2627928c-03d4-4fb4-a1fd-c2e1a42723cc` |
+| `FACTORY_API` | Factory API base URL | `https://api.finarkein.in/factory/v1` |
+
+### Step 3: Configure Client Attributes in Keycloak Admin Console
+
+1. Log in to Keycloak Admin Console
+2. Navigate to: **Clients** → Select your workspace client
+3. Go to the **Attributes** tab
+4. Add each attribute from the table above
+5. Click **Save**
+
+### Step 4: Verify Configuration
+
+Test the integration:
+
+```bash
+# Check if Keycloak is accessible
+curl https://id.finarkein.com/auth/realms/fin-dev/.well-known/openid-configuration
+
+# Verify admin client can authenticate
+curl -X POST https://id.finarkein.com/auth/realms/fin-dev/protocol/openid-connect/token \
+  -d "grant_type=client_credentials" \
+  -d "client_id=your-admin-client-id" \
+  -d "client_secret=your-admin-client-secret"
+```
+
+## Alternative: Using Keycloak Realm Attributes
+
+If you prefer to store credentials in realm attributes instead of client attributes, modify the `fetchCredentialsFromKeycloak` function in `server.ts`:
+
+```typescript
+// Instead of fetching clients, fetch realm attributes
+const realmUrl = `${keycloakUrl}/admin/realms/${keycloakRealm}`;
+const realmResponse = await fetch(realmUrl, {
+  headers: {
+    'Authorization': `Bearer ${adminToken}`,
+    'Content-Type': 'application/json',
+  },
+});
+
+const realm = await realmResponse.json();
+const attributes = realm.attributes || {};
+```
+
+## Troubleshooting
+
+### Keycloak Authentication Fails
+
+**Symptoms:** Logs show `[Keycloak] Failed to get admin token`
+
+**Solutions:**
+- Verify `KEYCLOAK_URL`, `KEYCLOAK_REALM` are correct
+- Check admin client credentials
+- Ensure service account is enabled for the admin client
+- Verify network connectivity to Keycloak
+
+### Workspace Credentials Not Found
+
+**Symptoms:** Logs show `[Keycloak] No client found for workspace: xxx`
+
+**Solutions:**
+- Verify client ID in Keycloak matches the workspace name exactly
+- Check client is enabled in Keycloak
+- Verify attributes are properly set
+
+### Missing Required Attributes
+
+**Symptoms:** Logs show `[Keycloak] Missing required credentials in client attributes`
+
+**Solutions:**
+- Verify `AUTH_CLIENT_ID` and `AUTH_CLIENT_SECRET` attributes exist
+- Check attribute names match exactly (case-sensitive)
+- Ensure attributes have non-empty values
+
+### Falls Back to Environment Variables
+
+**Symptoms:** Logs show `[Environment] Fetching credentials for workspace: xxx`
+
+**Solutions:**
+- Check all four Keycloak env vars are set
+- Review Keycloak error logs above the fallback message
+- This is expected behavior when Keycloak is not configured
+
+## Security Considerations
+
+1. **Secure Admin Client:**
+   - Use a dedicated service account client
+   - Limit permissions to only `view-clients` role
+   - Rotate credentials regularly
+
+2. **Protect Secrets:**
+   - Never commit Keycloak credentials to version control
+   - Use secure secret management (AWS Secrets Manager, etc.)
+   - Enable audit logging in Keycloak
+
+3. **Network Security:**
+   - Always use HTTPS for Keycloak connections
+   - Consider IP whitelisting for admin API access
+   - Enable TLS certificate validation
+
+## Development vs Production
+
+| Environment | Credential Source | Configuration |
+|-------------|------------------|---------------|
+| **Development** | Environment Variables | Set workspace-specific vars in `.env` |
+| **Production** | Keycloak | Configure Keycloak clients with attributes |
+| **Staging** | Either | Use Keycloak for production-like testing |
+
+## Adding a New Workspace
+
+### In Keycloak (Production):
+
+1. Create new client with workspace name as client ID
+2. Add all required attributes (see table above)
+3. Enable the client
+4. No code changes needed - system auto-discovers
+
+### In Environment Variables (Development):
+
+1. Add workspace-specific env vars (lowercase workspace prefix):
+   ```bash
+   # For workspace "demo" (converted to lowercase)
+   demo_AUTH_CLIENT_ID=client-id
+   demo_AUTH_CLIENT_SECRET=secret
+   demo_NERV_FLOW_ID=flow-id
+   demo_RECURRING_FLOW_ID=recurring-flow-id
+   ```
+
+   **Important:** Workspace name is converted to lowercase for env var lookup.
+   - Workspace "Demo" → looks for `demo_AUTH_CLIENT_ID`
+   - Workspace "ACME" → looks for `acme_AUTH_CLIENT_ID`
+
+2. Restart the application
+
+## Monitoring
+
+Monitor these logs for credential fetching:
+
+```bash
+# Successful Keycloak fetch
+[Keycloak] ✓ Successfully fetched credentials for workspace: tsfsl
+
+# Keycloak not configured - using fallback
+[Keycloak] Not configured, using environment variables
+[Environment] ✓ Successfully fetched credentials for workspace: tsfsl
+
+# Error cases
+[Keycloak] Failed to get admin token: 401
+[Keycloak] No client found for workspace: unknown-workspace
+```
+
+## Migration from Environment Variables to Keycloak
+
+1. **Inventory:** List all workspaces in your environment variables
+2. **Create Clients:** Create corresponding clients in Keycloak
+3. **Migrate Credentials:** Copy credentials from env vars to client attributes
+4. **Test:** Verify each workspace can fetch credentials from Keycloak
+5. **Configure:** Set Keycloak env vars in production
+6. **Deploy:** Credentials automatically come from Keycloak
+7. **Cleanup:** Remove workspace env vars (keep default fallback)
+
+## API Reference
+
+The credential fetching logic:
+
+```typescript
+async function fetchCredentials(workspace: string): Promise<WorkspaceCredentials>
+```
+
+1. Calls `fetchCredentialsFromKeycloak(workspace)`
+2. If successful, returns Keycloak credentials
+3. If null/error, calls `fetchCredentialsFromEnv(workspace)`
+4. Returns credentials or throws error
+
+See `server.ts` lines 239-249 for implementation.

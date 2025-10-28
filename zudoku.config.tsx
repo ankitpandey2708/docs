@@ -63,6 +63,11 @@ const config: ZudokuConfig = {
       type: "file",
       input: "./openapi2.yaml",
       path: "/api",
+      navigationId: "finarkein-api",
+      // Force the API console to use the proxy server (index 1) for Try it out
+      defaultOptions: {
+        serverUrl: "/api"
+      }
     }
   ],
   // Clerk authentication is only for the documentation pages

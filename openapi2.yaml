@@ -45,9 +45,9 @@ info:
   contact: {}
 servers:
 - url: https://api.finarkein.in/factory/v1
-  description: Finarkein Factory API
-- url: https://id.finarkein.com/auth/realms/fin-dev/protocol/openid-connect
-  description: Authentication Server (OAuth2 Token Endpoint)
+  description: Finarkein Production API (use this for your integration)
+- url: /api
+  description: Documentation Proxy (for "Try it out" feature only)
 paths:
   /{workspace}/dp/nerv/{flowId}:
     post:

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Head, Link } from "zudoku/components";
+import { Head } from "zudoku/components";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "zudoku/ui/Card";
 import { Badge } from "zudoku/ui/Badge";
 import { Alert, AlertDescription, AlertTitle } from "zudoku/ui/Alert";

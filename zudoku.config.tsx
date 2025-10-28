@@ -1,6 +1,5 @@
 import type { ZudokuConfig } from "zudoku";
 import { createApiIdentityPlugin } from "zudoku/plugins";
-import { MyApiKeyService } from "./src/MyApiKeyService.js";
 import { CredentialsPage } from "./src/CredentialsPage.js";
 
 const config: ZudokuConfig = {

@@ -3,7 +3,6 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import jwt from 'jsonwebtoken';
 import jwksClient from 'jwks-rsa';
-import { createProxyMiddleware } from 'http-proxy-middleware';
 
 dotenv.config();
 

@@ -118,7 +118,7 @@ export const CredentialsPage = () => {
                   <label className="text-sm font-medium text-muted-foreground">Workspace</label>
                   <div className="mt-1">
                     <Badge variant="secondary" className="text-base px-3 py-1">
-                      {credentials.workspace.toUpperCase()}
+                      {credentials.workspace}
                     </Badge>
                   </div>
                 </div>

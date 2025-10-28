@@ -91,7 +91,7 @@ export const MyApiKeyService = createApiKeyService({
     return [
       {
         id: `workspace-${credentials.workspace}`,
-        label: `${credentials.workspace.toUpperCase()} Workspace`,
+        label: `${credentials.workspace} Workspace`,
         apiKeys: [
           {
             id: `client-id-${credentials.workspace}`,

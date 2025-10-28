@@ -4,7 +4,7 @@
  */
 
 import { HEADERS } from '../lib/constants';
-import { validateResponse } from '../lib/http';
+import { validateResponse } from '../lib/utils';
 
 interface TokenResponse {
   access_token: string;

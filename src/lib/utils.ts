@@ -49,3 +49,20 @@ export function getAttributeValue(
 ): string | undefined {
   return attributes[upperCaseKey] || attributes[lowerCaseKey];
 }
+
+/**
+ * Validate HTTP response and throw error if not ok
+ * @param response Fetch response
+ * @param message Error message prefix
+ */
+export async function validateResponse(
+  response: Response,
+  message: string = 'Request failed'
+): Promise<void> {
+  if (!response.ok) {
+    const errorText = await response.text();
+    throw new Error(
+      `${message} (${response.status}): ${errorText || response.statusText}`
+    );
+  }
+}

@@ -6,8 +6,7 @@ import { Badge } from "zudoku/ui/Badge";
 import { Alert, AlertDescription, AlertTitle } from "zudoku/ui/Alert";
 import { KeyIcon, AlertCircleIcon } from "zudoku/icons";
 import type { WorkspaceCredentials } from "./types/credentials";
-import { buildCredentialsUrl, extractWorkspace } from "./lib/utils";
-import { validateResponse } from "./lib/http";
+import { buildCredentialsUrl, extractWorkspace, validateResponse } from "./lib/utils";
 import { HEADERS } from "./lib/constants";
 import { CredentialField } from "./components/CredentialField";
 

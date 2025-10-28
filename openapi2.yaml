@@ -48,6 +48,8 @@ servers:
   description: Finarkein Production API (use this for your integration)
 - url: /api
   description: Documentation Proxy (for "Try it out" feature only)
+- url: https://id.finarkein.com/auth/realms/fin-dev/protocol/openid-connect
+  description: Keycloak Authentication Server (for token endpoint only)
 paths:
   /{workspace}/dp/nerv/{flowId}:
     post:
@@ -1925,6 +1927,11 @@ paths:
         type: string
         example: <string>
   /token:
+    servers:
+    - url: https://id.finarkein.com/auth/realms/fin-dev/protocol/openid-connect
+      description: Keycloak Authentication Server
+    - url: /api
+      description: Documentation Proxy (for "Try it out" feature only)
     post:
       summary: Generate Access Token
       tags:

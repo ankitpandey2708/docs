@@ -1,0 +1,2037 @@
+openapi: 3.0.3
+info:
+  title: Finarkein
+  version: 1.0.0
+  contact: {}
+servers:
+- url: https://api.finarkein.in/factory/v1
+- url: '{{AUTH_TOKEN_URL}}'
+paths:
+  /{workspace}/dp/nerv/{flowId}:
+    post:
+      tags:
+      - Nerv
+      summary: New Run
+      description: New Run
+      operationId: newRun
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                consentTemplateId:
+                  type: string
+                  example: f2f86ccb-60fe-4ec4-b58d-3f90a4559938
+                customerMobileNumber:
+                  type: string
+                  example: '9881908250'
+                redirectUrl:
+                  type: string
+                  example: https://dev.fnrk.in/o/{{workspace}}/thank-you
+                webhook:
+                  type: object
+                  properties:
+                    addOnParams:
+                      type: object
+                      properties:
+                        application:
+                          type: string
+                          example: APP091234
+                        customerSegment:
+                          type: string
+                          example: hni
+                        other-key-1:
+                          type: string
+                          example: other-value-1
+                    consentStatus:
+                      type: string
+                      example: https://webhook.site/e497c184-6f87-44b9-bfb0-a8767b17b920
+                    dataPush:
+                      type: string
+                      example: https://webhook.site/e497c184-6f87-44b9-bfb0-a8767b17b920
+                    flowRunStatus:
+                      type: string
+                      example: https://webhook.site/e497c184-6f87-44b9-bfb0-a8767b17b920
+            examples:
+              New Run:
+                value:
+                  consentTemplateId: f2f86ccb-60fe-4ec4-b58d-3f90a4559938
+                  customerMobileNumber: '9881908250'
+                  redirectUrl: https://dev.fnrk.in/o/{{workspace}}/thank-you
+                  webhook:
+                    addOnParams:
+                      application: APP091234
+                      customerSegment: hni
+                      other-key-1: other-value-1
+                    consentStatus: https://webhook.site/e497c184-6f87-44b9-bfb0-a8767b17b920
+                    dataPush: https://webhook.site/e497c184-6f87-44b9-bfb0-a8767b17b920
+                    flowRunStatus: https://webhook.site/e497c184-6f87-44b9-bfb0-a8767b17b920
+      responses:
+        '200':
+          description: New Run
+          headers:
+            Cache-Control:
+              schema:
+                type: string
+                example: no-cache, no-store, max-age=0, must-revalidate
+            Connection:
+              schema:
+                type: string
+                example: keep-alive
+            Content-Length:
+              schema:
+                type: string
+                example: '128'
+            Content-Security-Policy:
+              schema:
+                type: string
+                example: default-src 'none';
+            Date:
+              schema:
+                type: string
+                example: Wed, 25 Oct 2023 09:43:39 GMT
+            Expires:
+              schema:
+                type: string
+                example: '0'
+            Pragma:
+              schema:
+                type: string
+                example: no-cache
+            Referrer-Policy:
+              schema:
+                type: string
+                example: no-referrer
+            Strict-Transport-Security:
+              schema:
+                type: string
+                example: max-age=31536000 ; includeSubDomains
+            Vary:
+              schema:
+                type: string
+                example: Access-Control-Request-Headers
+            X-Content-Type-Options:
+              schema:
+                type: string
+                example: nosniff
+            X-Frame-Options:
+              schema:
+                type: string
+                example: DENY
+            X-XSS-Protection:
+              schema:
+                type: string
+                example: 1 ; mode=block
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  redirectUrl:
+                    type: string
+                    example: https://dev.fnrk.in/v2/bf75efbb-5604-42d8-8163-f29cc7a0f5c6
+                  requestId:
+                    type: string
+                    example: bf75efbb-5604-42d8-8163-f29cc7a0f5c6
+              examples:
+                New Run:
+                  value:
+                    redirectUrl: https://dev.fnrk.in/v2/bf75efbb-5604-42d8-8163-f29cc7a0f5c6
+                    requestId: bf75efbb-5604-42d8-8163-f29cc7a0f5c6
+    parameters:
+    - name: workspace
+      in: path
+      required: true
+      schema:
+        type: string
+        example: <string>
+    - name: flowId
+      in: path
+      required: true
+      schema:
+        type: string
+        example: <string>
+  /{workspace}/dp/nerv/fetch/{flowId}:
+    post:
+      tags:
+      - Nerv
+      summary: New Recurring Run
+      description: "# Input parameters\n\n| Parameter | Description | Type | M/O |\n\
+        | --- | --- | --- | --- |\n| `mobileNumber` | Mobile number of the customer\
+        \ (also used to send SMS with Anubhav link, if enabled) | String | M |\n|\
+        \ `applicationNo` | Your internal system application number (insurance policy\
+        \ identifier, loan application identifier etc.). This will also reflect on\
+        \ the Anubhav Service Console (dedicated UI to track all Anubhav flows). |\
+        \ String | M |\n| `emailId` | Email address of the customer (also used to\
+        \ send email with Anubhav link, if enabled) | String | O |\n\n# Webhooks\n\
+        \nAnubhav Financial insights endpoint currently supports one webhook:\n\n\
+        - Flow Run Status (key: `flowRunStatus`)\n    \n\n## Flow Run Status\n\nFired\
+        \ when the flow run status changes.  \nTo register a dynamic webhook, you\
+        \ can pass an additional parameter in the input as shown below:\n\n``` json\n\
+        \"webhook\": {\n  \"flowRunStatus\": \"https://webhook.site/9b888dac-ba87-429a-8de3-d6716ce113f9\"\
+        ,\n  \"addOnParams\": {\n    \"application\": \"APP091234\",\n    \"customerSegment\"\
+        : \"hni\"\n  }\n}\n\n```\n\nwhere, `flowRunStatus` is the dedicated endpoint\
+        \ on your server as a webhook listener that can recieve POST requests on flow\
+        \ run status changes."
+      operationId: newRecurringRun
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                consentHandle:
+                  type: string
+                  example: bf75efbb-5604-42d8-8163-f29cc7a0f5c6
+                webhook:
+                  type: object
+                  properties:
+                    addOnParams:
+                      type: object
+                      properties:
+                        application:
+                          type: string
+                          example: APP091234
+                        customerSegment:
+                          type: string
+                          example: hni
+                        other-key-1:
+                          type: string
+                          example: other-value-1
+                    dataPush:
+                      type: string
+                      example: https://webhook.site/e497c184-6f87-44b9-bfb0-a8767b17b920
+                    flowRunStatus:
+                      type: string
+                      example: https://webhook.site/e497c184-6f87-44b9-bfb0-a8767b17b920
+            examples:
+              New Recurring Run:
+                value:
+                  consentHandle: bf75efbb-5604-42d8-8163-f29cc7a0f5c6
+                  webhook:
+                    addOnParams:
+                      application: APP091234
+                      customerSegment: hni
+                      other-key-1: other-value-1
+                    dataPush: https://webhook.site/e497c184-6f87-44b9-bfb0-a8767b17b920
+                    flowRunStatus: https://webhook.site/e497c184-6f87-44b9-bfb0-a8767b17b920
+      responses:
+        '200':
+          description: New Recurring Run
+          headers:
+            Cache-Control:
+              schema:
+                type: string
+                example: no-cache, no-store, max-age=0, must-revalidate
+            Connection:
+              schema:
+                type: string
+                example: keep-alive
+            Content-Length:
+              schema:
+                type: string
+                example: '52'
+            Content-Security-Policy:
+              schema:
+                type: string
+                example: default-src 'none';
+            Date:
+              schema:
+                type: string
+                example: Wed, 25 Oct 2023 09:46:10 GMT
+            Expires:
+              schema:
+                type: string
+                example: '0'
+            Pragma:
+              schema:
+                type: string
+                example: no-cache
+            Referrer-Policy:
+              schema:
+                type: string
+                example: no-referrer
+            Strict-Transport-Security:
+              schema:
+                type: string
+                example: max-age=31536000 ; includeSubDomains
+            Vary:
+              schema:
+                type: string
+                example: Access-Control-Request-Headers
+            X-Content-Type-Options:
+              schema:
+                type: string
+                example: nosniff
+            X-Frame-Options:
+              schema:
+                type: string
+                example: DENY
+            X-XSS-Protection:
+              schema:
+                type: string
+                example: 1 ; mode=block
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  requestId:
+                    type: string
+                    example: f5796894-e342-49a5-927f-e9729ed50a29
+              examples:
+                New Recurring Run:
+                  value:
+                    requestId: f5796894-e342-49a5-927f-e9729ed50a29
+    parameters:
+    - name: workspace
+      in: path
+      required: true
+      schema:
+        type: string
+        example: <string>
+    - name: flowId
+      in: path
+      required: true
+      schema:
+        type: string
+        example: <string>
+  /{workspace}/dp/nerv/{flowId}/{requestId}/status:
+    get:
+      tags:
+      - Nerv
+      summary: Get Status
+      description: Get Status
+      operationId: getStatus
+      responses:
+        '200':
+          description: Get Status
+          headers:
+            Cache-Control:
+              schema:
+                type: string
+                example: <string>
+            Connection:
+              schema:
+                type: string
+                example: <string>
+            Content-Length:
+              schema:
+                type: string
+                example: <integer>
+            Content-Security-Policy:
+              schema:
+                type: string
+                example: <string>
+            Date:
+              schema:
+                type: string
+                example: <string>
+            Expires:
+              schema:
+                type: string
+                example: <integer>
+            Pragma:
+              schema:
+                type: string
+                example: <string>
+            Referrer-Policy:
+              schema:
+                type: string
+                example: <string>
+            Strict-Transport-Security:
+              schema:
+                type: string
+                example: <string>
+            Vary:
+              schema:
+                type: string
+                example: <string>
+            X-Content-Type-Options:
+              schema:
+                type: string
+                example: <string>
+            X-Frame-Options:
+              schema:
+                type: string
+                example: <string>
+            X-XSS-Protection:
+              schema:
+                type: string
+                example: <integer>
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  requestId:
+                    type: string
+                    example: <string>
+                  state:
+                    type: object
+                    properties:
+                      consentStatus:
+                        type: string
+                        example: <string>
+                      dataFetchStatus:
+                        type: string
+                        example: <string>
+                      state:
+                        type: string
+                        example: <string>
+              examples:
+                Get Status:
+                  value:
+                    requestId: <string>
+                    state:
+                      consentStatus: <string>
+                      dataFetchStatus: <string>
+                      state: <string>
+    parameters:
+    - name: workspace
+      in: path
+      required: true
+      schema:
+        type: string
+        example: <string>
+    - name: flowId
+      in: path
+      required: true
+      schema:
+        type: string
+        example: <string>
+    - name: requestId
+      in: path
+      required: true
+      schema:
+        type: string
+        example: <string>
+  /{workspace}/dp/nerv/{flowId}/{requestId}/result:
+    get:
+      tags:
+      - Nerv
+      summary: Get Result
+      description: Get Result
+      operationId: getResult
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties: {}
+            examples:
+              Get Result:
+                value: {}
+      responses:
+        '200':
+          description: Get Result
+          headers:
+            Cache-Control:
+              schema:
+                type: string
+                example: <string>
+            Connection:
+              schema:
+                type: string
+                example: <string>
+            Content-Length:
+              schema:
+                type: string
+                example: <integer>
+            Content-Security-Policy:
+              schema:
+                type: string
+                example: <string>
+            Date:
+              schema:
+                type: string
+                example: <string>
+            Expires:
+              schema:
+                type: string
+                example: <integer>
+            Pragma:
+              schema:
+                type: string
+                example: <string>
+            Referrer-Policy:
+              schema:
+                type: string
+                example: <string>
+            Strict-Transport-Security:
+              schema:
+                type: string
+                example: <string>
+            Vary:
+              schema:
+                type: string
+                example: <string>
+            X-Content-Type-Options:
+              schema:
+                type: string
+                example: <string>
+            X-Frame-Options:
+              schema:
+                type: string
+                example: <string>
+            X-XSS-Protection:
+              schema:
+                type: string
+                example: <integer>
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  addOnParams:
+                    type: object
+                    properties:
+                      application:
+                        type: string
+                        example: <string>
+                      customerSegment:
+                        type: string
+                        example: <string>
+                      other-key-1:
+                        type: string
+                        example: <string>
+                  data:
+                    type: object
+                    properties:
+                      dataReportDetails:
+                        type: object
+                        properties:
+                          downloadUrl:
+                            type: string
+                            example: <string>
+                          downloadUrlExpirationInSeconds:
+                            type: string
+                            example: <integer>
+                      deposit.holders:
+                        type: array
+                        items:
+                          type: array
+                          items:
+                            type: string
+                            example: <string>
+                          example:
+                          - <string>
+                          - <string>
+                        example:
+                        - - <string>
+                          - <string>
+                        - - <string>
+                          - <string>
+                      deposit.statement.meta:
+                        type: object
+                        properties:
+                          fromDate:
+                            type: string
+                            example: <string>
+                          fromTimestamp:
+                            type: string
+                            example: <integer>
+                          noOfDays:
+                            type: string
+                            example: <integer>
+                          toDate:
+                            type: string
+                            example: <string>
+                          toTimestamp:
+                            type: string
+                            example: <integer>
+                      deposit.summary:
+                        type: array
+                        items:
+                          type: array
+                          items:
+                            type: string
+                            example: <string>
+                          example:
+                          - <string>
+                          - <string>
+                        example:
+                        - - <string>
+                          - <string>
+                        - - <string>
+                          - <string>
+                      deposit.transactions:
+                        type: array
+                        items:
+                          type: array
+                          items:
+                            type: string
+                            example: <string>
+                          example:
+                          - <string>
+                          - <string>
+                        example:
+                        - - <string>
+                          - <string>
+                        - - <string>
+                          - <string>
+                      deposit.transactions.meta:
+                        type: object
+                        properties:
+                          accountWiseMeta:
+                            type: array
+                            items:
+                              type: object
+                              properties:
+                                fromDate:
+                                  type: string
+                                  example: <string>
+                                fromTimestamp:
+                                  type: string
+                                  example: <integer>
+                                maskedAccNumber:
+                                  type: string
+                                  example: <string>
+                                noOfDays:
+                                  type: string
+                                  example: <integer>
+                                noOfMonths:
+                                  type: string
+                                  example: <integer>
+                                noOfTransactions:
+                                  type: string
+                                  example: <integer>
+                                toDate:
+                                  type: string
+                                  example: <string>
+                                toTimestamp:
+                                  type: string
+                                  example: <integer>
+                            example:
+                            - fromDate: <string>
+                              fromTimestamp: <integer>
+                              maskedAccNumber: <string>
+                              noOfDays: <integer>
+                              noOfMonths: <integer>
+                              noOfTransactions: <integer>
+                              toDate: <string>
+                              toTimestamp: <integer>
+                            - fromDate: <string>
+                              fromTimestamp: <integer>
+                              maskedAccNumber: <string>
+                              noOfDays: <integer>
+                              noOfMonths: <integer>
+                              noOfTransactions: <integer>
+                              toDate: <string>
+                              toTimestamp: <integer>
+                          fromDate:
+                            type: string
+                            example: <string>
+                          fromTimestamp:
+                            type: string
+                            example: <integer>
+                          noOfDays:
+                            type: string
+                            example: <integer>
+                          noOfMonths:
+                            type: string
+                            example: <integer>
+                          noOfTransactions:
+                            type: string
+                            example: <integer>
+                          toDate:
+                            type: string
+                            example: <string>
+                          toTimestamp:
+                            type: string
+                            example: <integer>
+                      equities.holders:
+                        type: array
+                        items:
+                          type: array
+                          items:
+                            type: string
+                            example: <string>
+                          example:
+                          - <string>
+                          - <string>
+                        example:
+                        - - <string>
+                          - <string>
+                        - - <string>
+                          - <string>
+                      equities.summary:
+                        type: array
+                        items:
+                          type: array
+                          items:
+                            type: string
+                            example: <string>
+                          example:
+                          - <string>
+                          - <string>
+                        example:
+                        - - <string>
+                          - <string>
+                        - - <string>
+                          - <string>
+                      equities.transactions:
+                        type: array
+                        items:
+                          type: array
+                          items:
+                            type: string
+                            example: <string>
+                          example:
+                          - <string>
+                          - <string>
+                        example:
+                        - - <string>
+                          - <string>
+                        - - <string>
+                          - <string>
+                      insurance_policies.holders:
+                        type: array
+                        items:
+                          type: array
+                          items:
+                            type: string
+                            example: <string>
+                          example:
+                          - <string>
+                          - <string>
+                        example:
+                        - - <string>
+                          - <string>
+                        - - <string>
+                          - <string>
+                      insurance_policies.riders:
+                        type: array
+                        items:
+                          type: array
+                          items:
+                            type: string
+                            example: <string>
+                          example:
+                          - <string>
+                          - <string>
+                        example:
+                        - - <string>
+                          - <string>
+                        - - <string>
+                          - <string>
+                      insurance_policies.summary:
+                        type: array
+                        items:
+                          type: array
+                          items:
+                            type: string
+                            example: <string>
+                          example:
+                          - <string>
+                          - <string>
+                        example:
+                        - - <string>
+                          - <string>
+                        - - <string>
+                          - <string>
+                      insurance_policies.transactions:
+                        type: array
+                        items:
+                          type: array
+                          items:
+                            type: string
+                            example: <string>
+                          example:
+                          - <string>
+                          - <string>
+                        example:
+                        - - <string>
+                          - <string>
+                        - - <string>
+                          - <string>
+                      mutual_funds.holders:
+                        type: array
+                        items:
+                          type: array
+                          items:
+                            type: string
+                            example: <string>
+                          example:
+                          - <string>
+                          - <string>
+                        example:
+                        - - <string>
+                          - <string>
+                        - - <string>
+                          - <string>
+                      mutual_funds.summary:
+                        type: array
+                        items:
+                          type: array
+                          items:
+                            type: string
+                            example: <string>
+                          example:
+                          - <string>
+                          - <string>
+                        example:
+                        - - <string>
+                          - <string>
+                        - - <string>
+                          - <string>
+                      mutual_funds.transactions:
+                        type: array
+                        items:
+                          type: array
+                          items:
+                            type: string
+                            example: <string>
+                          example:
+                          - <string>
+                          - <string>
+                        example:
+                        - - <string>
+                          - <string>
+                        - - <string>
+                          - <string>
+                      nps.holders:
+                        type: array
+                        items:
+                          type: array
+                          items:
+                            type: string
+                            example: <string>
+                          example:
+                          - <string>
+                          - <string>
+                        example:
+                        - - <string>
+                          - <string>
+                        - - <string>
+                          - <string>
+                      nps.summary:
+                        type: array
+                        items:
+                          type: array
+                          items:
+                            type: string
+                            example: <string>
+                          example:
+                          - <string>
+                          - <string>
+                        example:
+                        - - <string>
+                          - <string>
+                        - - <string>
+                          - <string>
+                      nps.transactions:
+                        type: array
+                        items:
+                          type: array
+                          items:
+                            type: string
+                            example: <string>
+                          example:
+                          - <string>
+                          - <string>
+                        example:
+                        - - <string>
+                          - <string>
+                        - - <string>
+                          - <string>
+                      recurring_deposit.holders:
+                        type: array
+                        items:
+                          type: array
+                          items:
+                            type: string
+                            example: <string>
+                          example:
+                          - <string>
+                          - <string>
+                        example:
+                        - - <string>
+                          - <string>
+                        - - <string>
+                          - <string>
+                      recurring_deposit.summary:
+                        type: array
+                        items:
+                          type: array
+                          items:
+                            type: string
+                            example: <string>
+                          example:
+                          - <string>
+                          - <string>
+                        example:
+                        - - <string>
+                          - <string>
+                        - - <string>
+                          - <string>
+                      recurring_deposit.transactions:
+                        type: array
+                        items:
+                          type: array
+                          items:
+                            type: string
+                            example: <string>
+                          example:
+                          - <string>
+                          - <string>
+                        example:
+                        - - <string>
+                          - <string>
+                        - - <string>
+                          - <string>
+                      term_deposit.holders:
+                        type: array
+                        items:
+                          type: array
+                          items:
+                            type: string
+                            example: <string>
+                          example:
+                          - <string>
+                          - <string>
+                        example:
+                        - - <string>
+                          - <string>
+                        - - <string>
+                          - <string>
+                      term_deposit.summary:
+                        type: array
+                        items:
+                          type: array
+                          items:
+                            type: string
+                            example: <string>
+                          example:
+                          - <string>
+                          - <string>
+                        example:
+                        - - <string>
+                          - <string>
+                        - - <string>
+                          - <string>
+                      term_deposit.transactions:
+                        type: array
+                        items:
+                          type: array
+                          items:
+                            type: string
+                            example: <string>
+                          example:
+                          - <string>
+                          - <string>
+                        example:
+                        - - <string>
+                          - <string>
+                        - - <string>
+                          - <string>
+                  requestId:
+                    type: string
+                    example: <string>
+                  state:
+                    type: object
+                    properties:
+                      consentStatus:
+                        type: string
+                        example: <string>
+                      dataFetchStatus:
+                        type: string
+                        example: <string>
+                      state:
+                        type: string
+                        example: <string>
+              examples:
+                Get Result:
+                  value:
+                    addOnParams:
+                      application: <string>
+                      customerSegment: <string>
+                      other-key-1: <string>
+                    data:
+                      dataReportDetails:
+                        downloadUrl: <string>
+                        downloadUrlExpirationInSeconds: <integer>
+                      deposit.holders:
+                      - - <string>
+                        - <string>
+                      - - <string>
+                        - <string>
+                      deposit.statement.meta:
+                        fromDate: <string>
+                        fromTimestamp: <integer>
+                        noOfDays: <integer>
+                        toDate: <string>
+                        toTimestamp: <integer>
+                      deposit.summary:
+                      - - <string>
+                        - <string>
+                      - - <string>
+                        - <string>
+                      deposit.transactions:
+                      - - <string>
+                        - <string>
+                      - - <string>
+                        - <string>
+                      deposit.transactions.meta:
+                        accountWiseMeta:
+                        - fromDate: <string>
+                          fromTimestamp: <integer>
+                          maskedAccNumber: <string>
+                          noOfDays: <integer>
+                          noOfMonths: <integer>
+                          noOfTransactions: <integer>
+                          toDate: <string>
+                          toTimestamp: <integer>
+                        - fromDate: <string>
+                          fromTimestamp: <integer>
+                          maskedAccNumber: <string>
+                          noOfDays: <integer>
+                          noOfMonths: <integer>
+                          noOfTransactions: <integer>
+                          toDate: <string>
+                          toTimestamp: <integer>
+                        fromDate: <string>
+                        fromTimestamp: <integer>
+                        noOfDays: <integer>
+                        noOfMonths: <integer>
+                        noOfTransactions: <integer>
+                        toDate: <string>
+                        toTimestamp: <integer>
+                      equities.holders:
+                      - - <string>
+                        - <string>
+                      - - <string>
+                        - <string>
+                      equities.summary:
+                      - - <string>
+                        - <string>
+                      - - <string>
+                        - <string>
+                      equities.transactions:
+                      - - <string>
+                        - <string>
+                      - - <string>
+                        - <string>
+                      insurance_policies.holders:
+                      - - <string>
+                        - <string>
+                      - - <string>
+                        - <string>
+                      insurance_policies.riders:
+                      - - <string>
+                        - <string>
+                      - - <string>
+                        - <string>
+                      insurance_policies.summary:
+                      - - <string>
+                        - <string>
+                      - - <string>
+                        - <string>
+                      insurance_policies.transactions:
+                      - - <string>
+                        - <string>
+                      - - <string>
+                        - <string>
+                      mutual_funds.holders:
+                      - - <string>
+                        - <string>
+                      - - <string>
+                        - <string>
+                      mutual_funds.summary:
+                      - - <string>
+                        - <string>
+                      - - <string>
+                        - <string>
+                      mutual_funds.transactions:
+                      - - <string>
+                        - <string>
+                      - - <string>
+                        - <string>
+                      nps.holders:
+                      - - <string>
+                        - <string>
+                      - - <string>
+                        - <string>
+                      nps.summary:
+                      - - <string>
+                        - <string>
+                      - - <string>
+                        - <string>
+                      nps.transactions:
+                      - - <string>
+                        - <string>
+                      - - <string>
+                        - <string>
+                      recurring_deposit.holders:
+                      - - <string>
+                        - <string>
+                      - - <string>
+                        - <string>
+                      recurring_deposit.summary:
+                      - - <string>
+                        - <string>
+                      - - <string>
+                        - <string>
+                      recurring_deposit.transactions:
+                      - - <string>
+                        - <string>
+                      - - <string>
+                        - <string>
+                      term_deposit.holders:
+                      - - <string>
+                        - <string>
+                      - - <string>
+                        - <string>
+                      term_deposit.summary:
+                      - - <string>
+                        - <string>
+                      - - <string>
+                        - <string>
+                      term_deposit.transactions:
+                      - - <string>
+                        - <string>
+                      - - <string>
+                        - <string>
+                    requestId: <string>
+                    state:
+                      consentStatus: <string>
+                      dataFetchStatus: <string>
+                      state: <string>
+    parameters:
+    - name: workspace
+      in: path
+      required: true
+      schema:
+        type: string
+        example: <string>
+    - name: flowId
+      in: path
+      required: true
+      schema:
+        type: string
+        example: <string>
+    - name: requestId
+      in: path
+      required: true
+      schema:
+        type: string
+        example: <string>
+  /{workspace}/consent/aa/template:
+    get:
+      tags:
+      - Consent templates
+      summary: Browse consent templates
+      description: Browse consent templates
+      operationId: browseConsentTemplates
+      responses:
+        '200':
+          description: ''
+        '404':
+          description: Browse consent templates
+          headers:
+            Cache-Control:
+              schema:
+                type: string
+                example: <string>
+            Connection:
+              schema:
+                type: string
+                example: <string>
+            Content-Length:
+              schema:
+                type: string
+                example: <integer>
+            Content-Security-Policy:
+              schema:
+                type: string
+                example: <string>
+            Date:
+              schema:
+                type: string
+                example: <string>
+            Expires:
+              schema:
+                type: string
+                example: <integer>
+            Pragma:
+              schema:
+                type: string
+                example: <string>
+            Referrer-Policy:
+              schema:
+                type: string
+                example: <string>
+            Server:
+              schema:
+                type: string
+                example: <string>
+            Strict-Transport-Security:
+              schema:
+                type: string
+                example: <string>
+            Vary:
+              schema:
+                type: string
+                example: <string>
+            X-Content-Type-Options:
+              schema:
+                type: string
+                example: <string>
+            X-Frame-Options:
+              schema:
+                type: string
+                example: <string>
+            X-XSS-Protection:
+              schema:
+                type: string
+                example: <integer>
+          content: {}
+    post:
+      tags:
+      - Consent templates
+      summary: Create new Consent Template
+      description: '| **Parameter Name** | **Description** |
+
+        | --- | --- |
+
+        | consentStartOffset | Example: `1m` — 1 minute in future when consent is
+        raised.  <br>  <br>If consent is raised at `2021-11-16T08:57:11.111Z` then
+        **consentStart** will be set to: `2021-11-16T09:57:11.111Z` |
+
+        | consentExpiryDuration | Example: `1d` — 1 day from **consentStart**.  <br>  <br>If
+        **consentStart** is `2021-11-16T09:57:11.111Z`, then **consentExpiry** will
+        be set to: `2021-11-17T09:57:11.111Z` |
+
+        | consentMode | Same as standard API.  <br>One of: VIEW / STORE / QUERY /
+        STREAM |
+
+        | consentTypes | Any or all of: PROFILE / SUMMARY / TRANSACTIONS |
+
+        | fiTypes | FITypes names should be as defined in the AA Technical Specification.
+        |
+
+        | purposeCode | One of: 101 / 102 / 103 / 104 / 105 |
+
+        | fetchType | One of: ONETIME / PERIODIC |
+
+        | consentTemplateDataRange | See following table for more details. |
+
+        | frequency | Frequency information for periodic (\`fetchType = PERIODIC\`)
+        information access.  <br>  <br>Example: `6h` — means **6** FI request per
+        hour.  <br>  <br>Supported Units: **h** / **d** / **M** / **y** / **i** <br>(Refer
+        note about Time notations at the bottom) |
+
+        | dataLife | How long to store data when `consentMode = STORE`.  <br>  <br>Supported
+        Units: **d** / **M** / **y** / **i** <br>(Refer note about Time notations
+        at the bottom) |
+
+
+        ## **Consent Template Data Range**
+
+
+        | **Data Range****Type Enumerations** | **Example (s)** | Description |
+
+        | --- | --- | --- |
+
+        | FINANCIAL_YEAR | For current FY, use:  <br>`{ "type": "FINANCIAL_YEAR",
+        "year": "0" }`  <br>  <br>For current and last 1 FY, use:  <br>`{ "type":
+        "FINANCIAL_YEAR", "year": "1" }` | If consent is raised on `2021-11-16` then
+        date range generated for consent is:  <br>  <br>`{ "from": "2021-04-01T00:00:00.000Z",
+        "to": "2022-03-31T23:59:59.999Z" }` |
+
+        | FIXED | `{ "type": "FIXED", "from": "2020-04-01T00:00:00.000Z", "to": "2022-03-31T23:59:59.999Z"
+        }` | Values specified in the consent Template will be considered. |
+
+        | SAME_AS_CONSENT | `{ "type": "SAME_AS_CONSENT" }` | If **consentStart**:
+        `2021-11-16T09:57:11.111Z` and **consentExpiry**: `2021-11-17T09:57:11.111Z`,
+        then  <br>data range will be as follows:  <br>  <br>`{ "from": "2021-11-16T09:57:11.111Z",
+        "to": "2021-11-17T09:57:11.111Z" }` |
+
+        | CONSENT_START_RELATIVE | Date range will be relative to resolved`consentStart`
+        and `consentEnd`  <br>  <br>`{ "type": "CONSENT_START_RELATIVE", "from": "-6M",
+        "to": "0m" }` | If **consentStart**: `2021-11-16T18:47:08.235Z` and **consentExpiry**:
+        `2021-11-17T18:47:08.235Z`, then data range will be as follows:  <br>  <br>`{
+        "from": "2021-05-16T18:47:08.235", "to": "2all 1-11-16T18:47:08.235" }` |
+
+
+        ### Time/Duration Notations
+
+
+        The time/duration notations expected in the Consent template definition use
+        the follow notations.
+
+
+        | **Notation** | **Time Unit** |
+
+        | --- | --- |
+
+        | s | Seconds |
+
+        | m | Minute |
+
+        | h | Hour |
+
+        | d | Day |
+
+        | w | Week |
+
+        | M | Month |
+
+        | y | Year |
+
+        | i | Infinite^ |
+
+
+        **^** Only supported in some fields: dataExpiry and frequency.'
+      operationId: createNewConsentTemplate
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties: {}
+            examples:
+              Create new Consent Template:
+                value: {}
+      responses:
+        '200':
+          description: ''
+        '404':
+          description: Create new Consent Template
+          headers:
+            Cache-Control:
+              schema:
+                type: string
+                example: <string>
+            Connection:
+              schema:
+                type: string
+                example: <string>
+            Content-Length:
+              schema:
+                type: string
+                example: <integer>
+            Content-Security-Policy:
+              schema:
+                type: string
+                example: <string>
+            Date:
+              schema:
+                type: string
+                example: <string>
+            Expires:
+              schema:
+                type: string
+                example: <integer>
+            Pragma:
+              schema:
+                type: string
+                example: <string>
+            Referrer-Policy:
+              schema:
+                type: string
+                example: <string>
+            Server:
+              schema:
+                type: string
+                example: <string>
+            Strict-Transport-Security:
+              schema:
+                type: string
+                example: <string>
+            Vary:
+              schema:
+                type: string
+                example: <string>
+            X-Content-Type-Options:
+              schema:
+                type: string
+                example: <string>
+            X-Frame-Options:
+              schema:
+                type: string
+                example: <string>
+            X-XSS-Protection:
+              schema:
+                type: string
+                example: <integer>
+          content: {}
+    parameters:
+    - name: workspace
+      in: path
+      required: true
+      schema:
+        type: string
+        example: 'false'
+  /{workspace}/consent/aa/template/{id}:
+    get:
+      tags:
+      - Consent templates
+      summary: Get consent template by identifier
+      description: Get consent template by identifier
+      operationId: getConsentTemplateByIdentifier
+      responses:
+        '200':
+          description: ''
+        '404':
+          description: Get consent template by identifier
+          headers:
+            Cache-Control:
+              schema:
+                type: string
+                example: <string>
+            Connection:
+              schema:
+                type: string
+                example: <string>
+            Content-Length:
+              schema:
+                type: string
+                example: <integer>
+            Content-Security-Policy:
+              schema:
+                type: string
+                example: <string>
+            Date:
+              schema:
+                type: string
+                example: <string>
+            Expires:
+              schema:
+                type: string
+                example: <integer>
+            Pragma:
+              schema:
+                type: string
+                example: <string>
+            Referrer-Policy:
+              schema:
+                type: string
+                example: <string>
+            Server:
+              schema:
+                type: string
+                example: <string>
+            Strict-Transport-Security:
+              schema:
+                type: string
+                example: <string>
+            Vary:
+              schema:
+                type: string
+                example: <string>
+            X-Content-Type-Options:
+              schema:
+                type: string
+                example: <string>
+            X-Frame-Options:
+              schema:
+                type: string
+                example: <string>
+            X-XSS-Protection:
+              schema:
+                type: string
+                example: <integer>
+          content: {}
+    parameters:
+    - name: workspace
+      in: path
+      required: true
+      schema:
+        type: string
+        example: <string>
+    - name: id
+      in: path
+      required: true
+      schema:
+        type: string
+        example: <string>
+      description: Identifier for the template
+  /{workspace}/institutions/aa/fip:
+    get:
+      tags:
+      - Institutions
+      summary: Get FIPs on AA network
+      description: Get FIPs on AA network
+      operationId: getFipsOnAaNetwork
+      responses:
+        '200':
+          description: Factory / Institutions / FIPs
+          headers:
+            Cache-Control:
+              schema:
+                type: string
+                example: <string>
+            Connection:
+              schema:
+                type: string
+                example: <string>
+            Content-Length:
+              schema:
+                type: string
+                example: <string>
+            Content-Security-Policy:
+              schema:
+                type: string
+                example: <string>
+            Date:
+              schema:
+                type: string
+                example: <string>
+            Expires:
+              schema:
+                type: string
+                example: <string>
+            Pragma:
+              schema:
+                type: string
+                example: <string>
+            Referrer-Policy:
+              schema:
+                type: string
+                example: <string>
+            Strict-Transport-Security:
+              schema:
+                type: string
+                example: <string>
+            Vary:
+              schema:
+                type: string
+                example: <string>
+            X-Content-Type-Options:
+              schema:
+                type: string
+                example: <string>
+            X-Frame-Options:
+              schema:
+                type: string
+                example: <string>
+            X-XSS-Protection:
+              schema:
+                type: string
+                example: <string>
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  content:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        fiTypes:
+                          type: array
+                          items:
+                            type: string
+                            example: <string>
+                          example:
+                          - <string>
+                          - <string>
+                        id:
+                          type: string
+                          example: <string>
+                        name:
+                          type: string
+                          example: <string>
+                        version:
+                          type: string
+                          example: <string>
+                    example:
+                    - fiTypes:
+                      - <string>
+                      - <string>
+                      id: <string>
+                      name: <string>
+                      version: <string>
+                    - fiTypes:
+                      - <string>
+                      - <string>
+                      id: <string>
+                      name: <string>
+                      version: <string>
+                  empty:
+                    type: string
+                    example: <string>
+                  first:
+                    type: string
+                    example: <string>
+                  last:
+                    type: string
+                    example: <string>
+                  number:
+                    type: string
+                    example: <string>
+                  numberOfElements:
+                    type: string
+                    example: <string>
+                  pageable:
+                    type: object
+                    properties:
+                      offset:
+                        type: string
+                        example: <string>
+                      pageNumber:
+                        type: string
+                        example: <string>
+                      pageSize:
+                        type: string
+                        example: <string>
+                      paged:
+                        type: string
+                        example: <string>
+                      sort:
+                        type: object
+                        properties:
+                          empty:
+                            type: string
+                            example: <string>
+                          sorted:
+                            type: string
+                            example: <string>
+                          unsorted:
+                            type: string
+                            example: <string>
+                      unpaged:
+                        type: string
+                        example: <string>
+                  size:
+                    type: string
+                    example: <string>
+                  sort:
+                    type: object
+                    properties:
+                      empty:
+                        type: string
+                        example: <string>
+                      sorted:
+                        type: string
+                        example: <string>
+                      unsorted:
+                        type: string
+                        example: <string>
+                  totalElements:
+                    type: string
+                    example: <string>
+                  totalPages:
+                    type: string
+                    example: <string>
+              examples:
+                Factory / Institutions / FIPs:
+                  value:
+                    content:
+                    - fiTypes:
+                      - <string>
+                      - <string>
+                      id: <string>
+                      name: <string>
+                      version: <string>
+                    - fiTypes:
+                      - <string>
+                      - <string>
+                      id: <string>
+                      name: <string>
+                      version: <string>
+                    empty: <string>
+                    first: <string>
+                    last: <string>
+                    number: <string>
+                    numberOfElements: <string>
+                    pageable:
+                      offset: <string>
+                      pageNumber: <string>
+                      pageSize: <string>
+                      paged: <string>
+                      sort:
+                        empty: <string>
+                        sorted: <string>
+                        unsorted: <string>
+                      unpaged: <string>
+                    size: <string>
+                    sort:
+                      empty: <string>
+                      sorted: <string>
+                      unsorted: <string>
+                    totalElements: <string>
+                    totalPages: <string>
+    patch:
+      tags:
+      - Institutions
+      summary: Update (enable/disable) FIP(s) status
+      description: Update (enable/disable) FIP(s) status
+      operationId: updateEnableDisableFipSStatus
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                fips:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      enabled:
+                        type: string
+                        example: <string>
+                      fipId:
+                        type: string
+                        example: <string>
+                  example:
+                  - enabled: <string>
+                    fipId: <string>
+                  - enabled: <string>
+                    fipId: <string>
+            examples:
+              Update (enable/disable) FIP(s) status:
+                value:
+                  fips:
+                  - enabled: <string>
+                    fipId: <string>
+                  - enabled: <string>
+                    fipId: <string>
+      responses:
+        '202':
+          description: Update FIP / Update FIP
+          headers:
+            Cache-Control:
+              schema:
+                type: string
+                example: <string>
+            Connection:
+              schema:
+                type: string
+                example: <string>
+            Content-Length:
+              schema:
+                type: string
+                example: <string>
+            Content-Security-Policy:
+              schema:
+                type: string
+                example: <string>
+            Date:
+              schema:
+                type: string
+                example: <string>
+            Expires:
+              schema:
+                type: string
+                example: <string>
+            Pragma:
+              schema:
+                type: string
+                example: <string>
+            Referrer-Policy:
+              schema:
+                type: string
+                example: <string>
+            Strict-Transport-Security:
+              schema:
+                type: string
+                example: <string>
+            Vary:
+              schema:
+                type: string
+                example: <string>
+            X-Content-Type-Options:
+              schema:
+                type: string
+                example: <string>
+            X-Frame-Options:
+              schema:
+                type: string
+                example: <string>
+            X-XSS-Protection:
+              schema:
+                type: string
+                example: <string>
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  timestamp:
+                    type: string
+                    example: <dateTime>
+                  txnId:
+                    type: string
+                    example: <string>
+              examples:
+                Update FIP:
+                  value:
+                    timestamp: <string>
+                    txnId: <string>
+    parameters:
+    - name: workspace
+      in: path
+      required: true
+      schema:
+        type: string
+        example: 'false'
+  /{workspace}/institutions/aa/fip/status:
+    get:
+      tags:
+      - Institutions
+      summary: Get FIP Health Status
+      description: Get FIP Health Status
+      operationId: getFipHealthStatus
+      responses:
+        '200':
+          description: ''
+        '500':
+          description: Get FIP Status-detailed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  fipHealthStats:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        cause:
+                          type: string
+                          example: <string>
+                        dataFetchSuccessRate:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              duration:
+                                type: string
+                                example: <string>
+                              value:
+                                type: string
+                                example: <number>
+                          example:
+                          - duration: <string>
+                            value: <number>
+                          - duration: <string>
+                            value: <number>
+                        fip:
+                          type: string
+                          example: <string>
+                        journeyMetric:
+                          type: object
+                          properties:
+                            ConsentPostResponse:
+                              type: string
+                              example: <integer>
+                            UserDiscoveryResponse:
+                              type: string
+                              example: <integer>
+                        preferredAction:
+                          type: string
+                          example: <string>
+                    example:
+                    - cause: <string>
+                      dataFetchSuccessRate:
+                      - duration: <string>
+                        value: <number>
+                      - duration: <string>
+                        value: <number>
+                      fip: <string>
+                      journeyMetric:
+                        ConsentPostResponse: <integer>
+                        UserDiscoveryResponse: <integer>
+                      preferredAction: <string>
+                    - cause: <string>
+                      dataFetchSuccessRate:
+                      - duration: <string>
+                        value: <number>
+                      - duration: <string>
+                        value: <number>
+                      fip: <string>
+                      journeyMetric:
+                        ConsentPostResponse: <integer>
+                        UserDiscoveryResponse: <integer>
+                      preferredAction: <string>
+              examples:
+                Get FIP Status-detailed:
+                  value:
+                    fipHealthStats:
+                    - cause: <string>
+                      dataFetchSuccessRate:
+                      - duration: <string>
+                        value: <number>
+                      - duration: <string>
+                        value: <number>
+                      fip: <string>
+                      journeyMetric:
+                        ConsentPostResponse: <integer>
+                        UserDiscoveryResponse: <integer>
+                      preferredAction: <string>
+                    - cause: <string>
+                      dataFetchSuccessRate:
+                      - duration: <string>
+                        value: <number>
+                      - duration: <string>
+                        value: <number>
+                      fip: <string>
+                      journeyMetric:
+                        ConsentPostResponse: <integer>
+                        UserDiscoveryResponse: <integer>
+                      preferredAction: <string>
+    parameters:
+    - name: workspace
+      in: path
+      required: true
+      schema:
+        type: string
+        example: <string>
+  /:
+    post:
+      summary: Generate Access token
+      description: "# Generate OAuth 2.0 Access Token\n\n## Overview\nThis endpoint\
+        \ generates an OAuth 2.0 access token using the **Client Credentials Grant**\
+        \ flow. The access token is required to authenticate subsequent API requests\
+        \ to protected resources.\n\n## Authentication Method\n**OAuth 2.0 - Client\
+        \ Credentials Grant**\n\nThis grant type is used for server-to-server authentication\
+        \ where the application authenticates itself using its client credentials\
+        \ (client ID and client secret) rather than on behalf of a specific user.\n\
+        \n## Required Variables\nBefore using this request, ensure the following environment\
+        \ or collection variables are configured:\n\n- **`AUTH_TOKEN_URL`** - The\
+        \ authorization server's token endpoint URL\n- **`AUTH_CLIENT_ID`** - Your\
+        \ application's client identifier (provided by the authorization server)\n\
+        - **`AUTH_CLIENT_SECRET`** - Your application's client secret (provided by\
+        \ the authorization server)\n\n## Request Parameters\n\n### Body Parameters\
+        \ (x-www-form-urlencoded)\n- **`grant_type`** (required): Must be set to `client_credentials`\
+        \ to indicate the OAuth 2.0 grant type being used\n\n### Headers\n- **`Accept`**:\
+        \ `application/json` - Indicates the client expects a JSON response\n- **`Content-Type`**:\
+        \ `application/json` - Specifies the content type of the request\n\n## Response\
+        \ Format\nThe endpoint returns a JSON object containing:\n\n```json\n{\n \
+        \ \"access_token\": \"eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwi...\",\n  \"\
+        expires_in\": 86400,\n  \"refresh_expires_in\": 0,\n  \"token_type\": \"Bearer\"\
+        ,\n  \"not-before-policy\": 0,\n  \"scope\": \"email profile\"\n}\n```\n\n\
+        ### Response Fields\n- **`access_token`**: The JWT (JSON Web Token) to be\
+        \ used for authenticating API requests. Include this token in the `Authorization`\
+        \ header as `Bearer {access_token}` for subsequent requests.\n- **`expires_in`**:\
+        \ Token validity duration in seconds (86400 seconds = 24 hours)\n- **`token_type`**:\
+        \ Always \"Bearer\" - indicates how the token should be used\n- **`scope`**:\
+        \ The permissions granted to this token (e.g., \"email profile\")\n- **`refresh_expires_in`**:\
+        \ Refresh token expiration (0 indicates no refresh token)\n- **`not-before-policy`**:\
+        \ Token is not valid before this time (0 means valid immediately)\n\n## Usage\
+        \ Notes\n\n### Token Expiration\n- The access token expires after **86400\
+        \ seconds (24 hours)** from issuance\n- Monitor the `expires_in` value and\
+        \ request a new token before expiration\n- Implement token refresh logic in\
+        \ your application to maintain uninterrupted access\n\n### Best Practices\n\
+        1. **Secure Storage**: Store client credentials securely using environment\
+        \ variables or secure vaults\n2. **Token Caching**: Cache the access token\
+        \ and reuse it until it expires to minimize token requests\n3. **Error Handling**:\
+        \ Implement proper error handling for authentication failures (401, 403 responses)\n\
+        4. **Token Renewal**: Request a new token before the current one expires to\
+        \ avoid service interruptions\n\n### Using the Access Token\nOnce obtained,\
+        \ include the access token in subsequent API requests:\n```\nAuthorization:\
+        \ Bearer {access_token}\n```\n\n## Status Codes\n- **200 OK**: Token successfully\
+        \ generated\n- **400 Bad Request**: Invalid request parameters or grant_type\n\
+        - **401 Unauthorized**: Invalid client credentials\n- **500 Internal Server\
+        \ Error**: Server-side error during token generation"
+      operationId: generateAccessToken
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                grant_type:
+                  type: string
+                  example: client_credentials
+            examples:
+              Generate Access token:
+                value:
+                  grant_type: client_credentials
+      responses:
+        '200':
+          description: Generate Access token
+          headers:
+            Cache-Control:
+              schema:
+                type: string
+                example: no-store
+            Connection:
+              schema:
+                type: string
+                example: keep-alive
+            Content-Length:
+              schema:
+                type: string
+                example: '1584'
+            Date:
+              schema:
+                type: string
+                example: Mon, 27 Oct 2025 18:57:26 GMT
+            Pragma:
+              schema:
+                type: string
+                example: no-cache
+            Referrer-Policy:
+              schema:
+                type: string
+                example: no-referrer
+            Set-Cookie:
+              schema:
+                type: string
+                example: KC_RESTART=; Version=1; Expires=Thu, 01-Jan-1970 00:00:10
+                  GMT; Max-Age=0; Path=/auth/realms/fin-dev/; Secure; HttpOnly
+            Strict-Transport-Security:
+              schema:
+                type: string
+                example: max-age=31536000; includeSubDomains
+            X-Content-Type-Options:
+              schema:
+                type: string
+                example: nosniff
+            X-Frame-Options:
+              schema:
+                type: string
+                example: SAMEORIGIN
+            X-XSS-Protection:
+              schema:
+                type: string
+                example: 1; mode=block
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  access_token:
+                    type: string
+                    example: eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICIxRlFKbThMMlVDZElYNDdqT1pDaDZPSFRJbHJFVklESThlZ2ZidnppTk9vIn0.eyJleHAiOjE3NjE2Nzc4NDYsImlhdCI6MTc2MTU5MTQ0NiwianRpIjoiYzMwNzcwMWItY2M2MC00ZmY0LWJiMzEtNDZmYmUxMzQzNGRjIiwiaXNzIjoiaHR0cHM6Ly9pZC5maW5hcmtlaW4uY29tL2F1dGgvcmVhbG1zL2Zpbi1kZXYiLCJhdWQiOlsic2VydmljZS10ZW5hbnQtY29uZmlnIiwiYWNjb3VudCJdLCJzdWIiOiIwYTgzNzNiNS1iNzE5LTQ1NjktOWVhMi0xOGFlMzFmNmU2NTciLCJ0eXAiOiJCZWFyZXIiLCJhenAiOiJjbGllbnQtdHNmc2wtMDNkOTUyZDYiLCJhY3IiOiIxIiwicmVhbG1fYWNjZXNzIjp7InJvbGVzIjpbIm9mZmxpbmVfYWNjZXNzIiwidW1hX2F1dGhvcml6YXRpb24iLCJkZWZhdWx0LXJvbGVzLWZpbi1kZXYiXX0sInJlc291cmNlX2FjY2VzcyI6eyJzZXJ2aWNlLXRlbmFudC1jb25maWciOnsicm9sZXMiOlsidGVuYW50LWNmZzpyZWFkIl19LCJhY2NvdW50Ijp7InJvbGVzIjpbIm1hbmFnZS1hY2NvdW50IiwibWFuYWdlLWFjY291bnQtbGlua3MiLCJ2aWV3LXByb2ZpbGUiXX19LCJzY29wZSI6ImVtYWlsIHByb2ZpbGUiLCJ3b3Jrc3BhY2UiOiJ0c2ZzbCIsImVtYWlsX3ZlcmlmaWVkIjpmYWxzZSwiY2xpZW50SWQiOiJjbGllbnQtdHNmc2wtMDNkOTUyZDYiLCJjbGllbnRIb3N0IjoiNTQuODYuNTAuMTM5Iiwib3JnIjoidHNmc2wiLCJwcmVmZXJyZWRfdXNlcm5hbWUiOiJzZXJ2aWNlLWFjY291bnQtY2xpZW50LXRzZnNsLTAzZDk1MmQ2IiwiY2xpZW50QWRkcmVzcyI6IjU0Ljg2LjUwLjEzOSJ9.UxTgFghjgpXC6dRm2zPFYC3wa_UoqAuZdv3Ib82mmtqxz4fa7H548k9Q8GgBssvC2H1YsqFHhxIWJ9Pbpxohjq8KqWyPw5K2e4tdSNysteoUoBCTNK2FCM7HKDgblY8vdklcSoyo4cGKOyYxsOPqLvIz3xVtdDE7KHHwWmBHMAM6-epHlyEewHZ07DSg-6bk2tbpPpuL2DxA16_lpwtgBLYjy6ThB0yTcZuuMPKRC0XPgUH2xL84yY2cStfwQRRlg_9Gs0az7NeqtZCqFnbCQMsc-v4cS25zVaDb_0-wFIJ2VSYho4JDlXxTsm5UsKmuKRBmpViyx_G58XNQoeEOKw
+                  expires_in:
+                    type: number
+                    example: 86400
+                  not-before-policy:
+                    type: number
+                    example: 0
+                  refresh_expires_in:
+                    type: number
+                    example: 0
+                  scope:
+                    type: string
+                    example: email profile
+                  token_type:
+                    type: string
+                    example: Bearer
+              examples:
+                Generate Access token:
+                  value:
+                    access_token: eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICIxRlFKbThMMlVDZElYNDdqT1pDaDZPSFRJbHJFVklESThlZ2ZidnppTk9vIn0.eyJleHAiOjE3NjE2Nzc4NDYsImlhdCI6MTc2MTU5MTQ0NiwianRpIjoiYzMwNzcwMWItY2M2MC00ZmY0LWJiMzEtNDZmYmUxMzQzNGRjIiwiaXNzIjoiaHR0cHM6Ly9pZC5maW5hcmtlaW4uY29tL2F1dGgvcmVhbG1zL2Zpbi1kZXYiLCJhdWQiOlsic2VydmljZS10ZW5hbnQtY29uZmlnIiwiYWNjb3VudCJdLCJzdWIiOiIwYTgzNzNiNS1iNzE5LTQ1NjktOWVhMi0xOGFlMzFmNmU2NTciLCJ0eXAiOiJCZWFyZXIiLCJhenAiOiJjbGllbnQtdHNmc2wtMDNkOTUyZDYiLCJhY3IiOiIxIiwicmVhbG1fYWNjZXNzIjp7InJvbGVzIjpbIm9mZmxpbmVfYWNjZXNzIiwidW1hX2F1dGhvcml6YXRpb24iLCJkZWZhdWx0LXJvbGVzLWZpbi1kZXYiXX0sInJlc291cmNlX2FjY2VzcyI6eyJzZXJ2aWNlLXRlbmFudC1jb25maWciOnsicm9sZXMiOlsidGVuYW50LWNmZzpyZWFkIl19LCJhY2NvdW50Ijp7InJvbGVzIjpbIm1hbmFnZS1hY2NvdW50IiwibWFuYWdlLWFjY291bnQtbGlua3MiLCJ2aWV3LXByb2ZpbGUiXX19LCJzY29wZSI6ImVtYWlsIHByb2ZpbGUiLCJ3b3Jrc3BhY2UiOiJ0c2ZzbCIsImVtYWlsX3ZlcmlmaWVkIjpmYWxzZSwiY2xpZW50SWQiOiJjbGllbnQtdHNmc2wtMDNkOTUyZDYiLCJjbGllbnRIb3N0IjoiNTQuODYuNTAuMTM5Iiwib3JnIjoidHNmc2wiLCJwcmVmZXJyZWRfdXNlcm5hbWUiOiJzZXJ2aWNlLWFjY291bnQtY2xpZW50LXRzZnNsLTAzZDk1MmQ2IiwiY2xpZW50QWRkcmVzcyI6IjU0Ljg2LjUwLjEzOSJ9.UxTgFghjgpXC6dRm2zPFYC3wa_UoqAuZdv3Ib82mmtqxz4fa7H548k9Q8GgBssvC2H1YsqFHhxIWJ9Pbpxohjq8KqWyPw5K2e4tdSNysteoUoBCTNK2FCM7HKDgblY8vdklcSoyo4cGKOyYxsOPqLvIz3xVtdDE7KHHwWmBHMAM6-epHlyEewHZ07DSg-6bk2tbpPpuL2DxA16_lpwtgBLYjy6ThB0yTcZuuMPKRC0XPgUH2xL84yY2cStfwQRRlg_9Gs0az7NeqtZCqFnbCQMsc-v4cS25zVaDb_0-wFIJ2VSYho4JDlXxTsm5UsKmuKRBmpViyx_G58XNQoeEOKw
+                    expires_in: 86400
+                    not-before-policy: 0
+                    refresh_expires_in: 0
+                    scope: email profile
+                    token_type: Bearer
+      security:
+      - basicAuth: []
+components:
+  securitySchemes:
+    basicAuth:
+      type: http
+      scheme: basic
+tags:
+- name: Nerv
+- name: Consent templates
+- name: Institutions

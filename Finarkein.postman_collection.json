@@ -1,0 +1,2418 @@
+{
+	"info": {
+		"_postman_id": "4108b453-6d23-4297-a785-92b204b71c64",
+		"name": "Finarkein",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "7899630"
+	},
+	"item": [
+		{
+			"name": "Nerv",
+			"item": [
+				{
+					"name": "New Run",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"res = pm.response.json();\r",
+									"pm.collectionVariables.set(\"current.runId\", res.requestId);\r",
+									"pm.collectionVariables.set(\"current.requestId\", res.requestId);\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{}",
+							"options": {
+								"raw": {
+									"headerFamily": "json",
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/:workspace/dp/nerv/:flowId",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								":workspace",
+								"dp",
+								"nerv",
+								":flowId"
+							],
+							"variable": [
+								{
+									"key": "workspace",
+									"value": "<string>"
+								},
+								{
+									"key": "flowId",
+									"value": "<string>"
+								}
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "New Run",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"customerMobileNumber\": \"9881908250\",\r\n    \"consentTemplateId\": \"f2f86ccb-60fe-4ec4-b58d-3f90a4559938\",\r\n    \"redirectUrl\": \"https://dev.fnrk.in/o/{{workspace}}/thank-you\",\r\n    \"webhook\": {\r\n        \"consentStatus\": \"https://webhook.site/e497c184-6f87-44b9-bfb0-a8767b17b920\",\r\n        \"dataPush\": \"https://webhook.site/e497c184-6f87-44b9-bfb0-a8767b17b920\",\r\n        \"flowRunStatus\": \"https://webhook.site/e497c184-6f87-44b9-bfb0-a8767b17b920\",\r\n        \"addOnParams\": {\r\n            \"application\": \"APP091234\",\r\n            \"customerSegment\": \"hni\",\r\n            \"other-key-1\": \"other-value-1\"\r\n        }\r\n    }\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{FACTORY_API}}/:workspace/dp/nerv",
+									"host": [
+										"{{FACTORY_API}}"
+									],
+									"path": [
+										":workspace",
+										"dp",
+										"nerv"
+									],
+									"variable": [
+										{
+											"key": "workspace",
+											"value": "{{workspace}}"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Date",
+									"value": "Wed, 25 Oct 2023 09:43:39 GMT"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Content-Length",
+									"value": "128"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Vary",
+									"value": "Origin"
+								},
+								{
+									"key": "Vary",
+									"value": "Access-Control-Request-Method"
+								},
+								{
+									"key": "Vary",
+									"value": "Access-Control-Request-Headers"
+								},
+								{
+									"key": "Vary",
+									"value": "Origin"
+								},
+								{
+									"key": "Vary",
+									"value": "Access-Control-Request-Method"
+								},
+								{
+									"key": "Vary",
+									"value": "Access-Control-Request-Headers"
+								},
+								{
+									"key": "Cache-Control",
+									"value": "no-cache, no-store, max-age=0, must-revalidate"
+								},
+								{
+									"key": "Pragma",
+									"value": "no-cache"
+								},
+								{
+									"key": "Expires",
+									"value": "0"
+								},
+								{
+									"key": "X-Content-Type-Options",
+									"value": "nosniff"
+								},
+								{
+									"key": "Strict-Transport-Security",
+									"value": "max-age=31536000 ; includeSubDomains"
+								},
+								{
+									"key": "X-Frame-Options",
+									"value": "DENY"
+								},
+								{
+									"key": "X-XSS-Protection",
+									"value": "1 ; mode=block"
+								},
+								{
+									"key": "Content-Security-Policy",
+									"value": "default-src 'none';"
+								},
+								{
+									"key": "Referrer-Policy",
+									"value": "no-referrer"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"requestId\": \"bf75efbb-5604-42d8-8163-f29cc7a0f5c6\",\n    \"redirectUrl\": \"https://dev.fnrk.in/v2/bf75efbb-5604-42d8-8163-f29cc7a0f5c6\"\n}"
+						}
+					]
+				},
+				{
+					"name": "New Recurring Run",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"res = pm.response.json();\r",
+									"pm.collectionVariables.set(\"current.runId\", res.requestId);\r",
+									"pm.collectionVariables.set(\"current.requestId\", res.requestId);\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{}",
+							"options": {
+								"raw": {
+									"headerFamily": "json",
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/:workspace/dp/nerv/fetch/:flowId",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								":workspace",
+								"dp",
+								"nerv",
+								"fetch",
+								":flowId"
+							],
+							"variable": [
+								{
+									"key": "workspace",
+									"value": "<string>"
+								},
+								{
+									"key": "flowId",
+									"value": "<string>"
+								}
+							]
+						},
+						"description": "# Input parameters\n\n| Parameter | Description | Type | M/O |\n| --- | --- | --- | --- |\n| `mobileNumber` | Mobile number of the customer (also used to send SMS with Anubhav link, if enabled) | String | M |\n| `applicationNo` | Your internal system application number (insurance policy identifier, loan application identifier etc.). This will also reflect on the Anubhav Service Console (dedicated UI to track all Anubhav flows). | String | M |\n| `emailId` | Email address of the customer (also used to send email with Anubhav link, if enabled) | String | O |\n\n# Webhooks\n\nAnubhav Financial insights endpoint currently supports one webhook:\n\n- Flow Run Status (key: `flowRunStatus`)\n    \n\n## Flow Run Status\n\nFired when the flow run status changes.  \nTo register a dynamic webhook, you can pass an additional parameter in the input as shown below:\n\n``` json\n\"webhook\": {\n  \"flowRunStatus\": \"https://webhook.site/9b888dac-ba87-429a-8de3-d6716ce113f9\",\n  \"addOnParams\": {\n    \"application\": \"APP091234\",\n    \"customerSegment\": \"hni\"\n  }\n}\n\n```\n\nwhere, `flowRunStatus` is the dedicated endpoint on your server as a webhook listener that can recieve POST requests on flow run status changes."
+					},
+					"response": [
+						{
+							"name": "New Recurring Run",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"consentHandle\": \"bf75efbb-5604-42d8-8163-f29cc7a0f5c6\",\r\n    \"webhook\": {\r\n        \"dataPush\": \"https://webhook.site/e497c184-6f87-44b9-bfb0-a8767b17b920\",\r\n        \"flowRunStatus\": \"https://webhook.site/e497c184-6f87-44b9-bfb0-a8767b17b920\",\r\n        \"addOnParams\": {\r\n            \"application\": \"APP091234\",\r\n            \"customerSegment\": \"hni\",\r\n            \"other-key-1\": \"other-value-1\"\r\n        }\r\n    }\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{FACTORY_API}}/:workspace/dp/nerv/fetch",
+									"host": [
+										"{{FACTORY_API}}"
+									],
+									"path": [
+										":workspace",
+										"dp",
+										"nerv",
+										"fetch"
+									],
+									"variable": [
+										{
+											"key": "workspace",
+											"value": "{{workspace}}"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Date",
+									"value": "Wed, 25 Oct 2023 09:46:10 GMT"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Content-Length",
+									"value": "52"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Vary",
+									"value": "Origin"
+								},
+								{
+									"key": "Vary",
+									"value": "Access-Control-Request-Method"
+								},
+								{
+									"key": "Vary",
+									"value": "Access-Control-Request-Headers"
+								},
+								{
+									"key": "Vary",
+									"value": "Origin"
+								},
+								{
+									"key": "Vary",
+									"value": "Access-Control-Request-Method"
+								},
+								{
+									"key": "Vary",
+									"value": "Access-Control-Request-Headers"
+								},
+								{
+									"key": "Cache-Control",
+									"value": "no-cache, no-store, max-age=0, must-revalidate"
+								},
+								{
+									"key": "Pragma",
+									"value": "no-cache"
+								},
+								{
+									"key": "Expires",
+									"value": "0"
+								},
+								{
+									"key": "X-Content-Type-Options",
+									"value": "nosniff"
+								},
+								{
+									"key": "Strict-Transport-Security",
+									"value": "max-age=31536000 ; includeSubDomains"
+								},
+								{
+									"key": "X-Frame-Options",
+									"value": "DENY"
+								},
+								{
+									"key": "X-XSS-Protection",
+									"value": "1 ; mode=block"
+								},
+								{
+									"key": "Content-Security-Policy",
+									"value": "default-src 'none';"
+								},
+								{
+									"key": "Referrer-Policy",
+									"value": "no-referrer"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"requestId\": \"f5796894-e342-49a5-927f-e9729ed50a29\"\n}"
+						}
+					]
+				},
+				{
+					"name": "Get Status",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/:workspace/dp/nerv/:flowId/:requestId/status",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								":workspace",
+								"dp",
+								"nerv",
+								":flowId",
+								":requestId",
+								"status"
+							],
+							"variable": [
+								{
+									"key": "workspace",
+									"value": "<string>"
+								},
+								{
+									"key": "flowId",
+									"value": "<string>"
+								},
+								{
+									"key": "requestId",
+									"value": "<string>"
+								}
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Get Status",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/:workspace/dp/nerv/:flowId/:requestId/status",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										":workspace",
+										"dp",
+										"nerv",
+										":flowId",
+										":requestId",
+										"status"
+									],
+									"variable": [
+										{
+											"key": "workspace"
+										},
+										{
+											"key": "flowId"
+										},
+										{
+											"key": "requestId"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Date",
+									"value": "<string>",
+									"description": {
+										"content": "",
+										"type": "text/plain"
+									}
+								},
+								{
+									"key": "Content-Length",
+									"value": "<integer>",
+									"description": {
+										"content": "",
+										"type": "text/plain"
+									}
+								},
+								{
+									"key": "Connection",
+									"value": "<string>",
+									"description": {
+										"content": "",
+										"type": "text/plain"
+									}
+								},
+								{
+									"key": "Vary",
+									"value": "<string>",
+									"description": {
+										"content": "",
+										"type": "text/plain"
+									}
+								},
+								{
+									"key": "Cache-Control",
+									"value": "<string>",
+									"description": {
+										"content": "",
+										"type": "text/plain"
+									}
+								},
+								{
+									"key": "Pragma",
+									"value": "<string>",
+									"description": {
+										"content": "",
+										"type": "text/plain"
+									}
+								},
+								{
+									"key": "Expires",
+									"value": "<integer>",
+									"description": {
+										"content": "",
+										"type": "text/plain"
+									}
+								},
+								{
+									"key": "X-Content-Type-Options",
+									"value": "<string>",
+									"description": {
+										"content": "",
+										"type": "text/plain"
+									}
+								},
+								{
+									"key": "Strict-Transport-Security",
+									"value": "<string>",
+									"description": {
+										"content": "",
+										"type": "text/plain"
+									}
+								},
+								{
+									"key": "X-Frame-Options",
+									"value": "<string>",
+									"description": {
+										"content": "",
+										"type": "text/plain"
+									}
+								},
+								{
+									"key": "X-XSS-Protection",
+									"value": "<integer>",
+									"description": {
+										"content": "",
+										"type": "text/plain"
+									}
+								},
+								{
+									"key": "Content-Security-Policy",
+									"value": "<string>",
+									"description": {
+										"content": "",
+										"type": "text/plain"
+									}
+								},
+								{
+									"key": "Referrer-Policy",
+									"value": "<string>",
+									"description": {
+										"content": "",
+										"type": "text/plain"
+									}
+								}
+							],
+							"cookie": [],
+							"body": "{\n  \"requestId\": \"<string>\",\n  \"state\": {\n    \"state\": \"<string>\",\n    \"consentStatus\": \"<string>\",\n    \"dataFetchStatus\": \"<string>\"\n  }\n}"
+						}
+					]
+				},
+				{
+					"name": "Get Result",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{}",
+							"options": {
+								"raw": {
+									"headerFamily": "json",
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/:workspace/dp/nerv/:flowId/:requestId/result",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								":workspace",
+								"dp",
+								"nerv",
+								":flowId",
+								":requestId",
+								"result"
+							],
+							"variable": [
+								{
+									"key": "workspace",
+									"value": "<string>"
+								},
+								{
+									"key": "flowId",
+									"value": "<string>"
+								},
+								{
+									"key": "requestId",
+									"value": "<string>"
+								}
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Get Result",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{}",
+									"options": {
+										"raw": {
+											"headerFamily": "json",
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/:workspace/dp/nerv/:flowId/:requestId/result",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										":workspace",
+										"dp",
+										"nerv",
+										":flowId",
+										":requestId",
+										"result"
+									],
+									"variable": [
+										{
+											"key": "workspace"
+										},
+										{
+											"key": "flowId"
+										},
+										{
+											"key": "requestId"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Date",
+									"value": "<string>",
+									"description": {
+										"content": "",
+										"type": "text/plain"
+									}
+								},
+								{
+									"key": "Content-Length",
+									"value": "<integer>",
+									"description": {
+										"content": "",
+										"type": "text/plain"
+									}
+								},
+								{
+									"key": "Connection",
+									"value": "<string>",
+									"description": {
+										"content": "",
+										"type": "text/plain"
+									}
+								},
+								{
+									"key": "Vary",
+									"value": "<string>",
+									"description": {
+										"content": "",
+										"type": "text/plain"
+									}
+								},
+								{
+									"key": "Cache-Control",
+									"value": "<string>",
+									"description": {
+										"content": "",
+										"type": "text/plain"
+									}
+								},
+								{
+									"key": "Pragma",
+									"value": "<string>",
+									"description": {
+										"content": "",
+										"type": "text/plain"
+									}
+								},
+								{
+									"key": "Expires",
+									"value": "<integer>",
+									"description": {
+										"content": "",
+										"type": "text/plain"
+									}
+								},
+								{
+									"key": "X-Content-Type-Options",
+									"value": "<string>",
+									"description": {
+										"content": "",
+										"type": "text/plain"
+									}
+								},
+								{
+									"key": "Strict-Transport-Security",
+									"value": "<string>",
+									"description": {
+										"content": "",
+										"type": "text/plain"
+									}
+								},
+								{
+									"key": "X-Frame-Options",
+									"value": "<string>",
+									"description": {
+										"content": "",
+										"type": "text/plain"
+									}
+								},
+								{
+									"key": "X-XSS-Protection",
+									"value": "<integer>",
+									"description": {
+										"content": "",
+										"type": "text/plain"
+									}
+								},
+								{
+									"key": "Content-Security-Policy",
+									"value": "<string>",
+									"description": {
+										"content": "",
+										"type": "text/plain"
+									}
+								},
+								{
+									"key": "Referrer-Policy",
+									"value": "<string>",
+									"description": {
+										"content": "",
+										"type": "text/plain"
+									}
+								}
+							],
+							"cookie": [],
+							"body": "{\n  \"requestId\": \"<string>\",\n  \"state\": {\n    \"state\": \"<string>\",\n    \"consentStatus\": \"<string>\",\n    \"dataFetchStatus\": \"<string>\"\n  },\n  \"data\": {\n    \"equities.transactions\": [\n      [\n        \"<string>\",\n        \"<string>\"\n      ],\n      [\n        \"<string>\",\n        \"<string>\"\n      ]\n    ],\n    \"deposit.holders\": [\n      [\n        \"<string>\",\n        \"<string>\"\n      ],\n      [\n        \"<string>\",\n        \"<string>\"\n      ]\n    ],\n    \"recurring_deposit.holders\": [\n      [\n        \"<string>\",\n        \"<string>\"\n      ],\n      [\n        \"<string>\",\n        \"<string>\"\n      ]\n    ],\n    \"nps.summary\": [\n      [\n        \"<string>\",\n        \"<string>\"\n      ],\n      [\n        \"<string>\",\n        \"<string>\"\n      ]\n    ],\n    \"deposit.statement.meta\": {\n      \"toTimestamp\": \"<integer>\",\n      \"fromTimestamp\": \"<integer>\",\n      \"fromDate\": \"<string>\",\n      \"noOfDays\": \"<integer>\",\n      \"toDate\": \"<string>\"\n    },\n    \"recurring_deposit.transactions\": [\n      [\n        \"<string>\",\n        \"<string>\"\n      ],\n      [\n        \"<string>\",\n        \"<string>\"\n      ]\n    ],\n    \"insurance_policies.riders\": [\n      [\n        \"<string>\",\n        \"<string>\"\n      ],\n      [\n        \"<string>\",\n        \"<string>\"\n      ]\n    ],\n    \"term_deposit.holders\": [\n      [\n        \"<string>\",\n        \"<string>\"\n      ],\n      [\n        \"<string>\",\n        \"<string>\"\n      ]\n    ],\n    \"insurance_policies.summary\": [\n      [\n        \"<string>\",\n        \"<string>\"\n      ],\n      [\n        \"<string>\",\n        \"<string>\"\n      ]\n    ],\n    \"deposit.transactions\": [\n      [\n        \"<string>\",\n        \"<string>\"\n      ],\n      [\n        \"<string>\",\n        \"<string>\"\n      ]\n    ],\n    \"equities.summary\": [\n      [\n        \"<string>\",\n        \"<string>\"\n      ],\n      [\n        \"<string>\",\n        \"<string>\"\n      ]\n    ],\n    \"term_deposit.summary\": [\n      [\n        \"<string>\",\n        \"<string>\"\n      ],\n      [\n        \"<string>\",\n        \"<string>\"\n      ]\n    ],\n    \"mutual_funds.transactions\": [\n      [\n        \"<string>\",\n        \"<string>\"\n      ],\n      [\n        \"<string>\",\n        \"<string>\"\n      ]\n    ],\n    \"nps.transactions\": [\n      [\n        \"<string>\",\n        \"<string>\"\n      ],\n      [\n        \"<string>\",\n        \"<string>\"\n      ]\n    ],\n    \"insurance_policies.holders\": [\n      [\n        \"<string>\",\n        \"<string>\"\n      ],\n      [\n        \"<string>\",\n        \"<string>\"\n      ]\n    ],\n    \"recurring_deposit.summary\": [\n      [\n        \"<string>\",\n        \"<string>\"\n      ],\n      [\n        \"<string>\",\n        \"<string>\"\n      ]\n    ],\n    \"term_deposit.transactions\": [\n      [\n        \"<string>\",\n        \"<string>\"\n      ],\n      [\n        \"<string>\",\n        \"<string>\"\n      ]\n    ],\n    \"mutual_funds.summary\": [\n      [\n        \"<string>\",\n        \"<string>\"\n      ],\n      [\n        \"<string>\",\n        \"<string>\"\n      ]\n    ],\n    \"nps.holders\": [\n      [\n        \"<string>\",\n        \"<string>\"\n      ],\n      [\n        \"<string>\",\n        \"<string>\"\n      ]\n    ],\n    \"deposit.transactions.meta\": {\n      \"accountWiseMeta\": [\n        {\n          \"noOfTransactions\": \"<integer>\",\n          \"toTimestamp\": \"<integer>\",\n          \"maskedAccNumber\": \"<string>\",\n          \"fromTimestamp\": \"<integer>\",\n          \"fromDate\": \"<string>\",\n          \"noOfDays\": \"<integer>\",\n          \"toDate\": \"<string>\",\n          \"noOfMonths\": \"<integer>\"\n        },\n        {\n          \"noOfTransactions\": \"<integer>\",\n          \"toTimestamp\": \"<integer>\",\n          \"maskedAccNumber\": \"<string>\",\n          \"fromTimestamp\": \"<integer>\",\n          \"fromDate\": \"<string>\",\n          \"noOfDays\": \"<integer>\",\n          \"toDate\": \"<string>\",\n          \"noOfMonths\": \"<integer>\"\n        }\n      ],\n      \"noOfTransactions\": \"<integer>\",\n      \"toTimestamp\": \"<integer>\",\n      \"fromTimestamp\": \"<integer>\",\n      \"fromDate\": \"<string>\",\n      \"noOfDays\": \"<integer>\",\n      \"toDate\": \"<string>\",\n      \"noOfMonths\": \"<integer>\"\n    },\n    \"insurance_policies.transactions\": [\n      [\n        \"<string>\",\n        \"<string>\"\n      ],\n      [\n        \"<string>\",\n        \"<string>\"\n      ]\n    ],\n    \"equities.holders\": [\n      [\n        \"<string>\",\n        \"<string>\"\n      ],\n      [\n        \"<string>\",\n        \"<string>\"\n      ]\n    ],\n    \"mutual_funds.holders\": [\n      [\n        \"<string>\",\n        \"<string>\"\n      ],\n      [\n        \"<string>\",\n        \"<string>\"\n      ]\n    ],\n    \"dataReportDetails\": {\n      \"downloadUrl\": \"<string>\",\n      \"downloadUrlExpirationInSeconds\": \"<integer>\"\n    },\n    \"deposit.summary\": [\n      [\n        \"<string>\",\n        \"<string>\"\n      ],\n      [\n        \"<string>\",\n        \"<string>\"\n      ]\n    ]\n  },\n  \"addOnParams\": {\n    \"application\": \"<string>\",\n    \"customerSegment\": \"<string>\",\n    \"other-key-1\": \"<string>\"\n  }\n}"
+						}
+					]
+				}
+			],
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"packages": {},
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"packages": {},
+						"exec": [
+							""
+						]
+					}
+				}
+			]
+		},
+		{
+			"name": "Consent templates",
+			"item": [
+				{
+					"name": "Browse consent templates",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/:workspace/consent/aa/template",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								":workspace",
+								"consent",
+								"aa",
+								"template"
+							],
+							"variable": [
+								{
+									"key": "workspace",
+									"value": "false"
+								}
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Browse consent templates",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/:workspace/consent/aa/template",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										":workspace",
+										"consent",
+										"aa",
+										"template"
+									],
+									"variable": [
+										{
+											"key": "workspace"
+										}
+									]
+								}
+							},
+							"status": "Not Found",
+							"code": 404,
+							"_postman_previewlanguage": "Text",
+							"header": [
+								{
+									"key": "Date",
+									"value": "<string>",
+									"description": {
+										"content": "",
+										"type": "text/plain"
+									}
+								},
+								{
+									"key": "Content-Length",
+									"value": "<integer>",
+									"description": {
+										"content": "",
+										"type": "text/plain"
+									}
+								},
+								{
+									"key": "Connection",
+									"value": "<string>",
+									"description": {
+										"content": "",
+										"type": "text/plain"
+									}
+								},
+								{
+									"key": "Vary",
+									"value": "<string>",
+									"description": {
+										"content": "",
+										"type": "text/plain"
+									}
+								},
+								{
+									"key": "Server",
+									"value": "<string>",
+									"description": {
+										"content": "",
+										"type": "text/plain"
+									}
+								},
+								{
+									"key": "Cache-Control",
+									"value": "<string>",
+									"description": {
+										"content": "",
+										"type": "text/plain"
+									}
+								},
+								{
+									"key": "Pragma",
+									"value": "<string>",
+									"description": {
+										"content": "",
+										"type": "text/plain"
+									}
+								},
+								{
+									"key": "Expires",
+									"value": "<integer>",
+									"description": {
+										"content": "",
+										"type": "text/plain"
+									}
+								},
+								{
+									"key": "X-Content-Type-Options",
+									"value": "<string>",
+									"description": {
+										"content": "",
+										"type": "text/plain"
+									}
+								},
+								{
+									"key": "Strict-Transport-Security",
+									"value": "<string>",
+									"description": {
+										"content": "",
+										"type": "text/plain"
+									}
+								},
+								{
+									"key": "X-Frame-Options",
+									"value": "<string>",
+									"description": {
+										"content": "",
+										"type": "text/plain"
+									}
+								},
+								{
+									"key": "X-XSS-Protection",
+									"value": "<integer>",
+									"description": {
+										"content": "",
+										"type": "text/plain"
+									}
+								},
+								{
+									"key": "Content-Security-Policy",
+									"value": "<string>",
+									"description": {
+										"content": "",
+										"type": "text/plain"
+									}
+								},
+								{
+									"key": "Referrer-Policy",
+									"value": "<string>",
+									"description": {
+										"content": "",
+										"type": "text/plain"
+									}
+								}
+							],
+							"cookie": [],
+							"body": null
+						}
+					]
+				},
+				{
+					"name": "Get consent template by identifier",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/:workspace/consent/aa/template/:id",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								":workspace",
+								"consent",
+								"aa",
+								"template",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "workspace",
+									"value": "<string>"
+								},
+								{
+									"key": "id",
+									"value": "<string>",
+									"description": "Identifier for the template"
+								}
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Get consent template by identifier",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/:workspace/consent/aa/template/:id",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										":workspace",
+										"consent",
+										"aa",
+										"template",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "workspace"
+										},
+										{
+											"key": "id"
+										}
+									]
+								}
+							},
+							"status": "Not Found",
+							"code": 404,
+							"_postman_previewlanguage": "Text",
+							"header": [
+								{
+									"key": "Date",
+									"value": "<string>",
+									"description": {
+										"content": "",
+										"type": "text/plain"
+									}
+								},
+								{
+									"key": "Content-Length",
+									"value": "<integer>",
+									"description": {
+										"content": "",
+										"type": "text/plain"
+									}
+								},
+								{
+									"key": "Connection",
+									"value": "<string>",
+									"description": {
+										"content": "",
+										"type": "text/plain"
+									}
+								},
+								{
+									"key": "Vary",
+									"value": "<string>",
+									"description": {
+										"content": "",
+										"type": "text/plain"
+									}
+								},
+								{
+									"key": "Server",
+									"value": "<string>",
+									"description": {
+										"content": "",
+										"type": "text/plain"
+									}
+								},
+								{
+									"key": "Cache-Control",
+									"value": "<string>",
+									"description": {
+										"content": "",
+										"type": "text/plain"
+									}
+								},
+								{
+									"key": "Pragma",
+									"value": "<string>",
+									"description": {
+										"content": "",
+										"type": "text/plain"
+									}
+								},
+								{
+									"key": "Expires",
+									"value": "<integer>",
+									"description": {
+										"content": "",
+										"type": "text/plain"
+									}
+								},
+								{
+									"key": "X-Content-Type-Options",
+									"value": "<string>",
+									"description": {
+										"content": "",
+										"type": "text/plain"
+									}
+								},
+								{
+									"key": "Strict-Transport-Security",
+									"value": "<string>",
+									"description": {
+										"content": "",
+										"type": "text/plain"
+									}
+								},
+								{
+									"key": "X-Frame-Options",
+									"value": "<string>",
+									"description": {
+										"content": "",
+										"type": "text/plain"
+									}
+								},
+								{
+									"key": "X-XSS-Protection",
+									"value": "<integer>",
+									"description": {
+										"content": "",
+										"type": "text/plain"
+									}
+								},
+								{
+									"key": "Content-Security-Policy",
+									"value": "<string>",
+									"description": {
+										"content": "",
+										"type": "text/plain"
+									}
+								},
+								{
+									"key": "Referrer-Policy",
+									"value": "<string>",
+									"description": {
+										"content": "",
+										"type": "text/plain"
+									}
+								}
+							],
+							"cookie": [],
+							"body": null
+						}
+					]
+				},
+				{
+					"name": "Create new Consent Template",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{}",
+							"options": {
+								"raw": {
+									"headerFamily": "json",
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/:workspace/consent/aa/template",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								":workspace",
+								"consent",
+								"aa",
+								"template"
+							],
+							"variable": [
+								{
+									"key": "workspace",
+									"value": "false"
+								}
+							]
+						},
+						"description": "| **Parameter Name** | **Description** |\n| --- | --- |\n| consentStartOffset | Example: `1m` — 1 minute in future when consent is raised.  <br>  <br>If consent is raised at `2021-11-16T08:57:11.111Z` then **consentStart** will be set to: `2021-11-16T09:57:11.111Z` |\n| consentExpiryDuration | Example: `1d` — 1 day from **consentStart**.  <br>  <br>If **consentStart** is `2021-11-16T09:57:11.111Z`, then **consentExpiry** will be set to: `2021-11-17T09:57:11.111Z` |\n| consentMode | Same as standard API.  <br>One of: VIEW / STORE / QUERY / STREAM |\n| consentTypes | Any or all of: PROFILE / SUMMARY / TRANSACTIONS |\n| fiTypes | FITypes names should be as defined in the AA Technical Specification. |\n| purposeCode | One of: 101 / 102 / 103 / 104 / 105 |\n| fetchType | One of: ONETIME / PERIODIC |\n| consentTemplateDataRange | See following table for more details. |\n| frequency | Frequency information for periodic (\\`fetchType = PERIODIC\\`) information access.  <br>  <br>Example: `6h` — means **6** FI request per hour.  <br>  <br>Supported Units: **h** / **d** / **M** / **y** / **i** <br>(Refer note about Time notations at the bottom) |\n| dataLife | How long to store data when `consentMode = STORE`.  <br>  <br>Supported Units: **d** / **M** / **y** / **i** <br>(Refer note about Time notations at the bottom) |\n\n## **Consent Template Data Range**\n\n| **Data Range****Type Enumerations** | **Example (s)** | Description |\n| --- | --- | --- |\n| FINANCIAL_YEAR | For current FY, use:  <br>`{ \"type\": \"FINANCIAL_YEAR\", \"year\": \"0\" }`  <br>  <br>For current and last 1 FY, use:  <br>`{ \"type\": \"FINANCIAL_YEAR\", \"year\": \"1\" }` | If consent is raised on `2021-11-16` then date range generated for consent is:  <br>  <br>`{ \"from\": \"2021-04-01T00:00:00.000Z\", \"to\": \"2022-03-31T23:59:59.999Z\" }` |\n| FIXED | `{ \"type\": \"FIXED\", \"from\": \"2020-04-01T00:00:00.000Z\", \"to\": \"2022-03-31T23:59:59.999Z\" }` | Values specified in the consent Template will be considered. |\n| SAME_AS_CONSENT | `{ \"type\": \"SAME_AS_CONSENT\" }` | If **consentStart**: `2021-11-16T09:57:11.111Z` and **consentExpiry**: `2021-11-17T09:57:11.111Z`, then  <br>data range will be as follows:  <br>  <br>`{ \"from\": \"2021-11-16T09:57:11.111Z\", \"to\": \"2021-11-17T09:57:11.111Z\" }` |\n| CONSENT_START_RELATIVE | Date range will be relative to resolved`consentStart` and `consentEnd`  <br>  <br>`{ \"type\": \"CONSENT_START_RELATIVE\", \"from\": \"-6M\", \"to\": \"0m\" }` | If **consentStart**: `2021-11-16T18:47:08.235Z` and **consentExpiry**: `2021-11-17T18:47:08.235Z`, then data range will be as follows:  <br>  <br>`{ \"from\": \"2021-05-16T18:47:08.235\", \"to\": \"2all 1-11-16T18:47:08.235\" }` |\n\n### Time/Duration Notations\n\nThe time/duration notations expected in the Consent template definition use the follow notations.\n\n| **Notation** | **Time Unit** |\n| --- | --- |\n| s | Seconds |\n| m | Minute |\n| h | Hour |\n| d | Day |\n| w | Week |\n| M | Month |\n| y | Year |\n| i | Infinite^ |\n\n**^** Only supported in some fields: dataExpiry and frequency."
+					},
+					"response": [
+						{
+							"name": "Create new Consent Template",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{}",
+									"options": {
+										"raw": {
+											"headerFamily": "json",
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/:workspace/consent/aa/template",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										":workspace",
+										"consent",
+										"aa",
+										"template"
+									],
+									"variable": [
+										{
+											"key": "workspace"
+										}
+									]
+								}
+							},
+							"status": "Not Found",
+							"code": 404,
+							"_postman_previewlanguage": "Text",
+							"header": [
+								{
+									"key": "Date",
+									"value": "<string>",
+									"description": {
+										"content": "",
+										"type": "text/plain"
+									}
+								},
+								{
+									"key": "Content-Length",
+									"value": "<integer>",
+									"description": {
+										"content": "",
+										"type": "text/plain"
+									}
+								},
+								{
+									"key": "Connection",
+									"value": "<string>",
+									"description": {
+										"content": "",
+										"type": "text/plain"
+									}
+								},
+								{
+									"key": "Vary",
+									"value": "<string>",
+									"description": {
+										"content": "",
+										"type": "text/plain"
+									}
+								},
+								{
+									"key": "Server",
+									"value": "<string>",
+									"description": {
+										"content": "",
+										"type": "text/plain"
+									}
+								},
+								{
+									"key": "Cache-Control",
+									"value": "<string>",
+									"description": {
+										"content": "",
+										"type": "text/plain"
+									}
+								},
+								{
+									"key": "Pragma",
+									"value": "<string>",
+									"description": {
+										"content": "",
+										"type": "text/plain"
+									}
+								},
+								{
+									"key": "Expires",
+									"value": "<integer>",
+									"description": {
+										"content": "",
+										"type": "text/plain"
+									}
+								},
+								{
+									"key": "X-Content-Type-Options",
+									"value": "<string>",
+									"description": {
+										"content": "",
+										"type": "text/plain"
+									}
+								},
+								{
+									"key": "Strict-Transport-Security",
+									"value": "<string>",
+									"description": {
+										"content": "",
+										"type": "text/plain"
+									}
+								},
+								{
+									"key": "X-Frame-Options",
+									"value": "<string>",
+									"description": {
+										"content": "",
+										"type": "text/plain"
+									}
+								},
+								{
+									"key": "X-XSS-Protection",
+									"value": "<integer>",
+									"description": {
+										"content": "",
+										"type": "text/plain"
+									}
+								},
+								{
+									"key": "Content-Security-Policy",
+									"value": "<string>",
+									"description": {
+										"content": "",
+										"type": "text/plain"
+									}
+								},
+								{
+									"key": "Referrer-Policy",
+									"value": "<string>",
+									"description": {
+										"content": "",
+										"type": "text/plain"
+									}
+								}
+							],
+							"cookie": [],
+							"body": null
+						}
+					]
+				}
+			],
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"packages": {},
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"packages": {},
+						"exec": [
+							""
+						]
+					}
+				}
+			]
+		},
+		{
+			"name": "Institutions",
+			"item": [
+				{
+					"name": "Get FIPs on AA network",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/:workspace/institutions/aa/fip",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								":workspace",
+								"institutions",
+								"aa",
+								"fip"
+							],
+							"variable": [
+								{
+									"key": "workspace",
+									"value": "false"
+								}
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Factory / Institutions / FIPs",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/:workspace/institutions/aa/fip",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										":workspace",
+										"institutions",
+										"aa",
+										"fip"
+									],
+									"variable": [
+										{
+											"key": "workspace"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Date",
+									"value": "<string>",
+									"description": {
+										"content": "",
+										"type": "text/plain"
+									}
+								},
+								{
+									"key": "Content-Length",
+									"value": "<string>",
+									"description": {
+										"content": "",
+										"type": "text/plain"
+									}
+								},
+								{
+									"key": "Connection",
+									"value": "<string>",
+									"description": {
+										"content": "",
+										"type": "text/plain"
+									}
+								},
+								{
+									"key": "Vary",
+									"value": "<string>",
+									"description": {
+										"content": "",
+										"type": "text/plain"
+									}
+								},
+								{
+									"key": "Cache-Control",
+									"value": "<string>",
+									"description": {
+										"content": "",
+										"type": "text/plain"
+									}
+								},
+								{
+									"key": "Pragma",
+									"value": "<string>",
+									"description": {
+										"content": "",
+										"type": "text/plain"
+									}
+								},
+								{
+									"key": "Expires",
+									"value": "<string>",
+									"description": {
+										"content": "",
+										"type": "text/plain"
+									}
+								},
+								{
+									"key": "X-Content-Type-Options",
+									"value": "<string>",
+									"description": {
+										"content": "",
+										"type": "text/plain"
+									}
+								},
+								{
+									"key": "Strict-Transport-Security",
+									"value": "<string>",
+									"description": {
+										"content": "",
+										"type": "text/plain"
+									}
+								},
+								{
+									"key": "X-Frame-Options",
+									"value": "<string>",
+									"description": {
+										"content": "",
+										"type": "text/plain"
+									}
+								},
+								{
+									"key": "X-XSS-Protection",
+									"value": "<string>",
+									"description": {
+										"content": "",
+										"type": "text/plain"
+									}
+								},
+								{
+									"key": "Content-Security-Policy",
+									"value": "<string>",
+									"description": {
+										"content": "",
+										"type": "text/plain"
+									}
+								},
+								{
+									"key": "Referrer-Policy",
+									"value": "<string>",
+									"description": {
+										"content": "",
+										"type": "text/plain"
+									}
+								}
+							],
+							"cookie": [],
+							"body": "{\n  \"content\": [\n    {\n      \"version\": \"<string>\",\n      \"name\": \"<string>\",\n      \"id\": \"<string>\",\n      \"fiTypes\": [\n        \"<string>\",\n        \"<string>\"\n      ]\n    },\n    {\n      \"version\": \"<string>\",\n      \"name\": \"<string>\",\n      \"id\": \"<string>\",\n      \"fiTypes\": [\n        \"<string>\",\n        \"<string>\"\n      ]\n    }\n  ],\n  \"pageable\": {\n    \"sort\": {\n      \"sorted\": \"<string>\",\n      \"empty\": \"<string>\",\n      \"unsorted\": \"<string>\"\n    },\n    \"pageSize\": \"<string>\",\n    \"pageNumber\": \"<string>\",\n    \"offset\": \"<string>\",\n    \"paged\": \"<string>\",\n    \"unpaged\": \"<string>\"\n  },\n  \"totalPages\": \"<string>\",\n  \"totalElements\": \"<string>\",\n  \"last\": \"<string>\",\n  \"number\": \"<string>\",\n  \"size\": \"<string>\",\n  \"numberOfElements\": \"<string>\",\n  \"sort\": {\n    \"sorted\": \"<string>\",\n    \"empty\": \"<string>\",\n    \"unsorted\": \"<string>\"\n  },\n  \"first\": \"<string>\",\n  \"empty\": \"<string>\"\n}"
+						}
+					]
+				},
+				{
+					"name": "Get FIP Health Status",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/:workspace/institutions/aa/fip/status",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								":workspace",
+								"institutions",
+								"aa",
+								"fip",
+								"status"
+							],
+							"variable": [
+								{
+									"key": "workspace",
+									"value": "<string>"
+								}
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Get FIP Status-detailed",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "?detailed=true",
+									"query": [
+										{
+											"key": "detailed",
+											"value": "true"
+										}
+									]
+								}
+							},
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json",
+									"description": {
+										"content": "",
+										"type": "text/plain"
+									}
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"fipHealthStats\": [\n        {\n            \"fip\": \"sbi-fip\",\n            \"journeyMetric\": {\n                \"UserDiscoveryResponse\": 100,\n                \"ConsentPostResponse\": 100\n            },\n            \"dataFetchSuccessRate\": [\n                {\n                    \"duration\": \"PT30M\",\n                    \"value\": 35.44\n                },\n                {\n                    \"duration\": \"PT60M\",\n                    \"value\": 35.44\n                },\n                {\n                    \"duration\": \"PT90M\",\n                    \"value\": 35.44\n                }\n            ],\n            \"cause\": \"performance\",\n            \"preferredAction\": \"disable\"\n        },\n        {\n            \"fip\": \"ICICI-FIP\",\n            \"journeyMetric\": {\n                \"UserDiscoveryResponse\": 100,\n                \"ConsentPostResponse\": 100\n            },\n            \"dataFetchSuccessRate\": [\n                {\n                    \"duration\": \"PT30M\",\n                    \"value\": 90\n                },\n                {\n                    \"duration\": \"PT60M\",\n                    \"value\": 90\n                },\n                {\n                    \"duration\": \"PT90M\",\n                    \"value\": 90\n                }\n            ],\n            \"cause\": \"auto\",\n            \"preferredAction\": \"enable\"\n        },\n        {\n            \"fip\": \"HDFC-FIP\",\n            \"journeyMetric\": {\n                \"UserDiscoveryResponse\": 100,\n                \"ConsentPostResponse\": 100\n            },\n            \"dataFetchSuccessRate\": [\n                {\n                    \"duration\": \"PT30M\",\n                    \"value\": 35.44\n                },\n                {\n                    \"duration\": \"PT60M\",\n                    \"value\": 35.44\n                }\n            ],\n            \"cause\": \"performance\",\n            \"preferredAction\": \"enable\"\n        },\n        {\n            \"fip\": \"kotak-fip\",\n            \"cause\": \"admin\",\n            \"preferredAction\": \"disable\"\n        },\n        {\n            \"fip\": \"UBI-FIP\",\n            \"journeyMetric\":  {\n                \"ConsentPostResponse\": 100\n            },\n            \"dataFetchSuccessRate\": [\n                {\n                    \"duration\": \"PT30M\",\n                    \"value\": 90\n                },\n                {\n                    \"duration\": \"PT60M\",\n                    \"value\": 90\n                },\n                {\n                    \"duration\": \"PT90M\",\n                    \"value\": 90\n                }\n            ],\n            \"cause\": \"auto\",\n            \"preferredAction\": \"enable\"\n        },\n        {\n            \"fip\": \"IBF-FIP\",\n            \"dataFetchSuccessRate\": [\n                {\n                    \"duration\": \"PT30M\",\n                    \"value\": 90\n                },\n                {\n                    \"duration\": \"PT60M\",\n                    \"value\": 90\n                },\n                {\n                    \"duration\": \"PT90M\",\n                    \"value\": 90\n                }\n            ],\n            \"cause\": \"auto\",\n            \"preferredAction\": \"enable\"\n        },\n        {\n            \"fip\": \"FEDRLB-FIP\",\n            \"journeyMetric\": {\n                \"UserDiscoveryResponse\": 100,\n                \"ConsentPostResponse\": 100\n            },\n            \"dataFetchSuccessRate\": [\n                {\n                    \"duration\": \"PT30M\",\n                    \"value\": 90\n                },\n                {\n                    \"duration\": \"PT60M\",\n                    \"value\": 90\n                },\n                {\n                    \"duration\": \"PT90M\",\n                    \"value\": 90\n                }\n            ],\n            \"cause\": \"auto\",\n            \"preferredAction\": \"enable\"\n        }\n    ]\n}"
+						},
+						{
+							"name": "Get FIP Status",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "?detailed=false",
+									"query": [
+										{
+											"key": "detailed",
+											"value": "false"
+										}
+									]
+								}
+							},
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json",
+									"description": {
+										"content": "",
+										"type": "text/plain"
+									}
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"fipHealthStats\": [\n        {\n            \"fip\": \"sbi-fip\",\n            \"cause\": \"performance\",\n            \"preferredAction\": \"disable\"\n        },\n        {\n            \"fip\": \"ICICI-FIP\",\n            \"cause\": \"auto\",\n            \"preferredAction\": \"enable\"\n        },\n        {\n            \"fip\": \"HDFC-FIP\",\n            \"cause\": \"performance\",\n            \"preferredAction\": \"enable\"\n        },\n        {\n            \"fip\": \"kotak-fip\",\n            \"cause\": \"admin\",\n            \"preferredAction\": \"disable\"\n        },\n        {\n            \"fip\": \"UBI-FIP\",\n            \"cause\": \"auto\",\n            \"preferredAction\": \"enable\"\n        },\n        {\n            \"fip\": \"IBF-FIP\",\n            \"cause\": \"auto\",\n            \"preferredAction\": \"enable\"\n        },\n        {\n            \"fip\": \"FEDRLB-FIP\",\n            \"cause\": \"auto\",\n            \"preferredAction\": \"enable\"\n        }\n    ]\n}"
+						},
+						{
+							"name": "Get FIP Status-detailed",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/:workspace/institutions/aa/fip/status",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										":workspace",
+										"institutions",
+										"aa",
+										"fip",
+										"status"
+									],
+									"variable": [
+										{
+											"key": "workspace"
+										}
+									]
+								}
+							},
+							"status": "Internal Server Error",
+							"code": 500,
+							"_postman_previewlanguage": "Text",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n  \"fipHealthStats\": [\n    {\n      \"fip\": \"<string>\",\n      \"journeyMetric\": {\n        \"UserDiscoveryResponse\": \"<integer>\",\n        \"ConsentPostResponse\": \"<integer>\"\n      },\n      \"dataFetchSuccessRate\": [\n        {\n          \"duration\": \"<string>\",\n          \"value\": \"<number>\"\n        },\n        {\n          \"duration\": \"<string>\",\n          \"value\": \"<number>\"\n        }\n      ],\n      \"cause\": \"<string>\",\n      \"preferredAction\": \"<string>\"\n    },\n    {\n      \"fip\": \"<string>\",\n      \"journeyMetric\": {\n        \"UserDiscoveryResponse\": \"<integer>\",\n        \"ConsentPostResponse\": \"<integer>\"\n      },\n      \"dataFetchSuccessRate\": [\n        {\n          \"duration\": \"<string>\",\n          \"value\": \"<number>\"\n        },\n        {\n          \"duration\": \"<string>\",\n          \"value\": \"<number>\"\n        }\n      ],\n      \"cause\": \"<string>\",\n      \"preferredAction\": \"<string>\"\n    }\n  ]\n}"
+						}
+					]
+				},
+				{
+					"name": "Update (enable/disable) FIP(s) status",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"fips\": [\n    {\n      \"fipId\": \"<string>\",\n      \"enabled\": \"<string>\"\n    },\n    {\n      \"fipId\": \"<string>\",\n      \"enabled\": \"<string>\"\n    }\n  ]\n}",
+							"options": {
+								"raw": {
+									"headerFamily": "json",
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/:workspace/institutions/aa/fip",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								":workspace",
+								"institutions",
+								"aa",
+								"fip"
+							],
+							"variable": [
+								{
+									"key": "workspace",
+									"value": "false"
+								}
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Update FIP",
+							"originalRequest": {
+								"method": "PATCH",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"fips\": [\n    {\n      \"fipId\": \"<string>\",\n      \"enabled\": \"<boolean>\"\n    },\n    {\n      \"fipId\": \"<string>\",\n      \"enabled\": \"<boolean>\"\n    }\n  ]\n}",
+									"options": {
+										"raw": {
+											"headerFamily": "json",
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/:workspace/institutions/aa/fip",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										":workspace",
+										"institutions",
+										"aa",
+										"fip"
+									],
+									"variable": [
+										{
+											"key": "workspace"
+										}
+									]
+								}
+							},
+							"status": "Accepted",
+							"code": 202,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Date",
+									"value": "<string>",
+									"description": {
+										"content": "",
+										"type": "text/plain"
+									}
+								},
+								{
+									"key": "Content-Length",
+									"value": "<integer>",
+									"description": {
+										"content": "",
+										"type": "text/plain"
+									}
+								},
+								{
+									"key": "Connection",
+									"value": "<string>",
+									"description": {
+										"content": "",
+										"type": "text/plain"
+									}
+								},
+								{
+									"key": "Vary",
+									"value": "<string>",
+									"description": {
+										"content": "",
+										"type": "text/plain"
+									}
+								},
+								{
+									"key": "Cache-Control",
+									"value": "<string>",
+									"description": {
+										"content": "",
+										"type": "text/plain"
+									}
+								},
+								{
+									"key": "Pragma",
+									"value": "<string>",
+									"description": {
+										"content": "",
+										"type": "text/plain"
+									}
+								},
+								{
+									"key": "Expires",
+									"value": "<integer>",
+									"description": {
+										"content": "",
+										"type": "text/plain"
+									}
+								},
+								{
+									"key": "X-Content-Type-Options",
+									"value": "<string>",
+									"description": {
+										"content": "",
+										"type": "text/plain"
+									}
+								},
+								{
+									"key": "Strict-Transport-Security",
+									"value": "<string>",
+									"description": {
+										"content": "",
+										"type": "text/plain"
+									}
+								},
+								{
+									"key": "X-Frame-Options",
+									"value": "<string>",
+									"description": {
+										"content": "",
+										"type": "text/plain"
+									}
+								},
+								{
+									"key": "X-XSS-Protection",
+									"value": "<integer>",
+									"description": {
+										"content": "",
+										"type": "text/plain"
+									}
+								},
+								{
+									"key": "Content-Security-Policy",
+									"value": "<string>",
+									"description": {
+										"content": "",
+										"type": "text/plain"
+									}
+								},
+								{
+									"key": "Referrer-Policy",
+									"value": "<string>",
+									"description": {
+										"content": "",
+										"type": "text/plain"
+									}
+								}
+							],
+							"cookie": [],
+							"body": "{\n  \"txnId\": \"<string>\",\n  \"timestamp\": \"<dateTime>\"\n}"
+						},
+						{
+							"name": "Update FIP",
+							"originalRequest": {
+								"method": "PATCH",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"fips\": [\n    {\n      \"fipId\": \"<string>\",\n      \"enabled\": \"<string>\"\n    },\n    {\n      \"fipId\": \"<string>\",\n      \"enabled\": \"<string>\"\n    }\n  ]\n}",
+									"options": {
+										"raw": {
+											"headerFamily": "json",
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/:workspace/institutions/aa/fip",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										":workspace",
+										"institutions",
+										"aa",
+										"fip"
+									],
+									"variable": [
+										{
+											"key": "workspace"
+										}
+									]
+								}
+							},
+							"status": "Accepted",
+							"code": 202,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Date",
+									"value": "<string>",
+									"description": {
+										"content": "",
+										"type": "text/plain"
+									}
+								},
+								{
+									"key": "Content-Length",
+									"value": "<string>",
+									"description": {
+										"content": "",
+										"type": "text/plain"
+									}
+								},
+								{
+									"key": "Connection",
+									"value": "<string>",
+									"description": {
+										"content": "",
+										"type": "text/plain"
+									}
+								},
+								{
+									"key": "Vary",
+									"value": "<string>",
+									"description": {
+										"content": "",
+										"type": "text/plain"
+									}
+								},
+								{
+									"key": "Cache-Control",
+									"value": "<string>",
+									"description": {
+										"content": "",
+										"type": "text/plain"
+									}
+								},
+								{
+									"key": "Pragma",
+									"value": "<string>",
+									"description": {
+										"content": "",
+										"type": "text/plain"
+									}
+								},
+								{
+									"key": "Expires",
+									"value": "<string>",
+									"description": {
+										"content": "",
+										"type": "text/plain"
+									}
+								},
+								{
+									"key": "X-Content-Type-Options",
+									"value": "<string>",
+									"description": {
+										"content": "",
+										"type": "text/plain"
+									}
+								},
+								{
+									"key": "Strict-Transport-Security",
+									"value": "<string>",
+									"description": {
+										"content": "",
+										"type": "text/plain"
+									}
+								},
+								{
+									"key": "X-Frame-Options",
+									"value": "<string>",
+									"description": {
+										"content": "",
+										"type": "text/plain"
+									}
+								},
+								{
+									"key": "X-XSS-Protection",
+									"value": "<string>",
+									"description": {
+										"content": "",
+										"type": "text/plain"
+									}
+								},
+								{
+									"key": "Content-Security-Policy",
+									"value": "<string>",
+									"description": {
+										"content": "",
+										"type": "text/plain"
+									}
+								},
+								{
+									"key": "Referrer-Policy",
+									"value": "<string>",
+									"description": {
+										"content": "",
+										"type": "text/plain"
+									}
+								}
+							],
+							"cookie": [],
+							"body": "{\n  \"txnId\": \"<string>\",\n  \"timestamp\": \"<string>\"\n}"
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "Generate Access token",
+			"protocolProfileBehavior": {
+				"disabledSystemHeaders": {}
+			},
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "{{AUTH_CLIENT_SECRET}}",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "{{AUTH_CLIENT_ID}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"disabled": true
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "grant_type",
+							"value": "client_credentials"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{AUTH_TOKEN_URL}}",
+					"host": [
+						"{{AUTH_TOKEN_URL}}"
+					]
+				},
+				"description": "# Generate OAuth 2.0 Access Token\n\n## Overview\nThis endpoint generates an OAuth 2.0 access token using the **Client Credentials Grant** flow. The access token is required to authenticate subsequent API requests to protected resources.\n\n## Authentication Method\n**OAuth 2.0 - Client Credentials Grant**\n\nThis grant type is used for server-to-server authentication where the application authenticates itself using its client credentials (client ID and client secret) rather than on behalf of a specific user.\n\n## Required Variables\nBefore using this request, ensure the following environment or collection variables are configured:\n\n- **`AUTH_TOKEN_URL`** - The authorization server's token endpoint URL\n- **`AUTH_CLIENT_ID`** - Your application's client identifier (provided by the authorization server)\n- **`AUTH_CLIENT_SECRET`** - Your application's client secret (provided by the authorization server)\n\n## Request Parameters\n\n### Body Parameters (x-www-form-urlencoded)\n- **`grant_type`** (required): Must be set to `client_credentials` to indicate the OAuth 2.0 grant type being used\n\n### Headers\n- **`Accept`**: `application/json` - Indicates the client expects a JSON response\n- **`Content-Type`**: `application/json` - Specifies the content type of the request\n\n## Response Format\nThe endpoint returns a JSON object containing:\n\n```json\n{\n  \"access_token\": \"eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwi...\",\n  \"expires_in\": 86400,\n  \"refresh_expires_in\": 0,\n  \"token_type\": \"Bearer\",\n  \"not-before-policy\": 0,\n  \"scope\": \"email profile\"\n}\n```\n\n### Response Fields\n- **`access_token`**: The JWT (JSON Web Token) to be used for authenticating API requests. Include this token in the `Authorization` header as `Bearer {access_token}` for subsequent requests.\n- **`expires_in`**: Token validity duration in seconds (86400 seconds = 24 hours)\n- **`token_type`**: Always \"Bearer\" - indicates how the token should be used\n- **`scope`**: The permissions granted to this token (e.g., \"email profile\")\n- **`refresh_expires_in`**: Refresh token expiration (0 indicates no refresh token)\n- **`not-before-policy`**: Token is not valid before this time (0 means valid immediately)\n\n## Usage Notes\n\n### Token Expiration\n- The access token expires after **86400 seconds (24 hours)** from issuance\n- Monitor the `expires_in` value and request a new token before expiration\n- Implement token refresh logic in your application to maintain uninterrupted access\n\n### Best Practices\n1. **Secure Storage**: Store client credentials securely using environment variables or secure vaults\n2. **Token Caching**: Cache the access token and reuse it until it expires to minimize token requests\n3. **Error Handling**: Implement proper error handling for authentication failures (401, 403 responses)\n4. **Token Renewal**: Request a new token before the current one expires to avoid service interruptions\n\n### Using the Access Token\nOnce obtained, include the access token in subsequent API requests:\n```\nAuthorization: Bearer {access_token}\n```\n\n## Status Codes\n- **200 OK**: Token successfully generated\n- **400 Bad Request**: Invalid request parameters or grant_type\n- **401 Unauthorized**: Invalid client credentials\n- **500 Internal Server Error**: Server-side error during token generation"
+			},
+			"response": [
+				{
+					"name": "Generate Access token",
+					"originalRequest": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"disabled": true
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"disabled": true
+							}
+						],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "grant_type",
+									"value": "client_credentials"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{AUTH_TOKEN_URL}}",
+							"host": [
+								"{{AUTH_TOKEN_URL}}"
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": null,
+					"header": [
+						{
+							"key": "Date",
+							"value": "Mon, 27 Oct 2025 18:57:26 GMT"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						},
+						{
+							"key": "Content-Length",
+							"value": "1584"
+						},
+						{
+							"key": "Connection",
+							"value": "keep-alive"
+						},
+						{
+							"key": "Cache-Control",
+							"value": "no-store"
+						},
+						{
+							"key": "Set-Cookie",
+							"value": "KC_RESTART=; Version=1; Expires=Thu, 01-Jan-1970 00:00:10 GMT; Max-Age=0; Path=/auth/realms/fin-dev/; Secure; HttpOnly"
+						},
+						{
+							"key": "X-XSS-Protection",
+							"value": "1; mode=block"
+						},
+						{
+							"key": "Pragma",
+							"value": "no-cache"
+						},
+						{
+							"key": "X-Frame-Options",
+							"value": "SAMEORIGIN"
+						},
+						{
+							"key": "Referrer-Policy",
+							"value": "no-referrer"
+						},
+						{
+							"key": "Strict-Transport-Security",
+							"value": "max-age=31536000; includeSubDomains"
+						},
+						{
+							"key": "X-Content-Type-Options",
+							"value": "nosniff"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"access_token\": \"eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICIxRlFKbThMMlVDZElYNDdqT1pDaDZPSFRJbHJFVklESThlZ2ZidnppTk9vIn0.eyJleHAiOjE3NjE2Nzc4NDYsImlhdCI6MTc2MTU5MTQ0NiwianRpIjoiYzMwNzcwMWItY2M2MC00ZmY0LWJiMzEtNDZmYmUxMzQzNGRjIiwiaXNzIjoiaHR0cHM6Ly9pZC5maW5hcmtlaW4uY29tL2F1dGgvcmVhbG1zL2Zpbi1kZXYiLCJhdWQiOlsic2VydmljZS10ZW5hbnQtY29uZmlnIiwiYWNjb3VudCJdLCJzdWIiOiIwYTgzNzNiNS1iNzE5LTQ1NjktOWVhMi0xOGFlMzFmNmU2NTciLCJ0eXAiOiJCZWFyZXIiLCJhenAiOiJjbGllbnQtdHNmc2wtMDNkOTUyZDYiLCJhY3IiOiIxIiwicmVhbG1fYWNjZXNzIjp7InJvbGVzIjpbIm9mZmxpbmVfYWNjZXNzIiwidW1hX2F1dGhvcml6YXRpb24iLCJkZWZhdWx0LXJvbGVzLWZpbi1kZXYiXX0sInJlc291cmNlX2FjY2VzcyI6eyJzZXJ2aWNlLXRlbmFudC1jb25maWciOnsicm9sZXMiOlsidGVuYW50LWNmZzpyZWFkIl19LCJhY2NvdW50Ijp7InJvbGVzIjpbIm1hbmFnZS1hY2NvdW50IiwibWFuYWdlLWFjY291bnQtbGlua3MiLCJ2aWV3LXByb2ZpbGUiXX19LCJzY29wZSI6ImVtYWlsIHByb2ZpbGUiLCJ3b3Jrc3BhY2UiOiJ0c2ZzbCIsImVtYWlsX3ZlcmlmaWVkIjpmYWxzZSwiY2xpZW50SWQiOiJjbGllbnQtdHNmc2wtMDNkOTUyZDYiLCJjbGllbnRIb3N0IjoiNTQuODYuNTAuMTM5Iiwib3JnIjoidHNmc2wiLCJwcmVmZXJyZWRfdXNlcm5hbWUiOiJzZXJ2aWNlLWFjY291bnQtY2xpZW50LXRzZnNsLTAzZDk1MmQ2IiwiY2xpZW50QWRkcmVzcyI6IjU0Ljg2LjUwLjEzOSJ9.UxTgFghjgpXC6dRm2zPFYC3wa_UoqAuZdv3Ib82mmtqxz4fa7H548k9Q8GgBssvC2H1YsqFHhxIWJ9Pbpxohjq8KqWyPw5K2e4tdSNysteoUoBCTNK2FCM7HKDgblY8vdklcSoyo4cGKOyYxsOPqLvIz3xVtdDE7KHHwWmBHMAM6-epHlyEewHZ07DSg-6bk2tbpPpuL2DxA16_lpwtgBLYjy6ThB0yTcZuuMPKRC0XPgUH2xL84yY2cStfwQRRlg_9Gs0az7NeqtZCqFnbCQMsc-v4cS25zVaDb_0-wFIJ2VSYho4JDlXxTsm5UsKmuKRBmpViyx_G58XNQoeEOKw\",\n    \"expires_in\": 86400,\n    \"refresh_expires_in\": 0,\n    \"token_type\": \"Bearer\",\n    \"not-before-policy\": 0,\n    \"scope\": \"email profile\"\n}"
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "current.flowId",
+			"value": "",
+			"type": "any"
+		},
+		{
+			"key": "current.runId",
+			"value": "",
+			"type": "any"
+		},
+		{
+			"key": "flow.anubhav.fin-info.runId",
+			"value": "",
+			"type": "any"
+		},
+		{
+			"key": "flow.aa-data.runId",
+			"value": "",
+			"type": "any"
+		},
+		{
+			"key": "flow.lending-insight.runId",
+			"value": "",
+			"type": "any"
+		},
+		{
+			"key": "flow.anubhav.fin-info.runId",
+			"value": "",
+			"type": "any"
+		},
+		{
+			"key": "flow.anubhav.itr.runId",
+			"value": "",
+			"type": "any"
+		},
+		{
+			"key": "flow.anubhav.itr.reqId",
+			"value": "",
+			"type": "any"
+		},
+		{
+			"key": "current.consentHandle",
+			"value": "",
+			"type": "any"
+		},
+		{
+			"key": "flow.fin-info-report.runId",
+			"value": "",
+			"type": "any"
+		},
+		{
+			"key": "flow.bulk-lending-insight.runId",
+			"value": "",
+			"type": "any"
+		},
+		{
+			"key": "flow.encr-lending-insight.runId",
+			"value": "",
+			"type": "any"
+		},
+		{
+			"key": "current.requestId",
+			"value": "",
+			"type": "any"
+		},
+		{
+			"key": "flow.mikt.requestId",
+			"value": "",
+			"type": "any"
+		},
+		{
+			"key": "flow.mikt.fetch.and.insights.runid",
+			"value": "",
+			"type": "any"
+		},
+		{
+			"key": "flow.bureau-analysis.flowId",
+			"value": "",
+			"type": "any"
+		},
+		{
+			"key": "flow.bureau-analysis.runId",
+			"value": "",
+			"type": "any"
+		},
+		{
+			"key": "flow.encr-bulk-lending-insight.runId",
+			"value": "",
+			"type": "any"
+		},
+		{
+			"key": "flow.hiu-data-fetch.runId",
+			"value": "",
+			"type": "any"
+		},
+		{
+			"key": "flow.hiu-data-fetch.id",
+			"value": "",
+			"type": "any"
+		},
+		{
+			"key": "flow.raxe-cda.flowId",
+			"value": "294df62c-ec76-411a-972d-2e1b9c81fd27",
+			"type": "any"
+		},
+		{
+			"key": "flow.raxe-cda.runId",
+			"value": "",
+			"type": "any"
+		},
+		{
+			"key": "flow.raxe-da.flowId",
+			"value": "",
+			"type": "any"
+		},
+		{
+			"key": "flow.raxe-da.runId",
+			"value": "",
+			"type": "any"
+		},
+		{
+			"key": "flow.raxe-a.flowId",
+			"value": "",
+			"type": "any"
+		},
+		{
+			"key": "flow.raxe-a.runId",
+			"value": "",
+			"type": "any"
+		},
+		{
+			"key": "current.raxe-cda.requestId",
+			"value": "",
+			"type": "any"
+		},
+		{
+			"key": "flow.anubhav.itr.current.session",
+			"value": "",
+			"type": "any"
+		},
+		{
+			"key": "flow.gst-info.id",
+			"value": "",
+			"type": "any"
+		},
+		{
+			"key": "flow.gst-info.runId",
+			"value": "",
+			"type": "any"
+		},
+		{
+			"key": "ayush.current.requestId",
+			"value": "",
+			"type": "any"
+		},
+		{
+			"key": "flow.pdf-lending-insight.id",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "flow.pdf-lending-insight.runId",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "flow.uddh.aa-decider",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "flow.uddh.consent",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "baseUrl",
+			"value": "https://api.finarkein.in/factory/v1",
+			"type": "any"
+		}
+	]
+}

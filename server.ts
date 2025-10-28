@@ -96,13 +96,11 @@ interface WorkspaceCredentials {
  * Fetch credentials from environment variables
  */
 function fetchCredentials(workspace: string): WorkspaceCredentials {
-  const workspaceUpper = workspace.toUpperCase();
-
   // Try workspace-specific env vars first
-  const clientId = process.env[`${workspaceUpper}_AUTH_CLIENT_ID`] || process.env.AUTH_CLIENT_ID;
-  const clientSecret = process.env[`${workspaceUpper}_AUTH_CLIENT_SECRET`] || process.env.AUTH_CLIENT_SECRET;
-  const nervFlowId = process.env[`${workspaceUpper}_NERV_FLOW_ID`] || process.env['nerv.flow.id'];
-  const recurringFlowId = process.env[`${workspaceUpper}_RECURRING_FLOW_ID`] || process.env['recurring.nerv.flow.id'];
+  const clientId = process.env[`${workspace}_AUTH_CLIENT_ID`] || process.env.AUTH_CLIENT_ID;
+  const clientSecret = process.env[`${workspace}_AUTH_CLIENT_SECRET`] || process.env.AUTH_CLIENT_SECRET;
+  const nervFlowId = process.env[`${workspace}_NERV_FLOW_ID`] || process.env['nerv.flow.id'];
+  const recurringFlowId = process.env[`${workspace}_RECURRING_FLOW_ID`] || process.env['recurring.nerv.flow.id'];
 
   if (!clientId || !clientSecret) {
     throw new Error(`Credentials not found for workspace: ${workspace}`);

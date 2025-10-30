@@ -45,7 +45,7 @@ servers:
 - url: https://api.finarkein.in/factory/v1
   description: Finarkein Factory API
 - url: https://id.finarkein.com/auth/realms/fin-dev/protocol/openid-connect
-  description: Authentication Server (OAuth2 Token Endpoint)
+  description: Authentication Server (OAuth2 Token Endpoint)  
 paths:
   /{workspace}/dp/nerv/{flowId}:
     post:
@@ -1916,6 +1916,9 @@ paths:
         type: string
         example: <string>
   /token:
+    servers:
+    - url: https://id.finarkein.com/auth/realms/fin-dev/protocol/openid-connect
+      description: Authentication Server (OAuth2 Token Endpoint)
     post:
       summary: Generate Access Token
       tags:
@@ -2068,14 +2071,6 @@ components:
       scheme: basic
 tags:
   - name: Authentication
-    description: OAuth 2.0 authentication and token management endpoints
-    x-displayName: Authentication
   - name: Nerv
-    description: Nerv workflow and data processing endpoints
-    x-displayName: Nerv API
   - name: Consent templates
-    description: Consent template management and retrieval
-    x-displayName: Consent Templates
   - name: Institutions
-    description: Financial institution information and management
-    x-displayName: Institutions

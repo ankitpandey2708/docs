@@ -1,0 +1,37 @@
+{
+  "name": "my-app",
+  "version": "0.1.0",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "dev": "concurrently \"npm run server\" \"zudoku dev\"",
+    "server": "tsx server.ts",
+    "build": "zudoku build",
+    "preview": "zudoku preview",
+    "lint": "eslint",
+    "knip": "knip"
+  },
+  "dependencies": {
+    "@clerk/clerk-js": "^5.102.0",
+    "concurrently": "^8.2.2",
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2",
+    "react": ">=19.0.0",
+    "react-dom": ">=19.0.0",
+    "zudoku": "0.64.1"
+  },
+  "devDependencies": {
+    "@types/cors": "^2.8.17",
+    "@types/express": "^4.17.21",
+    "@types/node": "^22.18.13",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "@typescript-eslint/eslint-plugin": "^8",
+    "@typescript-eslint/parser": "^8",
+    "eslint": "^8",
+    "knip": "^5.66.4",
+    "tsx": "^4.20.6",
+    "typescript": "^5.9.3"
+  }
+}

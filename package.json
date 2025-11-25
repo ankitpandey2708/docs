@@ -19,7 +19,7 @@
     "express": "^4.18.2",
     "react": ">=19.0.0",
     "react-dom": ">=19.0.0",
-    "zudoku": "0.65.1"
+    "zudoku": "^0.65.1"
   },
   "devDependencies": {
     "@types/cors": "^2.8.17",

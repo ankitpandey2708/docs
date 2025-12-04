@@ -163,16 +163,16 @@ const config: ZudokuConfig = {
     label: "API Catalog",
     // items: ["portfos"],
   },
-  // authentication: {
-  //   type: "clerk",
-  //   clerkPubKey:"pk_test_b3Blbi1ibHVlamF5LTMwLmNsZXJrLmFjY291bnRzLmRldiQ"
-  // },
   authentication: {
-    type: "openid",
-    clientId: "backend-service",
-    issuer: "http://localhost:8080/realms/fin-dev",
-    scopes: ["openid", "profile", "email"] // Optional: add custom scopes if needed
+    type: "clerk",
+    clerkPubKey:"pk_test_b3Blbi1ibHVlamF5LTMwLmNsZXJrLmFjY291bnRzLmRldiQ"
   },
+  // authentication: {
+  //   type: "openid",
+  //   clientId: "backend-service",
+  //   issuer: "http://localhost:8080/realms/fin-dev",
+  //   scopes: ["openid", "profile", "email"] // Optional: add custom scopes if needed
+  // },
   protectedRoutes: {
     "/oauth/callback": () => true,
     "/*": ({ auth }) => auth.isAuthenticated
